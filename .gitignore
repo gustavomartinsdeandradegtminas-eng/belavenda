@@ -1,0 +1,14 @@
+# Configuração local de preview (não precisa no site)
+.claude/
+
+# Sistema operacional
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Logs
+*.log
+
+# Ferramentas de deploy (ficam só na sua máquina)
+deploy.ps1
+deploy.bat

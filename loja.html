@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BelaVenda – Catálogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="bv-icons.js"></script>
+<script src="bv-seed.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#c2185b;--primary-d:#880e4f;--primary-l:#fce4ec;
+  --bg:#fdf4f9;--surface:#fff;--text:#111827;--muted:#6b7280;
+  --border:#fce7f3;--border2:#e5e7eb;
+  --success:#10b981;--warn:#f59e0b;--danger:#ef4444;--info:#2563eb;
+  --grad:linear-gradient(135deg,#880e4f 0%,#c2185b 55%,#e91e8c 100%);
+}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);min-height:100vh}
+.bv-display,.logo,h1,h2,.store-info h1,.store-brand.bv-logo,.boleto-logo{font-family:'Playfair Display',Georgia,serif}
+
+/* HEADER */
+.store-header{background:var(--grad);color:#fff;padding:32px 24px 24px}
+.store-header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
+.store-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;border:3px solid rgba(255,255,255,.4);flex-shrink:0}
+.store-info{flex:1;min-width:0}
+.store-info h1{font-size:1.5rem;font-weight:800;margin-bottom:4px}
+.store-info p{opacity:.85;font-size:.9rem}
+.store-brands{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.store-brand{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:3px 12px;font-size:.78rem;font-weight:600}
+.store-brand.bv-logo{background:rgba(255,255,255,.9);color:var(--primary);font-weight:800}
+/* Rating no header */
+.header-rating{display:flex;align-items:center;gap:8px;margin-top:10px}
+.stars-gold{color:#ffd54f;letter-spacing:1px;font-size:1rem}
+.stars-empty{color:rgba(255,255,255,.3);letter-spacing:1px;font-size:1rem}
+.rating-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 12px;font-size:.82rem;font-weight:700}
+
+/* CART BAR */
+.cart-bar{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.cart-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 24px}
+.cart-bar-left{font-size:.88rem;color:var(--muted)}
+.cart-btn{display:flex;align-items:center;gap:10px;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 20px;cursor:pointer;font-size:.9rem;font-weight:700;transition:background .2s}
+.cart-btn:hover{background:var(--primary-d)}
+.cart-count{background:rgba(255,255,255,.3);border-radius:20px;padding:2px 10px;font-size:.82rem}
+
+/* MAIN */
+.main-inner{max-width:1100px;margin:0 auto;padding:24px}
+.filter-section{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;align-items:center}
+.filter-section span{font-size:.85rem;font-weight:600;color:var(--muted)}
+.filter-chip{padding:7px 16px;border-radius:20px;border:2px solid var(--border);background:var(--surface);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s;color:var(--muted)}
+.filter-chip.active{border-color:var(--primary);background:var(--primary-l);color:var(--primary)}
+.search-wrap{margin-bottom:20px}
+.search-box{display:flex;align-items:center;gap:10px;background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:10px 16px;transition:border-color .2s;max-width:420px}
+.search-box:focus-within{border-color:var(--primary)}
+.search-box input{border:none;background:transparent;outline:none;font-size:.95rem;flex:1;font-family:inherit}
+
+/* PRODUCT GRID */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+.prod-card{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden;transition:transform .2s,box-shadow .2s}
+.prod-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.prod-img{height:140px;background:linear-gradient(135deg,var(--primary-l),#fff);display:flex;align-items:center;justify-content:center;font-size:3.5rem}
+.prod-body{padding:16px}
+.prod-brand{font-size:.72rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.prod-name{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3}
+.prod-cat{font-size:.78rem;color:var(--muted);margin-bottom:12px}
+.prod-price{font-size:1.2rem;font-weight:800;color:var(--text);margin-bottom:12px}
+.prod-actions{display:flex;align-items:center;gap:8px}
+.qty-ctrl{display:flex;align-items:center;border:2px solid var(--border);border-radius:8px;overflow:hidden}
+.qty-ctrl button{background:none;border:none;cursor:pointer;padding:6px 10px;font-size:1rem;color:var(--text);transition:background .2s}
+.qty-ctrl button:hover{background:var(--bg)}
+.qty-ctrl span{padding:0 10px;font-size:.9rem;font-weight:700;min-width:30px;text-align:center}
+.add-btn{flex:1;padding:8px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;transition:background .2s}
+.add-btn:hover{background:var(--primary-d)}
+
+/* ═══ LOJA FECHADA ═══ */
+.loja-fechada-banner{background:linear-gradient(135deg,#b71c1c,#c62828);color:#fff;text-align:center;padding:14px 24px;font-weight:700;font-size:.95rem;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:10px;position:sticky;top:0;z-index:200}
+.loja-fechada-banner span{font-size:1.4rem}
+.loja-fechada-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.loja-fechada-card{background:#fff;border-radius:20px;padding:44px 36px;text-align:center;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.25)}
+.loja-fechada-card h2{font-size:1.5rem;font-weight:800;color:#b71c1c;margin:16px 0 8px}
+.loja-fechada-card p{color:#757575;font-size:.95rem;line-height:1.6;margin-bottom:24px}
+.loja-fechada-card a{display:inline-block;padding:12px 28px;background:#c2185b;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;font-size:.9rem}
+.loja-fechada-card a:hover{background:#880e4f}
+.cart-btn:disabled,.add-btn:disabled{opacity:.4;cursor:not-allowed!important}
+
+/* ═══ AVALIAÇÕES ═══ */
+.reviews-section{max-width:1100px;margin:0 auto;padding:32px 24px 52px;border-top:2px solid var(--border)}
+.reviews-section h2{font-size:1.2rem;font-weight:800;margin-bottom:20px;color:var(--text);display:flex;align-items:center;gap:8px}
+.reviews-summary{display:flex;gap:28px;margin-bottom:28px;align-items:flex-start;flex-wrap:wrap}
+.avg-block{text-align:center;flex-shrink:0}
+.avg-num{font-size:3.8rem;font-weight:900;line-height:1;color:var(--text)}
+.avg-stars{font-size:1.4rem;color:#ffc107;margin:6px 0 2px}
+.avg-label{font-size:.78rem;color:var(--muted)}
+.bars-block{flex:1;min-width:200px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:.8rem;color:var(--muted)}
+.bar-track{flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;background:#ffc107;border-radius:4px;transition:width .5s}
+.review-card{background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px 18px;margin-bottom:10px}
+.review-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.review-nome{font-weight:700;font-size:.9rem}
+.review-data{font-size:.74rem;color:var(--muted)}
+.review-stars{font-size:.95rem;color:#ffc107;margin-bottom:6px}
+.review-stars .empty{color:#e0e0e0}
+.review-text{font-size:.88rem;color:var(--text);line-height:1.5}
+
+/* CART DRAWER */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;visibility:hidden;transition:all .3s}
+.cart-overlay.open{opacity:1;visibility:visible}
+.cart-drawer{position:fixed;top:0;right:0;bottom:0;width:400px;background:var(--surface);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s;box-shadow:-4px 0 20px rgba(0,0,0,.15)}
+.cart-overlay.open .cart-drawer{transform:translateX(0)}
+.cart-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cart-header h2{font-size:1.1rem;font-weight:700}
+.cart-close{background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--muted);padding:4px}
+.cart-items{flex:1;overflow-y:auto;padding:16px 24px}
+.cart-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f5f5f5}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:.9rem;font-weight:600;margin-bottom:2px}
+.cart-item-brand{font-size:.78rem;color:var(--muted)}
+.cart-item-price{font-size:.88rem;font-weight:700;color:var(--primary);margin-top:4px}
+.cart-item-ctrl{display:flex;align-items:center;gap:6px}
+.cart-item-ctrl button{background:var(--bg);border:1px solid var(--border);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:.9rem}
+.cart-item-ctrl span{font-size:.9rem;font-weight:700;min-width:20px;text-align:center}
+.cart-item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem}
+.cart-footer{padding:20px 24px;border-top:1px solid var(--border)}
+.cart-total{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:700;margin-bottom:16px}
+.checkout-btn{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s}
+.checkout-btn:hover{background:var(--primary-d)}
+
+/* CHECKOUT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:all .3s}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{background:var(--surface);border-radius:18px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;transform:translateY(20px);transition:transform .3s;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-hd{padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.modal-hd-title{font-weight:800;font-size:1.05rem;color:var(--text)}
+.modal-close{background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--bg)}
+.modal-body{padding:22px 24px}
+.modal-foot{padding:12px 24px 20px;display:flex;gap:10px}
+
+/* ═══ CHECKOUT STEPS ═══ */
+.csteps{display:flex;margin-bottom:24px}
+.cstep{flex:1;text-align:center;font-size:.72rem;font-weight:700;color:var(--muted);position:relative}
+.cstep.active{color:var(--primary)}
+.cstep.done{color:var(--success)}
+.cstep-circle{width:24px;height:24px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:.72rem;background:#fff;position:relative;z-index:1}
+.cstep.done .cstep-circle{background:var(--success);color:#fff;border-color:var(--success)}
+.cstep-label{font-size:.68rem;letter-spacing:.2px}
+.cstep-line{position:absolute;left:calc(50% + 13px);right:calc(-50% + 13px);top:11px;height:2px;background:var(--border);z-index:0}
+.cstep.done .cstep-line{background:var(--success)}
+
+/* FORM */
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 13px;border:2px solid var(--border);border-radius:9px;font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit;background:#fff;color:var(--text)}
+.form-group input:focus,.form-group select:focus{border-color:var(--primary)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-hint{font-size:.75rem;color:var(--muted);margin-top:4px}
+
+/* RESUMO */
+.resumo-box{background:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:16px;border:1px solid var(--border)}
+.resumo-title{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.resumo-row{display:flex;justify-content:space-between;font-size:.88rem;padding:2px 0}
+.resumo-total{display:flex;justify-content:space-between;font-weight:800;font-size:.98rem;border-top:1px solid var(--border);margin-top:8px;padding-top:8px}
+
+/* ═══ MÉTODO DE PAGAMENTO ═══ */
+.pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.pay-method{border:2px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;font-family:inherit}
+.pay-method:hover{border-color:var(--primary);background:var(--primary-l)}
+.pay-method.sel{border-color:var(--primary);background:var(--primary-l);box-shadow:0 0 0 3px rgba(194,24,91,.1)}
+.pay-method-icon{font-size:1.6rem;margin-bottom:6px;display:block}
+.pay-method-name{font-size:.82rem;font-weight:700;color:var(--text)}
+.pay-method-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+
+/* ═══ PIX ═══ */
+.pix-box{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:2px solid #81c784;border-radius:14px;padding:24px;text-align:center}
+.pix-title{font-size:1rem;font-weight:800;color:#1b5e20;margin-bottom:16px}
+.pix-qr{margin:0 auto 16px;display:block}
+.pix-amount{font-size:1.5rem;font-weight:900;color:#1b5e20;margin-bottom:16px}
+.pix-key-wrap{background:#fff;border:1px solid #a5d6a7;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.pix-key-text{flex:1;font-size:.74rem;font-family:monospace;color:#1b5e20;word-break:break-all;text-align:left}
+.copy-btn{padding:6px 14px;background:var(--success);color:#fff;border:none;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .2s;flex-shrink:0}
+.copy-btn:hover{background:#388e3c}
+.pix-timer{font-size:.85rem;color:#2e7d32;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.pix-tip{font-size:.78rem;color:#388e3c;margin-top:10px;line-height:1.5}
+
+/* ═══ CARTÃO ═══ */
+.virtual-card{background:linear-gradient(135deg,#1a237e 0%,#283593 50%,#3949ab 100%);border-radius:16px;padding:22px;color:#fff;margin-bottom:18px;box-shadow:0 8px 24px rgba(26,35,126,.3);position:relative;overflow:hidden}
+.virtual-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05)}
+.vc-chip{width:36px;height:26px;background:linear-gradient(135deg,#ffd54f,#ffca28);border-radius:4px;margin-bottom:16px}
+.vc-number{font-size:1rem;letter-spacing:4px;font-family:'Courier New',monospace;margin-bottom:14px;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.vc-footer{display:flex;justify-content:space-between;align-items:flex-end}
+.vc-label{font-size:.58rem;opacity:.6;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.vc-value{font-size:.82rem;font-weight:600;letter-spacing:1px}
+.vc-brand{font-size:1.8rem;opacity:.9}
+input[id="card-num"]{letter-spacing:3px;font-family:'Courier New',monospace;font-size:1rem}
+
+/* ═══ BOLETO ═══ */
+.boleto-box{background:#f8f9fa;border:1px solid var(--border);border-radius:12px;padding:22px}
+.boleto-logo{font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:4px}
+.boleto-logo span{color:var(--danger)}
+.boleto-banco{font-size:.75rem;color:var(--muted);margin-bottom:16px}
+.boleto-barcode{height:72px;background:repeating-linear-gradient(90deg,#000 0px,#000 1px,transparent 1px,transparent 3px,#000 3px,#000 5px,transparent 5px,transparent 7px,#000 7px,#000 8px,transparent 8px,transparent 12px,#000 12px,#000 14px,transparent 14px,transparent 18px);border-radius:3px;margin:12px 0}
+.boleto-num{font-size:.72rem;font-family:monospace;text-align:center;color:var(--text);word-break:break-all;padding:4px}
+.boleto-info{display:flex;justify-content:space-between;margin-top:12px;font-size:.78rem;color:var(--muted)}
+
+/* ═══ PROCESSANDO ═══ */
+.processing-screen{text-align:center;padding:36px 20px}
+@keyframes spin360{to{transform:rotate(360deg)}}
+.proc-spinner{width:52px;height:52px;border:4px solid var(--primary-l);border-top-color:var(--primary);border-radius:50%;animation:spin360 .8s linear infinite;margin:0 auto 16px}
+.proc-dots span{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--primary);margin:0 3px;animation:dots 1.2s ease infinite}
+.proc-dots span:nth-child(2){animation-delay:.2s}
+.proc-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dots{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* SUCCESS */
+.success-screen{text-align:center;padding:36px 20px}
+@keyframes popIn{0%{transform:scale(0);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.success-icon{font-size:4rem;display:block;margin:0 auto 16px;animation:popIn .5s ease forwards}
+.success-screen h2{font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--text)}
+.success-screen p{color:var(--muted);font-size:.9rem;margin-bottom:24px;line-height:1.6}
+.wa-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none}
+.tx-badge{background:#e8f5e9;color:var(--success);border-radius:8px;padding:8px 14px;font-size:.82rem;font-weight:600;margin-bottom:16px;display:inline-block}
+
+/* BTNS */
+.btn{padding:10px 22px;border-radius:9px;font-size:.92rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-d)}
+.btn-secondary{background:var(--bg);color:var(--text);border:2px solid var(--border)}.btn-secondary:hover{background:var(--border)}
+.btn-success{background:var(--success);color:#fff;width:100%;padding:14px;font-size:1rem}.btn-success:hover{background:#388e3c}
+.btn-full{width:100%}
+.pay-btn{width:100%;padding:14px;font-size:1rem;font-weight:800;border:none;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:8px}
+.pay-btn-pix{background:#1b5e20;color:#fff}.pay-btn-pix:hover{background:#2e7d32}
+.pay-btn-card{background:#1a237e;color:#fff}.pay-btn-card:hover{background:#283593}
+.pay-btn-boleto{background:#bf360c;color:#fff}.pay-btn-boleto:hover{background:#d84315}
+
+/* MOBILE */
+@media(max-width:600px){
+  .cart-drawer{width:100%}
+  .prod-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .prod-body{padding:12px}
+  .prod-img{height:110px;font-size:2.5rem}
+  .store-header-inner{flex-direction:column}
+  .pay-methods{grid-template-columns:1fr 1fr}
+  .modal{border-radius:14px}
+}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:3rem;margin-bottom:12px}
+.not-found{max-width:400px;margin:80px auto;text-align:center;padding:24px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="empty" style="padding:80px"><div class="empty-icon"><svg class="ic ic-xl"><use href="#ic-hourglass"/></svg></div><p>Carregando...</p></div>
+</div>
+<div id="reviews-root"></div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCartIfOut(event)">
+  <div class="cart-drawer">
+    <div class="cart-header">
+      <h2><svg class="ic"><use href="#ic-shopping-cart"/></svg> Meu Pedido</h2>
+      <button class="cart-close" onclick="closeCart()"><svg class="ic"><use href="#ic-x"/></svg></button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <p style="color:var(--muted);text-align:center;padding:30px">Nenhum item adicionado</p>
+    </div>
+    <div class="cart-footer" id="cart-footer" style="display:none">
+      <div class="cart-total"><span>Total</span><span id="cart-total-val">R$ 0,00</span></div>
+      <button class="checkout-btn" onclick="abrirCheckout()">Finalizar Pedido →</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkout-overlay">
+  <div class="modal" id="checkout-modal">
+    <div class="modal-hd">
+      <span class="modal-hd-title" id="modal-hd-title">Finalizar Pedido</span>
+      <button class="modal-close" onclick="fecharCheckout()"><svg class="ic"><use href="#ic-x"/></svg></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
+  </div>
+</div>
+
+<script src="belavenda-api.js"></script>
+<script>
+// ─── UTILS ────────────────────────────────────────────────
+const fmtM=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')
+const uid=()=>crypto.randomUUID()
+const now=()=>new Date().toISOString()
+const fmtData=d=>d?new Date(d).toLocaleDateString('pt-BR'):'—'
+
+// ─── STATE ────────────────────────────────────────────────
+const params=new URLSearchParams(location.search)
+const slug=params.get('slug')||''
+let revendedora=null, produtos=[], cart={}, marcaFiltro='Todas', buscaQ=''
+
+// ─── DB ───────────────────────────────────────────────────
+function findRev(slug){return(JSON.parse(localStorage.getItem('bv_revendedoras')||'[]')).find(r=>r.slugLoja===slug)||null}
+function getProds(revId){return JSON.parse(localStorage.getItem('bv_produtos_'+revId)||'[]').filter(p=>p.visivelCatalogo)}
+function savePedido(p,revId){const k='bv_pedidos_'+revId,a=JSON.parse(localStorage.getItem(k)||'[]');a.push(p);localStorage.setItem(k,JSON.stringify(a))}
+function getAvaliacoes(revId){return JSON.parse(localStorage.getItem('bv_avaliacoes_'+revId)||'[]')}
+function getClienteSession(){return JSON.parse(localStorage.getItem('bv_cliente_session')||'null')}
+
+// ─── STARS ────────────────────────────────────────────────
+function starsHTML(n,max=5,gold='#ffc107',empty='#e0e0e0'){
+  const r=Math.round(n)
+  return`<span style="color:${gold}">${icon('star-filled').repeat(r)}</span><span style="color:${empty}">${icon('star').repeat(max-r)}</span>`
+}
+function avgRating(avs){return avs.length?avs.reduce((s,a)=>s+a.estrelas,0)/avs.length:0}
+
+// ─── FAKE PIX QR ──────────────────────────────────────────
+function pixQRSVG(){
+  const S=4,N=21,cells=[]
+  function finder(ox,oy){
+    for(let r=0;r<7;r++)for(let c=0;c<7;c++){
+      const border=r===0||r===6||c===0||c===6
+      const inner=r>=2&&r<=4&&c>=2&&c<=4
+      if(border||inner)cells.push(`<rect x="${(ox+c)*S}" y="${(oy+r)*S}" width="${S-1}" height="${S-1}" fill="#000"/>`)
+    }
+  }
+  finder(0,0);finder(14,0);finder(0,14)
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    if((r<8&&c<8)||(r<8&&c>=13)||(r>=13&&c<8))continue
+    if(Math.abs(Math.sin(r*17+c*31+r*c*7))>0.45)cells.push(`<rect x="${c*S}" y="${r*S}" width="${S-1}" height="${S-1}" fill="#000"/>`)
+  }
+  return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${N*S} ${N*S}" width="150" height="150" style="border-radius:8px;border:8px solid #fff;background:#fff">${cells.join('')}</svg>`
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+window.onload=function(){
+  if(!slug){showNotFound('URL inválida.');return}
+  revendedora=findRev(slug)
+  if(!revendedora){showNotFound(`Loja "${slug}" não encontrada.`);return}
+  produtos=getProds(revendedora.id)
+  renderPage()
+}
+
+function isLojaAberta(){return revendedora?.lojaAberta!==false}
+
+function showNotFound(msg){
+  document.getElementById('app').innerHTML=`<div class="not-found"><div style="font-size:4rem;margin-bottom:16px">`+icon('search','ic-xl')+`</div><h1>Loja não encontrada</h1><p>${msg}</p></div>`
+}
+
+// ─── RENDER PAGE ──────────────────────────────────────────
+function renderPage(){
+  const aberta=isLojaAberta()
+  const avs=getAvaliacoes(revendedora.id)
+  const avg=avgRating(avs)
+  const marcas=[...new Set(produtos.map(p=>p.marca))].filter(Boolean)
+  const ini=revendedora.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
+  const cli=getClienteSession()
+  document.title=`${revendedora.nome} – BelaVenda`
+
+  document.getElementById('app').innerHTML=`
+    ${!aberta?`<div class="loja-fechada-banner">
+      <span>`+icon('lock-closed','ic-lg')+`</span>
+      Esta loja está temporariamente fechada e não está aceitando pedidos no momento
+    </div>`:''}
+    <div class="store-header">
+      <div class="store-header-inner">
+        <div class="store-avatar">${ini}</div>
+        <div class="store-info">
+          <h1>${revendedora.nome}</h1>
+          <p>`+icon('map-pin')+` ${revendedora.cidade}, ${revendedora.estado}
+            ${aberta
+              ?`<span style="margin-left:10px;background:rgba(255,255,255,.2);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700"><span style="color:var(--success)">`+icon('circle-green')+`</span> Aberta</span>`
+              :`<span style="margin-left:10px;background:rgba(0,0,0,.25);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700">`+icon('lock-closed')+` Fechada</span>`}
+          </p>
+          <div class="store-brands">
+            <span class="store-brand bv-logo">BelaVenda</span>
+            ${marcas.map(m=>`<span class="store-brand">${m}</span>`).join('')}
+          </div>
+          ${avs.length?`
+          <div class="header-rating">
+            <span class="stars-gold">${icon('star-filled').repeat(Math.round(avg))}</span>
+            <span class="stars-empty">${icon('star').repeat(5-Math.round(avg))}</span>
+            <span class="rating-badge">${avg.toFixed(1)} · ${avs.length} avaliaç${avs.length>1?'ões':'ão'}</span>
+          </div>`:`<div class="header-rating"><span style="opacity:.65;font-size:.82rem;margin-top:6px">Sem avaliações ainda</span></div>`}
+        </div>
+        ${cli?`<div style="margin-left:auto;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:12px;padding:10px 16px;color:#fff;font-size:.85rem;text-align:right;flex-shrink:0">
+          <div style="font-weight:700">Olá, ${cli.nome.split(' ')[0]}! `+icon('hand-wave')+`</div>
+          <a href="cliente.html" style="color:rgba(255,255,255,.8);font-size:.78rem">← Área do cliente</a>
+        </div>`:''}
+      </div>
+    </div>
+    <div class="cart-bar">
+      <div class="cart-bar-inner">
+        <span class="cart-bar-left">${produtos.length} produto(s) disponíve${produtos.length===1?'l':'is'}</span>
+        <button class="cart-btn" onclick="${aberta?'openCart()':'void(0)'}" ${aberta?'':'disabled title="Loja fechada"'}>
+          `+icon('shopping-cart')+` Meu Pedido <span class="cart-count" id="cart-badge">0 itens</span>
+        </button>
+      </div>
+    </div>
+    <div class="main-inner">
+      <div class="search-wrap">
+        <div class="search-box"><span>`+icon('search')+`</span><input type="text" placeholder="Buscar produto..." oninput="setBusca(this.value)"></div>
+      </div>
+      <div class="filter-section">
+        <span>Marca:</span>
+        <button class="filter-chip${marcaFiltro==='Todas'?' active':''}" onclick="setMarca('Todas')">Todas</button>
+        ${marcas.map(m=>`<button class="filter-chip${marcaFiltro===m?' active':''}" onclick="setMarca('${m}')">${m}</button>`).join('')}
+      </div>
+      <div class="prod-grid" id="prod-grid">${renderProdCards()}</div>
+    </div>`
+
+  renderReviewsSection(avs)
+  updateCartBadge()
+}
+
+function renderReviewsSection(avs){
+  const root=document.getElementById('reviews-root')
+  if(!avs.length){root.innerHTML='';return}
+  const avg=avgRating(avs)
+  // distribuição por estrelas
+  const dist=[5,4,3,2,1].map(n=>({n,count:avs.filter(a=>a.estrelas===n).length}))
+  const maxCount=Math.max(...dist.map(d=>d.count),1)
+  root.innerHTML=`
+    <div class="reviews-section">
+      <h2><span style="color:#ffc107">`+icon('star')+`</span> Avaliações <span style="font-size:.9rem;font-weight:400;color:var(--muted)">(${avs.length})</span></h2>
+      <div class="reviews-summary">
+        <div class="avg-block">
+          <div class="avg-num">${avg.toFixed(1)}</div>
+          <div class="avg-stars">${starsHTML(avg,5,'#ffc107','#e0e0e0')}</div>
+          <div class="avg-label">${avs.length} avaliaç${avs.length>1?'ões':'ão'}</div>
+        </div>
+        <div class="bars-block">
+          ${dist.map(d=>`
+          <div class="bar-row">
+            <span style="width:14px">${d.n}</span>
+            <span style="color:#ffc107;font-size:.82rem">${icon('star-filled')}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round(d.count/maxCount*100)}%"></div></div>
+            <span style="width:18px;text-align:right">${d.count}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+      ${avs.slice().sort((a,b)=>new Date(b.data)-new Date(a.data)).map(a=>`
+        <div class="review-card">
+          <div class="review-head">
+            <span class="review-nome">`+icon('user')+` ${a.clienteNome}</span>
+            <span class="review-data">${fmtData(a.data)}</span>
+          </div>
+          <div class="review-stars">${starsHTML(a.estrelas)}</div>
+          ${a.comentario?`<div class="review-text">"${a.comentario}"</div>`:''}
+        </div>`).join('')}
+    </div>`
+}
+
+// ─── PRODUCTS ─────────────────────────────────────────────
+const CAT_EMOJI_FB={Maquiagem:'lipstick',Perfumaria:'perfume',Skincare:'droplet',Cabelos:'hair-comb','Corpo e Banho':'lotion',Unhas:'nail-polish','Proteção Solar':'sun',Solar:'sun','Sobrancelhas e Cílios':'eye',Masculino:'person-beard',Cuidados:'sparkles',Outros:'sparkles'}
+
+function getProdImg(p){
+  // Render: URL/data URI -> <img>; senão é um NOME DE ÍCONE -> icon()
+  const imagem=p.imagem
+  if(imagem&&/^(https?:|data:)/.test(imagem)){
+    const fb=CAT_EMOJI_FB[p.categoria]||'sparkles'
+    return`<img src="${imagem}" style="width:100%;height:100%;object-fit:cover;border-radius:0" loading="lazy" onerror="this.parentElement.innerHTML=icon('${fb}','ic-xl');">`
+  }
+  if(imagem) return icon(imagem,'ic-xl')
+  return icon(CAT_EMOJI_FB[p.categoria]||'sparkles','ic-xl')
+}
+
+function renderProdCards(){
+  const aberta=isLojaAberta()
+  let list=produtos
+  if(marcaFiltro!=='Todas')list=list.filter(p=>p.marca===marcaFiltro)
+  if(buscaQ)list=list.filter(p=>p.nome.toLowerCase().includes(buscaQ)||p.marca.toLowerCase().includes(buscaQ))
+  if(!list.length)return`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">`+icon('search','ic-xl')+`</div><p>Nenhum produto encontrado</p></div>`
+  return list.map(p=>{
+    const qty=cart[p.id]||0
+    return`<div class="prod-card">
+      <div class="prod-img" style="${p.imagem&&(p.imagem.startsWith('http')||p.imagem.startsWith('data:'))?'padding:0;overflow:hidden':''}">${getProdImg(p)}</div>
+      <div class="prod-body">
+        <div class="prod-brand">${p.marca}</div>
+        <div class="prod-name">${p.nome}</div>
+        <div class="prod-cat">${p.categoria}</div>
+        <div class="prod-price">${fmtM(p.precoVenda)}</div>
+        <div class="prod-actions">
+          ${!aberta
+            ?`<button class="add-btn" disabled style="opacity:.4;cursor:not-allowed;width:100%">Loja fechada</button>`
+            :qty>0
+              ?`<div class="qty-ctrl"><button onclick="decQty('${p.id}')">−</button><span>${qty}</span><button onclick="incQty('${p.id}')">+</button></div>`
+              :`<button class="add-btn" onclick="addToCart('${p.id}')">Adicionar</button>`
+          }
+        </div>
+      </div>
+    </div>`}).join('')
+}
+function reRenderGrid(){const g=document.getElementById('prod-grid');if(g)g.innerHTML=renderProdCards()}
+function setMarca(m){marcaFiltro=m;reRenderGrid()}
+function setBusca(q){buscaQ=q.toLowerCase();reRenderGrid()}
+
+// ─── CART ─────────────────────────────────────────────────
+function addToCart(id){cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge()}
+function incQty(id){cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge();renderCartItems()}
+function decQty(id){cart[id]=(cart[id]||1)-1;if(cart[id]<=0)delete cart[id];reRenderGrid();updateCartBadge();renderCartItems()}
+function removeFromCart(id){delete cart[id];reRenderGrid();updateCartBadge();renderCartItems()}
+function cartItems(){return Object.keys(cart).map(id=>({...produtos.find(p=>p.id===id),qty:cart[id]})).filter(x=>x&&x.id)}
+function cartTotal(){return cartItems().reduce((s,it)=>s+(it.precoVenda||0)*it.qty,0)}
+function cartCount(){return Object.values(cart).reduce((s,n)=>s+n,0)}
+function updateCartBadge(){const b=document.getElementById('cart-badge'),n=cartCount();if(b)b.textContent=n+' ite'+(n===1?'m':'ns')}
+function openCart(){renderCartItems();document.getElementById('cart-overlay').classList.add('open')}
+function closeCart(){document.getElementById('cart-overlay').classList.remove('open')}
+function closeCartIfOut(e){if(e.target===document.getElementById('cart-overlay'))closeCart()}
+function renderCartItems(){
+  const items=cartItems(),el=document.getElementById('cart-items'),ft=document.getElementById('cart-footer')
+  if(!items.length){el.innerHTML='<p style="color:var(--muted);text-align:center;padding:30px">Nenhum item</p>';ft.style.display='none';return}
+  el.innerHTML=items.map(it=>`<div class="cart-item">
+    <div class="cart-item-info">
+      <div class="cart-item-name">${it.nome}</div>
+      <div class="cart-item-brand">${it.marca}</div>
+      <div class="cart-item-price">${fmtM(it.precoVenda)} × ${it.qty} = ${fmtM(it.precoVenda*it.qty)}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <button class="cart-item-del" onclick="removeFromCart('${it.id}')">`+icon('trash')+`</button>
+      <div class="cart-item-ctrl"><button onclick="decQty('${it.id}')">−</button><span>${it.qty}</span><button onclick="incQty('${it.id}')">+</button></div>
+    </div>
+  </div>`).join('')
+  document.getElementById('cart-total-val').textContent=fmtM(cartTotal())
+  ft.style.display='block'
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHECKOUT MULTI-STEP
+// ═══════════════════════════════════════════════════════════
+let chStep=0, chInfo={}, chMetodo='PIX', pixTimerInt=null, pixSec=900
+
+function fecharCheckout(){
+  document.getElementById('checkout-overlay').classList.remove('open')
+  clearInterval(pixTimerInt);pixTimerInt=null
+}
+
+function abrirCheckout(){
+  if(!cartCount())return
+  if(!isLojaAberta()){
+    alert('Esta loja está fechada no momento e não aceita pedidos. Tente novamente mais tarde.')
+    return
+  }
+  closeCart();chStep=1;chInfo={};chMetodo='PIX'
+  clearInterval(pixTimerInt)
+  renderStep()
+  document.getElementById('checkout-overlay').classList.add('open')
+}
+
+function stepBar(current){
+  const steps=[{n:1,l:'Dados'},{n:2,l:'Pagamento'},{n:3,l:'Confirmação'}]
+  return`<div class="csteps">${steps.map((s,i)=>{
+    const cls=s.n<current?'done':s.n===current?'active':''
+    return`<div class="cstep ${cls}">
+      <div class="cstep-circle">${s.n<current?icon('check','ic-sm'):s.n}</div>
+      <div class="cstep-label">${s.l}</div>
+      ${i<steps.length-1?`<div class="cstep-line"></div>`:''}
+    </div>`}).join('')}</div>`
+}
+
+function renderStep(){
+  if(chStep===1) renderStep1()
+  else if(chStep===2) renderStep2()
+  else if(chStep===3) renderStep3()
+}
+
+// ─── STEP 1: DADOS ────────────────────────────────────────
+async function renderStep1(){
+  const cli=getClienteSession()
+  document.getElementById('modal-hd-title').textContent='Finalizar Pedido'
+  const items=cartItems()
+  document.getElementById('modal-body').innerHTML=`
+    ${stepBar(1)}
+    <div class="resumo-box">
+      <div class="resumo-title">Resumo</div>
+      ${items.map(it=>`<div class="resumo-row"><span>${it.qty}× ${it.nome}</span><span>${fmtM(it.precoVenda*it.qty)}</span></div>`).join('')}
+      <div class="resumo-total"><span>Total dos itens</span><span style="color:var(--primary)">${fmtM(cartTotal())}</span></div>
+    </div>
+    ${cli?`<div style="background:#e8f5e9;border:1px solid #c8e6c9;border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:.85rem;color:#2e7d32">`+icon('check')+` Identificado como <strong>${cli.nome}</strong></div>`:''}
+    <div class="form-group"><label>Seu nome *</label><input id="ch-nome" value="${cli?.nome||''}" placeholder="Nome completo"></div>
+    <div class="form-group"><label>WhatsApp *</label><input id="ch-wa" type="tel" value="${cli?.whatsapp||''}" placeholder="+55 41 99999-0000"></div>
+    <div class="form-group">
+      <label>CEP de entrega</label>
+      <input id="ch-cep" type="text" inputmode="numeric" placeholder="00000-000" maxlength="9" value="${cli?.cep||''}" oninput="onChCepInput(this)">
+      <div class="form-hint">Informe o CEP para calcular o frete</div>
+    </div>
+    <div class="form-group"><label>Endereço de entrega</label><input id="ch-end" placeholder="Rua, número, bairro, cidade..."><div class="form-hint">Complemento do endereço</div></div>
+    <div id="delivery-section-wrap"></div>`
+  document.getElementById('modal-foot').innerHTML=`
+    <button class="btn btn-secondary" onclick="fecharCheckout()">Cancelar</button>
+    <button class="btn btn-primary" onclick="nextStep1()" style="flex:1">Continuar →</button>`
+  // Se já tem CEP pré-preenchido, carrega frete
+  const cepInicial=(cli?.cep||'').replace(/\D/g,'')
+  if(cepInicial.length===8) carregarOpcoesEntrega(cepInicial)
+}
+
+function onChCepInput(el){
+  let v=el.value.replace(/\D/g,'')
+  if(v.length>5)v=v.slice(0,5)+'-'+v.slice(5,8)
+  el.value=v
+  chInfo.entrega=null
+  if(v.replace(/\D/g,'').length===8) carregarOpcoesEntrega(v.replace(/\D/g,''))
+  else document.getElementById('delivery-section-wrap').innerHTML=''
+}
+
+async function carregarOpcoesEntrega(toCEP){
+  const wrap=document.getElementById('delivery-section-wrap')
+  if(!wrap)return
+  wrap.innerHTML=`<div style="padding:16px;text-align:center;color:var(--muted);font-size:.85rem">`+icon('motorcycle')+` Calculando opções de entrega...</div>`
+  try{
+    const fromCEP=(revendedora.cep||'').replace(/\D/g,'')
+    // Passa coords da revendedora se já existirem (evita geocoding extra)
+    const fromCoords=(revendedora.lat&&revendedora.lng)?{lat:revendedora.lat,lng:revendedora.lng}:undefined
+    const items=cartItems()
+    let opts=[]
+    if(window.BV&&BV.delivery){
+      opts=await BV.delivery.quote({fromCEP,toCEP,fromCoords,items})
+    }
+    if(!opts||!opts.length){wrap.innerHTML='';return}
+
+    const fmtPreco=v=>{
+      if(v===null||v===undefined) return '<span style="color:var(--muted);font-size:.8rem">Indisponível</span>'
+      if(v===0) return '<span style="color:var(--success);font-weight:800;font-size:.9rem">Grátis</span>'
+      return `<strong style="font-size:.95rem">${fmtM(v)}</strong>`
+    }
+
+    wrap.innerHTML=`
+      <div style="margin:18px 0 0">
+        <div style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+          ${icon('motorcycle')} Opções de entrega${opts[0]?.distKm?` <span style="font-weight:400;font-size:.75rem;color:var(--muted)">(${opts[0].distKm} km até você)</span>`:''}
+        </div>
+        <div id="delivery-opts-list">
+          ${opts.map(opt=>`
+            <div class="delivery-opt${opt.unavailable?' delivery-opt-unavail':''}" style="${opt.unavailable?'opacity:.5;cursor:default':''}"
+              onclick="${opt.unavailable?'':'selecionarEntrega('+JSON.stringify(opt).replace(/"/g,'&quot;')+')'}">
+              <div style="flex-shrink:0;width:40px;text-align:center;line-height:1">${icon(opt.logo,'ic-lg')}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:.9rem;font-weight:700;color:var(--text)">${opt.name}</div>
+                <div style="font-size:.75rem;color:var(--primary);font-weight:600;margin-top:1px">${opt.etaLabel}</div>
+                <div style="font-size:.73rem;color:var(--muted);margin-top:2px">${opt.desc}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;min-width:56px">${fmtPreco(opt.price)}</div>
+            </div>`).join('')}
+        </div>
+      </div>`
+
+    if(!document.getElementById('delivery-style')){
+      const s=document.createElement('style')
+      s.id='delivery-style'
+      s.textContent=`
+        .delivery-opt{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:12px;
+          border:2px solid var(--border);cursor:pointer;transition:all .18s;background:#fff;margin-bottom:8px}
+        .delivery-opt:hover:not(.delivery-opt-unavail){border-color:var(--primary);background:var(--primary-l)}
+        .delivery-opt.selected{border-color:var(--primary);background:var(--primary-l);box-shadow:0 0 0 3px rgba(194,24,91,.12)}`
+      document.head.appendChild(s)
+    }
+  }catch(e){
+    wrap.innerHTML=`<div style="padding:12px;background:#fff3e0;border-radius:9px;font-size:.82rem;color:#bf360c">
+      ${icon('alert-triangle')} Não foi possível calcular o frete. Combine diretamente com a revendedora.</div>`
+  }
+}
+
+function selecionarEntrega(opt){
+  chInfo.entrega=opt
+  document.querySelectorAll('.delivery-opt').forEach(el=>el.classList.remove('selected'))
+  event.currentTarget.classList.add('selected')
+}
+
+function nextStep1(){
+  const nome=document.getElementById('ch-nome').value.trim()
+  const wa=document.getElementById('ch-wa').value.trim()
+  if(!nome||!wa){
+    if(!nome)document.getElementById('ch-nome').style.borderColor='var(--danger)'
+    if(!wa)document.getElementById('ch-wa').style.borderColor='var(--danger)'
+    return
+  }
+  const cepEl=document.getElementById('ch-cep')
+  const cepDest=(cepEl?.value||'').replace(/\D/g,'')
+  // Se há opções de entrega disponíveis mas nenhuma foi selecionada, exigir seleção
+  const deliveryWrap=document.getElementById('delivery-section-wrap')
+  if(deliveryWrap&&deliveryWrap.querySelector('.delivery-opt')&&!chInfo.entrega){
+    alert('Por favor, selecione um método de entrega.')
+    deliveryWrap.scrollIntoView({behavior:'smooth',block:'center'})
+    return
+  }
+  chInfo={...chInfo,nome,wa,cepDest,endereco:document.getElementById('ch-end').value.trim()}
+  chStep=2;renderStep()
+}
+
+// ─── STEP 2: PAGAMENTO ────────────────────────────────────
+function renderStep2(){
+  document.getElementById('modal-hd-title').textContent='Forma de Pagamento'
+  const subtotal=cartTotal()
+  const frete=chInfo.entrega?.price||0
+  const total=subtotal+frete
+  document.getElementById('modal-body').innerHTML=`
+    ${stepBar(2)}
+    <div class="resumo-box">
+      <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:4px"><span>Subtotal</span><span>${fmtM(subtotal)}</span></div>
+      ${chInfo.entrega?`<div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px"><span>${icon('truck')} ${chInfo.entrega.carrier} ${chInfo.entrega.service}</span><span>${chInfo.entrega.price===0?'Grátis':fmtM(chInfo.entrega.price)}</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;color:var(--primary);border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span>Total</span><span>${fmtM(total)}</span></div>
+    </div>
+    <div style="font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Escolha o método:</div>
+    <div class="pay-methods">
+      ${[
+        {id:'PIX',icon:'pix',name:'PIX',sub:'Aprovação imediata'},
+        {id:'CREDITO',icon:'credit-card',name:'Cartão de Crédito',sub:'Até 12×'},
+        {id:'DEBITO',icon:'credit-card',name:'Cartão de Débito',sub:'À vista'},
+        {id:'BOLETO',icon:'barcode',name:'Boleto',sub:'Venc. em 3 dias'},
+      ].map(m=>`
+        <button class="pay-method${chMetodo===m.id?' sel':''}" onclick="selectMetodo('${m.id}')">
+          <span class="pay-method-icon">${icon(m.icon,'ic-lg')}</span>
+          <div class="pay-method-name">${m.name}</div>
+          <div class="pay-method-sub">${m.sub}</div>
+        </button>`).join('')}
+    </div>
+    <div id="pay-form-area"></div>`
+  document.getElementById('modal-foot').innerHTML=`
+    <button class="btn btn-secondary" onclick="()=>{chStep=1;renderStep()}">← Voltar</button>
+    <button id="pay-action-btn" class="btn btn-primary" style="flex:1" onclick="processarPagamento()">Pagar ${fmtM(total)} →</button>`
+  renderPayForm(chMetodo)
+}
+
+function selectMetodo(m){
+  chMetodo=m
+  document.querySelectorAll('.pay-method').forEach(el=>el.classList.remove('sel'))
+  event.currentTarget.classList.add('sel')
+  renderPayForm(m)
+}
+
+function renderPayForm(m){
+  const area=document.getElementById('pay-form-area')
+  if(!area)return
+  if(m==='PIX'){
+    area.innerHTML=`<div style="background:#e8f5e9;border-radius:9px;padding:12px 14px;font-size:.85rem;color:#2e7d32;margin-top:4px">
+      ${icon('check-circle')} Você receberá o QR Code e a chave PIX para pagar. Aprovação em segundos!</div>`
+  } else if(m==='CREDITO'){
+    area.innerHTML=`
+      <div class="virtual-card" id="vc">
+        <div class="vc-chip"></div>
+        <div class="vc-number" id="vc-num">•••• •••• •••• ••••</div>
+        <div class="vc-footer">
+          <div><div class="vc-label">Nome</div><div class="vc-value" id="vc-name">NOME NO CARTÃO</div></div>
+          <div><div class="vc-label">Validade</div><div class="vc-value" id="vc-exp">MM/AA</div></div>
+          <div class="vc-brand" id="vc-brand">${icon('credit-card')}</div>
+        </div>
+      </div>
+      <div class="form-group"><label>Número do Cartão</label><input id="card-num" inputmode="numeric" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCardNum(this)"></div>
+      <div class="form-group"><label>Nome no Cartão</label><input id="card-name" placeholder="COMO ESTÁ NO CARTÃO" oninput="document.getElementById('vc-name').textContent=this.value.toUpperCase()||'NOME NO CARTÃO'" style="text-transform:uppercase"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Validade</label><input id="card-exp" inputmode="numeric" placeholder="MM/AA" maxlength="5" oninput="fmtExpiry(this)"></div>
+        <div class="form-group"><label>CVV</label><input id="card-cvv" inputmode="numeric" placeholder="123" maxlength="4" type="password"></div>
+      </div>
+      <div class="form-group"><label>Parcelas</label><select id="card-parc">${[1,2,3,6,12].map(n=>`<option value="${n}">${n}× de ${fmtM((cartTotal()+(chInfo.entrega?.price||0))/n)}${n>1?' (sem juros)':''}</option>`).join('')}</select></div>`
+  } else if(m==='DEBITO'){
+    area.innerHTML=`
+      <div class="virtual-card" style="background:linear-gradient(135deg,#1b5e20,#2e7d32,#388e3c)" id="vc">
+        <div class="vc-chip"></div>
+        <div class="vc-number" id="vc-num">•••• •••• •••• ••••</div>
+        <div class="vc-footer">
+          <div><div class="vc-label">Nome</div><div class="vc-value" id="vc-name">NOME NO CARTÃO</div></div>
+          <div><div class="vc-label">Validade</div><div class="vc-value" id="vc-exp">MM/AA</div></div>
+          <div class="vc-brand">${icon('credit-card')}</div>
+        </div>
+      </div>
+      <div class="form-group"><label>Número do Cartão</label><input id="card-num" inputmode="numeric" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCardNum(this)"></div>
+      <div class="form-group"><label>Nome no Cartão</label><input id="card-name" placeholder="COMO ESTÁ NO CARTÃO" oninput="document.getElementById('vc-name').textContent=this.value.toUpperCase()||'NOME NO CARTÃO'" style="text-transform:uppercase"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Validade</label><input id="card-exp" inputmode="numeric" placeholder="MM/AA" maxlength="5" oninput="fmtExpiry(this)"></div>
+        <div class="form-group"><label>CVV</label><input id="card-cvv" inputmode="numeric" placeholder="123" maxlength="4" type="password"></div>
+      </div>`
+  } else if(m==='BOLETO'){
+    const due=new Date();due.setDate(due.getDate()+3)
+    area.innerHTML=`<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:9px;padding:12px 14px;font-size:.85rem;color:#e65100;margin-top:4px">
+      ${icon('document')} Boleto gerado ao confirmar. Vencimento em <strong>${due.toLocaleDateString('pt-BR')}</strong>. Pague em qualquer banco ou lotérica.</div>`
+  }
+}
+
+// Card input formatters
+function fmtCardNum(el){
+  let v=el.value.replace(/\D/g,'').slice(0,16)
+  el.value=v.match(/.{1,4}/g)?.join(' ')||v
+  const num=v||'••••••••••••••••'
+  const disp=num.slice(0,4).padEnd(4,'•')+' '+num.slice(4,8).padEnd(4,'•')+' '+num.slice(8,12).padEnd(4,'•')+' '+num.slice(12,16).padEnd(4,'•')
+  const vn=document.getElementById('vc-num');if(vn)vn.textContent=disp
+  const brand=document.getElementById('vc-brand');if(brand){
+    brand.textContent=v.startsWith('4')?'VISA':v.startsWith('5')||v.startsWith('2')?'MC':v.startsWith('3')?'AMEX':'CARTÃO'
+  }
+}
+function fmtExpiry(el){
+  let v=el.value.replace(/\D/g,'').slice(0,4)
+  if(v.length>2)v=v.slice(0,2)+'/'+v.slice(2)
+  el.value=v
+  const ve=document.getElementById('vc-exp');if(ve)ve.textContent=v||'MM/AA'
+}
+function copyText(text,btnId){
+  navigator.clipboard?.writeText(text).catch(()=>{})
+  const b=document.getElementById(btnId);if(!b)return
+  const orig=b.textContent;b.textContent='Copiado!';b.style.background='#388e3c'
+  setTimeout(()=>{b.textContent=orig;b.style.background=''},2200)
+}
+
+// ─── PROCESSAR PAGAMENTO ──────────────────────────────────
+function processarPagamento(){
+  if(chMetodo==='PIX') showPixScreen()
+  else if(chMetodo==='CREDITO'||chMetodo==='DEBITO') processPagarCartao()
+  else if(chMetodo==='BOLETO') showBoletoScreen()
+}
+
+function showPixScreen(){
+  const total=cartTotal()+(chInfo.entrega?.price||0)
+  const pixKey=`belavenda+${revendedora.id.slice(0,8).toUpperCase()}@belavenda.app`
+  pixSec=900
+  document.getElementById('modal-hd-title').textContent='Pagamento PIX'
+  document.getElementById('modal-body').innerHTML=`
+    ${stepBar(2)}
+    <div class="pix-box">
+      <div class="pix-title">${icon('mobile-phone')} Escaneie o QR Code ou copie a chave</div>
+      ${pixQRSVG()}
+      <div class="pix-amount">${fmtM(total)}</div>
+      <div class="pix-key-wrap">
+        <span class="pix-key-text">${pixKey}</span>
+        <button class="copy-btn" id="copy-pix-btn" onclick="copyText('${pixKey}','copy-pix-btn')">Copiar</button>
+      </div>
+      <div class="pix-timer">${icon('stopwatch')} Expira em <span id="pix-time">15:00</span></div>
+      <div class="pix-tip">Abra o app do seu banco → PIX → Pagar com QR ou chave → cole a chave acima</div>
+    </div>`
+  document.getElementById('modal-foot').innerHTML=`
+    <button class="btn btn-secondary" onclick="()=>{chStep=2;renderStep()}">← Mudar método</button>
+    <button class="btn btn-success btn-full" onclick="confirmarPix()" style="flex:1">${icon('check-circle')} Já Paguei</button>`
+  // timer
+  clearInterval(pixTimerInt)
+  pixTimerInt=setInterval(()=>{
+    pixSec--
+    const el=document.getElementById('pix-time')
+    if(el)el.textContent=Math.floor(pixSec/60)+':'+(pixSec%60).toString().padStart(2,'0')
+    if(pixSec<=0){clearInterval(pixTimerInt);if(el)el.textContent='Expirado'}
+  },1000)
+}
+
+function confirmarPix(){
+  clearInterval(pixTimerInt)
+  criarPedido({metodo:'PIX',status:'PAGO',txId:'PIX'+uid().replace(/-/g,'').slice(0,12).toUpperCase(),dataPagamento:now()})
+}
+
+function processPagarCartao(){
+  const num=(document.getElementById('card-num')?.value||'').replace(/\D/g,'')
+  const name=(document.getElementById('card-name')?.value||'').trim()
+  const exp=document.getElementById('card-exp')?.value||''
+  const cvv=(document.getElementById('card-cvv')?.value||'').replace(/\D/g,'')
+  if(num.length<16||!name||exp.length<5||cvv.length<3){
+    alert('Preencha todos os dados do cartão corretamente.');return
+  }
+  const parc=parseInt(document.getElementById('card-parc')?.value||1)
+  const total=cartTotal()+(chInfo.entrega?.price||0)
+  document.getElementById('modal-hd-title').textContent='Processando...'
+  document.getElementById('modal-body').innerHTML=`
+    <div class="processing-screen">
+      <div class="proc-spinner"></div>
+      <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">Processando pagamento...</h3>
+      <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px">Aguarde enquanto confirmamos seu pagamento.</p>
+      <div class="proc-dots"><span></span><span></span><span></span></div>
+    </div>`
+  document.getElementById('modal-foot').innerHTML=''
+  setTimeout(()=>{
+    criarPedido({
+      metodo:chMetodo,status:'PAGO',
+      txId:'CC'+uid().replace(/-/g,'').slice(0,12).toUpperCase(),
+      dataPagamento:now(),
+      ultimos4:num.slice(-4),
+      parcelas:parc,
+      valorParcela:total/parc
+    })
+  },2500)
+}
+
+function showBoletoScreen(){
+  const total=cartTotal()+(chInfo.entrega?.price||0)
+  const due=new Date();due.setDate(due.getDate()+3)
+  const barcodeNum=`3399${Math.random().toString().slice(2,14)} 00010 ${Math.random().toString().slice(2,12)} 0000 ${Math.random().toString().slice(2,8)} 00000000 ${Math.round(total*100).toString().padStart(10,'0')}`
+  document.getElementById('modal-hd-title').textContent='Boleto Bancário'
+  document.getElementById('modal-body').innerHTML=`
+    ${stepBar(2)}
+    <div class="boleto-box">
+      <div class="boleto-logo">Bela<span>Venda</span> Payments</div>
+      <div class="boleto-banco">Banco Bradesco — Boleto de cobrança</div>
+      <div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)">
+        <span><strong>Beneficiário:</strong> ${revendedora.nome}</span>
+        <span><strong>Valor:</strong> ${fmtM(total)}</span>
+      </div>
+      <div class="boleto-barcode"></div>
+      <div class="boleto-num">${barcodeNum}</div>
+      <div class="boleto-info">
+        <span>Vencimento: <strong>${due.toLocaleDateString('pt-BR')}</strong></span>
+        <span>Valor: <strong>${fmtM(total)}</strong></span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:4px">
+      <button class="copy-btn" id="copy-boleto-btn" onclick="copyText('${barcodeNum.replace(/\s/g,'')}','copy-boleto-btn')" style="flex:1;padding:10px">${icon('clipboard')} Copiar Código</button>
+    </div>
+    <p style="font-size:.78rem;color:var(--muted);text-align:center">Pague em qualquer banco, lotérica ou Internet Banking até ${due.toLocaleDateString('pt-BR')}.</p>`
+  document.getElementById('modal-foot').innerHTML=`
+    <button class="btn btn-secondary" onclick="()=>{chStep=2;renderStep()}">← Mudar</button>
+    <button class="btn btn-primary" style="flex:1;background:#bf360c" onclick="confirmarBoleto()">${icon('document')} Confirmar Pedido</button>`
+}
+
+function confirmarBoleto(){
+  criarPedido({metodo:'BOLETO',status:'AGUARDANDO_BOLETO',txId:'BOL'+uid().replace(/-/g,'').slice(0,12).toUpperCase(),dataPagamento:null})
+}
+
+// ─── CRIAR PEDIDO ─────────────────────────────────────────
+function criarPedido(pagamento){
+  clearInterval(pixTimerInt)
+  const items=cartItems()
+  const subtotal=cartTotal()
+  const frete=chInfo.entrega?.price||0
+  const total=subtotal+frete
+  // Cliente
+  const cliKey='bv_clientes_'+revendedora.id
+  const clientes=JSON.parse(localStorage.getItem(cliKey)||'[]')
+  let cli=clientes.find(c=>c.telefone===chInfo.wa)
+  if(!cli){cli={id:uid(),revendedoraId:revendedora.id,nome:chInfo.nome,telefone:chInfo.wa,endereco:chInfo.endereco,criadoEm:now()};clientes.push(cli);localStorage.setItem(cliKey,JSON.stringify(clientes))}
+  // Pedido
+  const pedido={
+    id:uid(),revendedoraId:revendedora.id,clienteFinalId:cli.id,
+    clienteNome:chInfo.nome,clienteTelefone:chInfo.wa,clienteEndereco:chInfo.endereco,
+    cepDestino:chInfo.cepDest||'',
+    valorSubtotal:subtotal,valorFrete:frete,valorTotal:total,
+    formaPagamento:pagamento.metodo,status:'NOVO',
+    dataCriacao:now(),avaliado:false,
+    entrega:chInfo.entrega||null,
+    lucroEstimado:items.reduce((s,it)=>s+((it.precoVenda||0)-(it.precoCusto||0))*it.qty,0),
+    itens:items.map(it=>({produtoId:it.id,nome:it.nome,quantidade:it.qty,precoUnitario:it.precoVenda})),
+    pagamento
+  }
+  savePedido(pedido,revendedora.id)
+  cart={};updateCartBadge();reRenderGrid()
+  showSuccess(pedido,pagamento)
+}
+
+// ─── TELA DE SUCESSO ──────────────────────────────────────
+function showSuccess(pedido,pagamento){
+  const statusMsg={
+    PAGO:icon('check-circle')+' Pagamento confirmado!',
+    AGUARDANDO_PIX:icon('hourglass')+' Aguardando confirmação do PIX',
+    AGUARDANDO_BOLETO:icon('document')+' Pedido registrado — aguardando pagamento do boleto'
+  }
+  const corMsg=pagamento.status==='PAGO'?'#43a047':pagamento.status==='AGUARDANDO_PIX'?'#e65100':'#1976d2'
+  const items=pedido.itens
+  const msg=`Oi ${revendedora.nome.split(' ')[0]}! Fiz meu pedido na BelaVenda:\n`+
+    items.map(it=>`• ${it.quantidade}x ${it.nome}`).join('\n')+
+    `\n\nSubtotal: ${fmtM(pedido.valorSubtotal)}`+
+    (pedido.entrega?`\nFrete: ${pedido.entrega.carrier} ${pedido.entrega.service} — ${pedido.entrega.price===0?'Grátis':fmtM(pedido.entrega.price)}`:'') +
+    `\nTotal: ${fmtM(pedido.valorTotal)}\nPagamento: ${pagamento.metodo}${pagamento.status==='PAGO'?' (PAGO)':''}\nID: #${pedido.id.slice(0,8).toUpperCase()}`
+  document.getElementById('modal-hd-title').textContent=''
+  document.getElementById('modal-body').innerHTML=`
+    <div class="success-screen">
+      <span class="success-icon">${pagamento.status==='PAGO'?icon('party-popper','ic-xl'):icon('mailbox','ic-xl')}</span>
+      <h2>Pedido registrado!</h2>
+      <div class="tx-badge">${statusMsg[pagamento.status]||'Pedido enviado!'}</div>
+      <p>Pedido <strong>#${pedido.id.slice(0,8).toUpperCase()}</strong><br>
+      ${pagamento.ultimos4?`Cartão final <strong>${pagamento.ultimos4}</strong><br>`:''}
+      ${pagamento.parcelas>1?`<strong>${pagamento.parcelas}× de ${fmtM(pedido.valorTotal/pagamento.parcelas)}</strong><br>`:''}
+      Envie a confirmação para <strong>${revendedora.nome}</strong> pelo WhatsApp.</p>
+      <a class="wa-btn" href="https://wa.me/${revendedora.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}" target="_blank">
+        ${icon('chat-bubble')} Confirmar pelo WhatsApp
+      </a>
+    </div>`
+  document.getElementById('modal-foot').innerHTML=`<button class="btn btn-secondary btn-full" onclick="fecharCheckout()">Fechar</button>`
+}
+</script>
+</body>
+</html>
