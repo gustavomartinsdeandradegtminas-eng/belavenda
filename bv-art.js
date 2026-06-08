@@ -80,20 +80,38 @@
   };
 
   // ── Fotos reais (Pexels CDN) por tipo de produto ───────────────
+  // Todas as fotos foram verificadas: sem nomes ou logotipos de marcas visíveis.
   // Fallback automático para a ilustração SVG se a foto não carregar.
   var PHOTO = {
-    lipstick:[6648498,6648494,8433369], gloss:[34321279,6648488,6648494],
-    foundation:[7256108,7256102,27676711], palette:[4889720,396129,32388555],
-    powder:[15657763,7256102,396129], mascara:[7712438,5473382,2688992],
-    blush:[4889720,396129,15657763],
-    perfume:[9790391,10873814,20899863], perfumeWood:[23230653,28606609,9221913],
-    serum:[7321654,8131568,9775170], toner:[3762879,8102129,7321654],
-    cream:[10221858,6690232,36339062], sunscreen:[7466763,8157696,16378487],
-    nail:[6954960,6954964,10609757,2281695], nailRed:[10609757,6954960,2281695],
-    shampoo:[4154194,8167172,13516802], hairoil:[8131568,8167172,9775170],
-    lotion:[14788377,6847856,27742135], soap:[7789606,7032151,7797117],
-    men:[9221913,8747010,30263576], gift:[5632335,1327689,12969358],
-    cosmetic:[5632335,12969358,1327689]
+    // Maquiagem — batons, pós, sombras (close-ups sem embalagem com marca)
+    lipstick:    [7256093, 6648498, 7810570],
+    gloss:       [6648488, 34321279, 7810573],
+    foundation:  [7256108, 7290632, 7256082],
+    palette:     [4889720, 32388555, 7290640],
+    powder:      [15657763, 14801435, 7290206],
+    mascara:     [6473740, 3951888, 7588587],
+    blush:       [2533266, 7290627, 4889720],
+    // Fragrâncias — frascos genéricos/artísticos sem rótulo de marca
+    perfume:     [7670692, 1666404, 20895893],
+    perfumeWood: [7405394, 30263576, 9221913],
+    // Skincare — gotejadores, potes e texturas sem embalagem com marca
+    serum:       [4735937, 16038186, 6914613],
+    toner:       [3762879, 8102129, 7321654],
+    cream:       [10221858, 6690232, 36339062],
+    sunscreen:   [7466763, 8157696, 16378487],
+    // Unhas — aplicação e frascos genéricos
+    nail:        [6954960, 2281695, 6954964],
+    nailRed:     [10609757, 6954960, 1373748],
+    // Cabelos e corpo — frascos minimalistas / ingredientes naturais
+    shampoo:     [4154194, 13516802, 8167172],
+    hairoil:     [8131568, 9775170, 4735937],
+    lotion:      [14788377, 6847856, 27742135],
+    soap:        [7789606, 7032151, 7797117],
+    // Masculino — acessórios de grooming e frasco de colônia sem marca
+    men:         [8789601, 30263576, 5828579],
+    // Presentes e cosméticos em geral
+    gift:        [5632335, 1327689, 12969358],
+    cosmetic:    [5632335, 7290627, 12969358]
   };
   function photoUrl(id){ return 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id + '.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=500&h=500'; }
   function hashStr(s){ s = String(s == null ? '' : s); var h = 0; for (var i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; } return Math.abs(h); }
