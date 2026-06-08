@@ -22,26 +22,33 @@
 body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);display:flex;min-height:100vh}
 .bv-display,.logo,h1,h2{font-family:'Playfair Display',Georgia,serif}
 /* SIDEBAR */
-.sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s}
-.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
-.sidebar-logo h1{color:#fff;font-size:1.4rem;font-weight:800;font-family:'Playfair Display',Georgia,serif}
-.sidebar-logo h1 span{color:var(--primary)}
-.sidebar-logo p{color:rgba(255,255,255,.5);font-size:.75rem;margin-top:2px}
-.sidebar-nav{flex:1;padding:16px 0;overflow-y:auto}
-.nav-section{padding:8px 20px 4px;font-size:.7rem;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-top:8px}
-.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;color:rgba(255,255,255,.7);font-size:.9rem;transition:all .2s;border-left:3px solid transparent;text-decoration:none}
-.nav-item:hover{background:var(--sidebar-hover);color:#fff}
-.nav-item.active{background:rgba(194,24,91,.15);color:#fff;border-left-color:var(--primary)}
-.nav-item-icon{font-size:1.1rem;width:22px;text-align:center}
-.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1)}
-.user-info{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0}
-.user-name{color:#fff;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.user-sub{color:rgba(255,255,255,.4);font-size:.72rem}
-.btn-logout{width:100%;padding:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:rgba(255,255,255,.7);cursor:pointer;font-size:.82rem;transition:all .2s}
-.btn-logout:hover{background:rgba(255,255,255,.15);color:#fff}
+.sidebar{width:258px;background:linear-gradient(185deg,#220c18 0%,#160810 55%,#1c0a13 100%);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s;box-shadow:4px 0 28px rgba(0,0,0,.22);border-right:1px solid rgba(255,255,255,.05)}
+.sidebar::before{content:'';position:absolute;inset:0;background:radial-gradient(130% 45% at 0% 0%,rgba(233,30,140,.14),transparent 62%);pointer-events:none;z-index:0}
+.sidebar>*{position:relative;z-index:1}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:12px}
+.sidebar-logo-mark{width:44px;height:44px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 18px rgba(194,24,91,.5),inset 0 1px 0 rgba(255,255,255,.25);font-family:'Playfair Display',Georgia,serif;font-weight:800;color:#fff;font-size:1.3rem;line-height:1}
+.sidebar-logo-text h1{color:#fff;font-size:1.35rem;font-weight:800;font-family:'Playfair Display',Georgia,serif;line-height:1.05;letter-spacing:.2px}
+.sidebar-logo-text h1 span{background:linear-gradient(120deg,#f48fb1,#e91e8c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar-logo-text p{color:rgba(255,255,255,.42);font-size:.7rem;margin-top:3px;letter-spacing:.3px}
+.sidebar-nav{flex:1;padding:12px;overflow-y:auto}
+.nav-section{padding:14px 12px 6px;font-size:.66rem;font-weight:700;color:rgba(255,255,255,.34);text-transform:uppercase;letter-spacing:1.3px}
+.nav-item{display:flex;align-items:center;gap:13px;padding:10px 12px;margin:2px 0;border-radius:11px;cursor:pointer;color:rgba(255,255,255,.66);font-size:.9rem;font-weight:500;transition:background .2s,color .2s,transform .15s;text-decoration:none;position:relative}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff;transform:translateX(2px)}
+.nav-item:hover .nav-item-icon{color:#f48fb1}
+.nav-item.active{background:linear-gradient(100deg,rgba(194,24,91,.34),rgba(233,30,140,.13));color:#fff;font-weight:600;box-shadow:0 3px 12px rgba(194,24,91,.24)}
+.nav-item.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:4px;height:22px;border-radius:0 4px 4px 0;background:var(--grad);box-shadow:0 0 10px rgba(233,30,140,.75)}
+.nav-item.active .nav-item-icon{color:#fff}
+.nav-item-icon{font-size:1.15rem;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);transition:color .2s;flex-shrink:0}
+.sidebar-footer{padding:14px;border-top:1px solid rgba(255,255,255,.07)}
+.user-info{display:flex;align-items:center;gap:11px;margin-bottom:12px;padding:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06)}
+.user-avatar{width:38px;height:38px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;box-shadow:0 3px 10px rgba(194,24,91,.4)}
+.user-name{color:#fff;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.user-sub{color:rgba(255,255,255,.42);font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.btn-logout{width:100%;padding:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:9px;color:rgba(255,255,255,.72);cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-logout:hover{background:rgba(239,68,68,.16);border-color:rgba(239,68,68,.4);color:#fff}
+.btn-logout .ic{font-size:.95rem}
 /* MAIN */
-.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.main{margin-left:258px;flex:1;display:flex;flex-direction:column;min-height:100vh}
 .topbar{background:var(--grad);color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 3px 16px rgba(194,24,91,.25)}
 .topbar-title{font-size:1.1rem;font-weight:700;color:#fff;font-family:'Playfair Display',Georgia,serif}.hamburger{color:#fff!important}
 .topbar-actions{display:flex;gap:10px;align-items:center}
@@ -161,14 +168,15 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
 
 /* ─── LOJA STATUS ─────────────────────────────────────── */
-.loja-status-pill{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:8px;margin:4px 12px 8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;border:1px solid transparent;user-select:none}
-.loja-status-pill.aberta{background:rgba(67,160,71,.15);color:#2e7d32;border-color:rgba(67,160,71,.35)}
-.loja-status-pill.fechada{background:rgba(229,57,53,.15);color:#c62828;border-color:rgba(229,57,53,.35)}
-.loja-status-pill:hover{opacity:.8;transform:translateX(2px)}
-.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .3s}
-.dot-aberta{background:#43a047;box-shadow:0 0 0 3px rgba(67,160,71,.25),0 0 8px rgba(67,160,71,.4)}
-.dot-fechada{background:#e53935}
-.loja-toggle-badge{margin-left:auto;font-size:.68rem;background:rgba(255,255,255,.2);padding:2px 7px;border-radius:10px;font-weight:600}
+.loja-status-pill{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:12px;margin:4px 0 6px;font-size:.84rem;font-weight:700;cursor:pointer;transition:all .2s;border:1px solid transparent;user-select:none}
+.loja-status-pill.aberta{background:linear-gradient(100deg,rgba(16,185,129,.2),rgba(16,185,129,.08));color:#6ee7b7;border-color:rgba(16,185,129,.35)}
+.loja-status-pill.fechada{background:linear-gradient(100deg,rgba(239,68,68,.2),rgba(239,68,68,.08));color:#fca5a5;border-color:rgba(239,68,68,.35)}
+.loja-status-pill:hover{transform:translateX(2px);filter:brightness(1.12)}
+.status-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;transition:all .3s}
+.dot-aberta{background:#34d399;box-shadow:0 0 0 3px rgba(16,185,129,.25),0 0 10px rgba(16,185,129,.55);animation:bv-pulse 2.4s ease-in-out infinite}
+.dot-fechada{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.2)}
+@keyframes bv-pulse{0%,100%{box-shadow:0 0 0 3px rgba(16,185,129,.25),0 0 10px rgba(16,185,129,.55)}50%{box-shadow:0 0 0 5px rgba(16,185,129,.12),0 0 14px rgba(16,185,129,.75)}}
+.loja-toggle-badge{margin-left:auto;font-size:.66rem;background:rgba(255,255,255,.14);padding:3px 9px;border-radius:20px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:rgba(255,255,255,.85)}
 
 /* ─── KPI LOJA STATUS ─────────────────────────────────── */
 .kpi-loja{cursor:pointer;transition:all .2s;border:2px solid transparent!important}
@@ -201,8 +209,11 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <h1>Bela<span>Venda</span></h1>
-    <p>Painel da Revendedora</p>
+    <div class="sidebar-logo-mark">B</div>
+    <div class="sidebar-logo-text">
+      <h1>Bela<span>Venda</span></h1>
+      <p>Painel da Revendedora</p>
+    </div>
   </div>
   <div class="sidebar-nav">
     <div class="nav-section">Principal</div>
@@ -250,7 +261,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
         <div class="user-sub" id="user-slug"></div>
       </div>
     </div>
-    <button class="btn-logout" onclick="logout()">Sair da conta</button>
+    <button class="btn-logout" onclick="logout()"><svg class="ic"><use href="#ic-arrow-right"/></svg> Sair da conta</button>
   </div>
 </nav>
 
