@@ -93,7 +93,7 @@
     blush:       [2533266, 7290627, 4889720],
     // Fragrâncias — frascos genéricos/artísticos sem rótulo de marca
     perfume:     [7670692, 1666404, 20895893],
-    perfumeWood: [7405394, 30263576, 9221913],
+    perfumeWood: [7405394, 30263576, 14466498],
     // Skincare — gotejadores, potes e texturas sem embalagem com marca
     serum:       [4735937, 16038186, 6914613],
     toner:       [3762879, 8102129, 7321654],
