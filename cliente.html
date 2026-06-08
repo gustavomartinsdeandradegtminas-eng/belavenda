@@ -327,6 +327,34 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .btn-ver:hover{box-shadow:0 5px 16px rgba(233,30,140,.38);transform:translateY(-1px)}
 
 /* ══════════════════════════════════════════════════════
+   TOOLBAR EXPLORAR — categorias, ordenação, filtros
+══════════════════════════════════════════════════════ */
+.cat-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.cat-scroll::-webkit-scrollbar{height:5px}
+.cat-scroll::-webkit-scrollbar-thumb{background:var(--rose-l);border-radius:10px}
+.cat-chip{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:22px;border:1.5px solid var(--border2);background:var(--surface);font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit}
+.cat-chip:hover{border-color:var(--rose-l);color:var(--rose)}
+.cat-chip.active{border-color:transparent;background:var(--grad-primary);color:#fff;box-shadow:0 4px 12px rgba(233,30,140,.3)}
+.sort-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.sort-field{flex:1;min-width:170px}
+.sort-field label{display:block;font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.sort-select{width:100%;padding:9px 13px;border:1.5px solid var(--border2);border-radius:10px;font-size:.84rem;font-family:inherit;background:var(--bg);color:var(--text);font-weight:600;cursor:pointer;outline:none;transition:all .2s}
+.sort-select:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(233,30,140,.1)}
+.toggle-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--bg);font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;user-select:none;white-space:nowrap;align-self:flex-end;margin-bottom:0}
+.toggle-pill.on{border-color:transparent;background:#d1fae5;color:#059669}
+.toggle-pill .dotsw{width:32px;height:18px;border-radius:20px;background:#cbd5e1;position:relative;transition:background .2s;flex-shrink:0}
+.toggle-pill.on .dotsw{background:#10b981}
+.toggle-pill .dotsw::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-pill.on .dotsw::after{transform:translateX(14px)}
+/* Botão favorito no card de loja */
+.fav-btn{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border2);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--muted-l);transition:all .2s;flex-shrink:0;padding:0;font-family:inherit}
+.fav-btn:hover{border-color:var(--rose-mid);color:var(--rose);transform:scale(1.09)}
+.fav-btn.on{border-color:transparent;background:var(--grad-primary);color:#fff;box-shadow:0 4px 13px rgba(233,30,140,.38)}
+.fav-btn .ic{font-size:1.1rem}
+.loja-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.loja-tag{font-size:.68rem;font-weight:700;background:var(--rose-l);color:var(--rose-d);border-radius:8px;padding:2px 8px}
+
+/* ══════════════════════════════════════════════════════
    PEDIDO CARDS
 ══════════════════════════════════════════════════════ */
 .pedido-card{
@@ -706,9 +734,13 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   .auth-card-header{padding:24px 18px 20px}
   .filter-controls{flex-direction:column}
   .slider-wrap,.busca-wrap{width:100%;min-width:unset}
-  .loja-card{flex-wrap:wrap}
+  .loja-card{flex-wrap:wrap;position:relative}
+  .loja-info{padding-right:46px}
+  .fav-btn{position:absolute;top:14px;right:14px;width:38px;height:38px}
   .loja-right{width:100%;display:flex;justify-content:space-between;align-items:center}
   .dist-badge{display:inline-block}
+  .sort-field{min-width:140px}
+  .toggle-pill{align-self:stretch;justify-content:center}
   .match-stack{height:460px;max-width:100%}
   .swipe-btn{width:60px;height:60px;font-size:1.4rem}
   .main{padding:14px 12px 90px}
@@ -796,12 +828,14 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
     <div class="tabs">
       <button class="tab active"  onclick="showTab('match')"><svg class="ic"><use href="#ic-heart-gift"/></svg> Match</button>
       <button class="tab"         onclick="showTab('explorar')"><svg class="ic"><use href="#ic-magnifying-glass"/></svg> Explorar</button>
+      <button class="tab"         onclick="showTab('favoritas')"><svg class="ic"><use href="#ic-heart"/></svg> Favoritas<span id="fav-tab-count"></span></button>
       <button class="tab"         onclick="showTab('pedidos')"><svg class="ic"><use href="#ic-package"/></svg> Pedidos</button>
       <button class="tab"         onclick="showTab('lojas')"><svg class="ic"><use href="#ic-storefront"/></svg> Minhas Lojas</button>
     </div>
 
     <div id="tab-match"></div>
     <div id="tab-explorar" style="display:none"></div>
+    <div id="tab-favoritas" style="display:none"></div>
     <div id="tab-pedidos"  style="display:none"></div>
     <div id="tab-lojas"    style="display:none"></div>
   </div>
@@ -1027,15 +1061,19 @@ function showPainel(){
   document.getElementById('banner-cep').style.display=semCep?'flex':'none'
   renderMatch()
   renderExplorar()
+  renderFavoritas()
   renderPedidos()
   renderMinhasLojas()
+  atualizarBadgeFav()
 }
 
 // ─── TABS ─────────────────────────────────────────────────
-const TAB_NAMES=['match','explorar','pedidos','lojas']
+const TAB_NAMES=['match','explorar','favoritas','pedidos','lojas']
 function showTab(t){
   document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',TAB_NAMES[i]===t))
   TAB_NAMES.forEach(n=>document.getElementById('tab-'+n).style.display=n===t?'':'none')
+  if(t==='favoritas')renderFavoritas()
+  if(t==='explorar')renderExplorar()
 }
 
 // ─── MODAL CEP ────────────────────────────────────────────
@@ -1089,6 +1127,24 @@ function loadCurtidas(){return JSON.parse(localStorage.getItem('bv_curtidas_'+(g
 function loadPasses(){return JSON.parse(localStorage.getItem('bv_passes_'+(getSession()||{}).whatsapp)||'[]')}
 function saveCurtidas(arr){localStorage.setItem('bv_curtidas_'+(getSession()||{}).whatsapp,JSON.stringify(arr))}
 function savePasses(arr){localStorage.setItem('bv_passes_'+(getSession()||{}).whatsapp,JSON.stringify(arr))}
+
+// Favoritas (lojas salvas manualmente pelo cliente)
+function loadFavoritas(){return JSON.parse(localStorage.getItem('bv_favoritas_'+(getSession()||{}).whatsapp)||'[]')}
+function saveFavoritas(arr){localStorage.setItem('bv_favoritas_'+(getSession()||{}).whatsapp,JSON.stringify(arr))}
+function isFav(id){return loadFavoritas().indexOf(id)>=0}
+function toggleFav(id){
+  let f=loadFavoritas(); const i=f.indexOf(id)
+  if(i>=0)f.splice(i,1); else f.push(id)
+  saveFavoritas(f)
+  // re-renderiza a aba ativa e atualiza o contador
+  const ativa=document.querySelector('.tab.active')
+  filtrarLojas(); renderFavoritas(); atualizarBadgeFav()
+}
+function atualizarBadgeFav(){
+  const n=loadFavoritas().length
+  const b=document.getElementById('fav-tab-count')
+  if(b)b.textContent=n?` (${n})`:''
+}
 
 // Estado do deck
 let matchDeck=[], matchIndex=0, curtidas=[], passes=[]
@@ -1516,11 +1572,20 @@ function salvarPrefs(){
 }
 
 // ─── EXPLORAR ─────────────────────────────────────────────
-let raio=5000, buscaProd=''
+let raio=5000, buscaProd='', catFiltro='', ordenar='dist', soAbertas=false
+
+function todasCategorias(){
+  const set=new Set()
+  getRevs().forEach(r=>getProdos(r.id).forEach(p=>{if(p.categoria)set.add(p.categoria)}))
+  return [...set].sort((a,b)=>a.localeCompare(b))
+}
+
 function renderExplorar(){
   const s=getSession(), temLoc=s&&s.lat&&s.lng
   const el=document.getElementById('tab-explorar')
+  if(!el)return
   const locText=temLoc?`${icon('map-pin')} ${s.cidade}, ${s.estado} — CEP ${(s.cep||'').replace(/(\d{5})(\d{3})/,'$1-$2')}`:`${icon('map-pin')} Localização não definida`
+  const cats=todasCategorias()
   el.innerHTML=`
     <div class="loc-chip" onclick="abrirModalCep()" title="Clique para atualizar seu CEP">
       <span>${icon('map-pin')}</span>${locText}<span style="font-size:.75rem;opacity:.6">${icon('pencil')}</span>
@@ -1538,61 +1603,121 @@ function renderExplorar(){
           <label>Distância máxima</label>
           <div class="slider-header">
             <span style="font-size:.78rem;color:var(--muted)">Raio:</span>
-            <span class="slider-value" id="raio-label">${raio} km</span>
+            <span class="slider-value" id="raio-label">${raio>=5000?'tudo':raio+' km'}</span>
           </div>
           <input type="range" id="raio-slider" min="1" max="5000" value="${raio}" oninput="setRaio(this.value)">
-          <div class="slider-ticks"><span>1 km</span><span>50 km</span><span>100 km</span><span>200 km</span></div>
+          <div class="slider-ticks"><span>1 km</span><span>50 km</span><span>100 km</span><span>tudo</span></div>
         </div>
       </div>
+    </div>
+    <div class="cat-scroll">
+      <button class="cat-chip ${catFiltro===''?'active':''}" data-cat="" onclick="setCat('')">${icon('sparkles')} Todas</button>
+      ${cats.map(c=>`<button class="cat-chip ${catFiltro===c?'active':''}" data-cat="${c}" onclick="setCat('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('')}
+    </div>
+    <div class="sort-row">
+      <div class="sort-field">
+        <label>Ordenar por</label>
+        <select class="sort-select" onchange="setOrdenar(this.value)">
+          <option value="dist" ${ordenar==='dist'?'selected':''}>Mais próximas</option>
+          <option value="avaliacao" ${ordenar==='avaliacao'?'selected':''}>Melhor avaliadas</option>
+          <option value="produtos" ${ordenar==='produtos'?'selected':''}>Mais produtos</option>
+          <option value="nome" ${ordenar==='nome'?'selected':''}>Nome (A → Z)</option>
+          ${buscaProd?`<option value="relevancia" ${ordenar==='relevancia'?'selected':''}>Relevância da busca</option>`:''}
+        </select>
+      </div>
+      <div class="toggle-pill ${soAbertas?'on':''}" id="toggle-abertas" onclick="toggleSoAbertas()"><span class="dotsw"></span> Só lojas abertas</div>
     </div>
     <div id="lojas-resultado"><div class="empty"><div class="spinner"></div><p>Buscando...</p></div></div>
   `
   filtrarLojas()
 }
-function setRaio(v){raio=parseInt(v);const el=document.getElementById('raio-label');if(el)el.textContent=raio+(raio>=5000?' km · tudo':' km');filtrarLojas()}
+function setRaio(v){raio=parseInt(v);const el=document.getElementById('raio-label');if(el)el.textContent=(raio>=5000?'tudo':raio+' km');filtrarLojas()}
 function setBusca(v){buscaProd=v.trim().toLowerCase();filtrarLojas()}
-function filtrarLojas(){
-  const s=getSession(), temLoc=s&&s.lat&&s.lng, el=document.getElementById('lojas-resultado')
-  if(!el)return
+function setCat(c){catFiltro=c;document.querySelectorAll('#tab-explorar .cat-chip').forEach(ch=>ch.classList.toggle('active',ch.getAttribute('data-cat')===c));filtrarLojas()}
+function setOrdenar(v){ordenar=v;filtrarLojas()}
+function toggleSoAbertas(){soAbertas=!soAbertas;const t=document.getElementById('toggle-abertas');if(t)t.classList.toggle('on',soAbertas);filtrarLojas()}
+
+function lojasFiltradas(){
+  const s=getSession(), temLoc=s&&s.lat&&s.lng
   let lista=getRevs().map(rev=>{
     const prods=getProdos(rev.id)
     const dist=(temLoc&&rev.lat&&rev.lng)?haversine(s.lat,s.lng,rev.lat,rev.lng):null
     const match=buscaProd?prods.filter(p=>p.nome.toLowerCase().includes(buscaProd)||p.marca.toLowerCase().includes(buscaProd)||p.categoria.toLowerCase().includes(buscaProd)):prods
     return{rev,prods,match,dist}
-  }).filter(({dist,match})=>{
+  }).filter(({rev,prods,dist,match})=>{
     if(buscaProd&&!match.length)return false
+    if(catFiltro&&!prods.some(p=>p.categoria===catFiltro))return false
+    if(soAbertas&&rev.lojaAberta===false)return false
     return dist===null||dist<=raio
-  }).sort((a,b)=>(a.dist??9999)-(b.dist??9999))
+  })
+  const avg=r=>avgRatingRev(r.id)
+  if(ordenar==='avaliacao')      lista.sort((a,b)=>avg(b.rev)-avg(a.rev))
+  else if(ordenar==='produtos')  lista.sort((a,b)=>b.prods.length-a.prods.length)
+  else if(ordenar==='nome')      lista.sort((a,b)=>a.rev.nome.localeCompare(b.rev.nome))
+  else if(ordenar==='relevancia')lista.sort((a,b)=>b.match.length-a.match.length||((a.dist??9999)-(b.dist??9999)))
+  else                           lista.sort((a,b)=>(a.dist??9999)-(b.dist??9999))
+  return lista
+}
+
+function lojaCardHTML({rev,prods,match,dist}){
+  const ini=rev.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
+  const marcas=[...new Set(prods.map(p=>p.marca))].slice(0,3)
+  const avs=getAvaliacoes(rev.id)
+  const avgStar=avs.length?avs.reduce((s,a)=>s+a.estrelas,0)/avs.length:0
+  const lojaAberta=rev.lojaAberta!==false
+  const fav=isFav(rev.id)
+  return`<div class="loja-card${!lojaAberta?' loja-fechada-card-dim':''}" onclick="location.href='loja.html?slug=${rev.slugLoja}'" style="${!lojaAberta?'opacity:.78':''}">
+    <div class="loja-avatar">${ini}</div>
+    <div class="loja-info">
+      <h3>${rev.nome}
+        ${!lojaAberta?`<span style="font-size:.68rem;background:#fce4ec;color:#b71c1c;border-radius:6px;padding:2px 7px;font-weight:700;margin-left:6px;vertical-align:middle">${icon('lock-closed')} Fechada</span>`:''}
+      </h3>
+      <div class="loja-meta">${icon('map-pin')} ${rev.cidade}, ${rev.estado}
+        ${lojaAberta?`<span style="color:#43a047;font-weight:700"> · ${icon('dot')} Aberta</span>`:''}
+      </div>
+      ${avs.length?`<div style="font-size:.76rem;margin-bottom:3px">${starsHTML(avgStar)} <span style="color:var(--muted)">${avgStar.toFixed(1)} (${avs.length})</span></div>`:`<div style="font-size:.74rem;color:var(--muted-l);margin-bottom:3px">Sem avaliações ainda</div>`}
+      <div class="loja-tags">
+        <span class="loja-tag">${icon('shopping-bag')} ${prods.length} produto(s)</span>
+        ${marcas.map(m=>`<span class="loja-tag" style="background:#f3f0ff;color:#6d28d9">${m}</span>`).join('')}
+      </div>
+      ${buscaProd&&match.length?`<span class="prod-match" style="margin-top:5px">${icon('check')} ${match.length} com "${buscaProd}"</span>`:''}
+    </div>
+    <button class="fav-btn ${fav?'on':''}" title="${fav?'Remover dos favoritos':'Adicionar aos favoritos'}" onclick="event.stopPropagation();toggleFav('${rev.id}')">${icon('heart')}</button>
+    <div class="loja-right">
+      <span class="dist-badge${dist===null?' no-data':''}">${dist!==null?icon('map-pin')+' '+fmtDist(dist):'?'}</span>
+      <button class="btn-ver">${lojaAberta?'Ver Catálogo':'Ver Produtos'}</button>
+    </div>
+  </div>`
+}
+
+function filtrarLojas(){
+  const el=document.getElementById('lojas-resultado')
+  if(!el)return
+  const lista=lojasFiltradas()
   if(!lista.length){
-    const msg=buscaProd?`"${buscaProd}" em ${raio} km`:`${raio} km`
+    const msg=buscaProd?`"${buscaProd}"`:(catFiltro||`${raio>=5000?'todas as distâncias':raio+' km'}`)
     el.innerHTML=`<div class="empty"><div class="empty-icon">${icon('search','ic-xl')}</div><p>Nenhuma revendedora encontrada<br>para <strong>${msg}</strong>.</p></div>`
     return
   }
-  el.innerHTML=`<div class="resultado-header">${lista.length} revendedora(s)</div>`+
-  lista.map(({rev,prods,match,dist})=>{
-    const ini=rev.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
-    const marcas=[...new Set(prods.map(p=>p.marca))].slice(0,3).join(' · ')
-    const avs=getAvaliacoes(rev.id)
-    const avgStar=avs.length?avs.reduce((s,a)=>s+a.estrelas,0)/avs.length:0
-    const lojaAberta=rev.lojaAberta!==false
-    return`<div class="loja-card${!lojaAberta?' loja-fechada-card-dim':''}" onclick="location.href='loja.html?slug=${rev.slugLoja}'" style="${!lojaAberta?'opacity:.72':''}">
-      <div class="loja-avatar">${ini}</div>
-      <div class="loja-info">
-        <h3>${rev.nome}
-          ${!lojaAberta?`<span style="font-size:.68rem;background:#fce4ec;color:#b71c1c;border-radius:6px;padding:2px 7px;font-weight:700;margin-left:6px;vertical-align:middle">${icon('lock-closed')} Fechada</span>`:''}
-        </h3>
-        <div class="loja-meta">${icon('map-pin')} ${rev.cidade}, ${rev.estado}${marcas?' · '+marcas:''}
-          ${lojaAberta?`<span style="color:#43a047;font-weight:700"> · ${icon('dot')} Aberta</span>`:''}
-        </div>
-        ${avs.length?`<div style="font-size:.76rem;margin-bottom:3px">${starsHTML(avgStar)} <span style="color:var(--muted)">${avgStar.toFixed(1)} (${avs.length})</span></div>`:''}
-        ${buscaProd&&match.length?`<span class="prod-match">${icon('check')} ${match.length} produto(s) com "${buscaProd}"</span>`:''}
-      </div>
-      <div class="loja-right">
-        <span class="dist-badge${dist===null?' no-data':''}">${dist!==null?icon('map-pin')+' '+fmtDist(dist):'?'}</span>
-        <button class="btn-ver">${lojaAberta?'Ver Catálogo':'Ver Produtos'}</button>
-      </div>
-    </div>`
-  }).join('')
+  el.innerHTML=`<div class="resultado-header">${lista.length} revendedora(s)${catFiltro?' · '+catFiltro:''}</div>`+lista.map(lojaCardHTML).join('')
+}
+
+// ─── FAVORITAS ────────────────────────────────────────────
+function renderFavoritas(){
+  const el=document.getElementById('tab-favoritas')
+  if(!el)return
+  const s=getSession(), temLoc=s&&s.lat&&s.lng
+  const favs=loadFavoritas()
+  if(!favs.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">${icon('heart','ic-xl')}</div><p><strong>Você ainda não favoritou nenhuma loja.</strong><br>Toque no ${icon('heart')} nos cards da aba <b>Explorar</b> para salvar suas lojas preferidas aqui.</p><button class="btn-ver" style="margin-top:16px" onclick="showTab('explorar')">${icon('magnifying-glass')} Explorar lojas</button></div>`
+    return
+  }
+  const lista=favs.map(id=>getRevs().find(r=>r.id===id)).filter(Boolean).map(rev=>{
+    const prods=getProdos(rev.id)
+    const dist=(temLoc&&rev.lat&&rev.lng)?haversine(s.lat,s.lng,rev.lat,rev.lng):null
+    return{rev,prods,match:[],dist}
+  })
+  el.innerHTML=`<div class="resultado-header">${icon('heart-filled')} ${lista.length} loja(s) favorita(s)</div>`+lista.map(lojaCardHTML).join('')
 }
 
 // ─── MEUS PEDIDOS ─────────────────────────────────────────
