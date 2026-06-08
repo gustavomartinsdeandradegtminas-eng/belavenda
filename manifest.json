@@ -1,0 +1,23 @@
+{
+  "name": "BelaVenda — Beleza perto de você",
+  "short_name": "BelaVenda",
+  "description": "Marketplace que conecta revendedoras de cosméticos a clientes próximos. Descubra lojas perto de você e receba por motoboy.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fdf4f9",
+  "theme_color": "#c2185b",
+  "lang": "pt-BR",
+  "categories": ["shopping", "lifestyle", "beauty"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Sou Cliente", "url": "./cliente.html", "description": "Descobrir revendedoras perto de mim" },
+    { "name": "Sou Revendedora", "url": "./painel.html", "description": "Abrir meu painel de vendas" }
+  ]
+}

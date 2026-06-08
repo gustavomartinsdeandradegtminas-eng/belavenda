@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BelaVenda – Área do Cliente</title>
+<meta name="description" content="Descubra revendedoras de cosméticos perto de você, acompanhe seus pedidos e favorite suas lojas no BelaVenda.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c2185b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BelaVenda">
 <style>
 /* ═══════════════════════════════════════════════════════
    BELAVENDA CLIENTE — Design Premium 2.0
@@ -1968,5 +1975,6 @@ function renderMinhasLojas(){
   }).join('')
 }
 </script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 </body>
 </html>
