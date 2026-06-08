@@ -455,8 +455,8 @@ function renderReviewsSection(avs){
 const CAT_EMOJI_FB={Maquiagem:'lipstick',Perfumaria:'perfume',Skincare:'droplet',Cabelos:'hair-comb','Corpo e Banho':'lotion',Unhas:'nail-polish','Proteção Solar':'sun',Solar:'sun','Sobrancelhas e Cílios':'eye',Masculino:'person-beard',Cuidados:'sparkles',Outros:'sparkles'}
 
 function getProdImg(p){
-  // URL/data URI -> <img>; senão ilustração colorida do produto (bv-art.js)
-  return prodImg(p.imagem, p.categoria)
+  // URL/data URI -> <img>; senão foto real do tipo de produto (bv-art.js), com fallback ilustração
+  return prodImg(p.imagem, p.categoria, p.id||p.nome)
 }
 
 function renderProdCards(){

@@ -767,7 +767,7 @@ function renderProdRows(produtos){
   return f.map(p=>{
     const margem=p.precoVenda>0?Math.round((p.precoVenda-p.precoCusto)/p.precoVenda*100):0
     const cor=margem<20?'var(--danger)':margem<35?'var(--warn)':'var(--success)'
-    const imgContent=prodImg(p.imagem, p.categoria)
+    const imgContent=prodImg(p.imagem, p.categoria, p.id||p.nome)
     return`<tr>
       <td>
         <div style="display:flex;align-items:center;gap:10px">
@@ -865,11 +865,7 @@ function abrirFormProduto(id){
   const marcaOpts=MARCAS_LISTA.map(m=>`<option${p?.marca===m?' selected':''}>${m}</option>`).join('')
   const catOpts=CATEGORIAS_LISTA.map(c=>`<option${p?.categoria===c?' selected':''}>${c}</option>`).join('')
 
-  const prevContent=_prodImgSel
-    ? (/^(https?:|data:)/.test(_prodImgSel)
-        ? `<img src="${_prodImgSel}" style="width:100%;height:100%;object-fit:cover">`
-        : prodArt(_prodImgSel))
-    : prodArt(PROD_IMGS[catInicial]?.[0]?.v||'cosmetic')
+  const prevContent=prodImg(_prodImgSel||PROD_IMGS[catInicial]?.[0]?.v||'cosmetic', catInicial, _prodImgSel||catInicial)
 
   openModal(p?'Editar Produto':'Novo Produto',`
     <div class="form-group">
@@ -947,7 +943,7 @@ function updateImgGrid(cat){
   }
   grid.innerHTML=opts.map(o=>`
     <div class="img-opt${_prodImgSel===o.v?' selected':''}" onclick="selectProdImg('${o.v}',this)" title="${o.l}">
-      <span class="img-opt-em">${prodArt(o.v)}</span>
+      <span class="img-opt-em">${prodImg(o.v, cat, o.v)}</span>
       <span class="img-opt-lb">${o.l}</span>
     </div>
   `).join('')
@@ -955,7 +951,7 @@ function updateImgGrid(cat){
   const urlEl=document.getElementById('img-url')
   if(urlEl&&!urlEl.value){
     const prev=document.getElementById('img-preview')
-    if(prev)prev.innerHTML=prodArt(_prodImgSel||opts[0].v)
+    if(prev)prev.innerHTML=prodImg(_prodImgSel||opts[0].v, cat, _prodImgSel||opts[0].v)
   }
 }
 
@@ -966,7 +962,7 @@ function selectProdImg(v,el){
   document.querySelectorAll('.img-opt').forEach(x=>x.classList.remove('selected'))
   if(el)el.classList.add('selected')
   const prev=document.getElementById('img-preview')
-  if(prev)prev.innerHTML=prodArt(v)
+  if(prev)prev.innerHTML=prodImg(v, null, v)
 }
 
 function previewImgUrl(url){

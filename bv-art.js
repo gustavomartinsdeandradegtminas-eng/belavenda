@@ -79,11 +79,42 @@
     return '<svg class="prod-art" viewBox="0 0 48 48" aria-hidden="true" focusable="false">' + inner + '</svg>';
   };
 
-  w.prodImg = function (imagem, categoria) {
+  // ── Fotos reais (Pexels CDN) por tipo de produto ───────────────
+  // Fallback automático para a ilustração SVG se a foto não carregar.
+  var PHOTO = {
+    lipstick:[6648498,6648494,8433369], gloss:[34321279,6648488,6648494],
+    foundation:[7256108,7256102,27676711], palette:[4889720,396129,32388555],
+    powder:[15657763,7256102,396129], mascara:[7712438,5473382,2688992],
+    blush:[4889720,396129,15657763],
+    perfume:[9790391,10873814,20899863], perfumeWood:[23230653,28606609,9221913],
+    serum:[7321654,8131568,9775170], toner:[3762879,8102129,7321654],
+    cream:[10221858,6690232,36339062], sunscreen:[7466763,8157696,16378487],
+    nail:[6954960,6954964,10609757,2281695], nailRed:[10609757,6954960,2281695],
+    shampoo:[4154194,8167172,13516802], hairoil:[8131568,8167172,9775170],
+    lotion:[14788377,6847856,27742135], soap:[7789606,7032151,7797117],
+    men:[9221913,8747010,30263576], gift:[5632335,1327689,12969358],
+    cosmetic:[5632335,12969358,1327689]
+  };
+  function photoUrl(id){ return 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id + '.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=500&h=500'; }
+  function hashStr(s){ s = String(s == null ? '' : s); var h = 0; for (var i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; } return Math.abs(h); }
+
+  // se a foto falhar, troca pela ilustração
+  w.bvImgFallback = function (img, key) { try { img.parentNode.innerHTML = w.prodArt(key); } catch (e) {} };
+
+  function prodPhoto(key, seed) {
+    var arr = PHOTO[key];
+    if (!arr || !arr.length) return w.prodArt(key);
+    var id = arr[hashStr(seed) % arr.length];
+    return '<img src="' + photoUrl(id) + '" class="prod-photo" loading="lazy" alt="" onerror="bvImgFallback(this,\'' + key + '\')">';
+  }
+
+  w.prodImg = function (imagem, categoria, seed) {
     if (imagem && /^(https?:|data:)/.test(imagem)) {
       return '<img src="' + imagem + '" class="prod-photo" loading="lazy" alt="">';
     }
-    return w.prodArt(resolveKey(imagem, categoria));
+    var key = resolveKey(imagem, categoria);
+    if (PHOTO[key]) return prodPhoto(key, seed != null ? seed : (imagem || key));
+    return w.prodArt(key);
   };
 
   // chaves disponíveis (para montar seletores no painel)
@@ -98,7 +129,8 @@
       '.prod-art{display:block;width:auto;height:78%;max-width:80%;margin:auto}' +
       '.prod-photo{width:100%;height:100%;object-fit:cover}' +
       '.prod-img-cell .prod-art,.img-opt .prod-art{height:100%;width:100%;max-width:100%}' +
-      '.img-opt .prod-art{padding:4px}';
+      '.img-opt .prod-art{padding:4px}' +
+      '.img-opt .prod-photo,.prod-img-cell .prod-photo{border-radius:6px}';
     (d.head || d.documentElement).appendChild(s);
   }
   injectCss();
