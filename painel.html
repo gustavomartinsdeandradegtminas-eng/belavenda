@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="bv-icons.js"></script>
 <script src="bv-seed.js"></script>
+<script src="bv-art.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -766,12 +767,7 @@ function renderProdRows(produtos){
   return f.map(p=>{
     const margem=p.precoVenda>0?Math.round((p.precoVenda-p.precoCusto)/p.precoVenda*100):0
     const cor=margem<20?'var(--danger)':margem<35?'var(--warn)':'var(--success)'
-    const img=p.imagem
-    const imgContent=!img
-      ?icon('lipstick','ic-lg')
-      :(/^(https?:|data:)/.test(img)
-        ?`<img src="${img}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`
-        :icon(img,'ic-lg'))
+    const imgContent=prodImg(p.imagem, p.categoria)
     return`<tr>
       <td>
         <div style="display:flex;align-items:center;gap:10px">
@@ -823,46 +819,38 @@ const CATEGORIAS_LISTA=[
 ]
 const PROD_IMGS={
   Maquiagem:[
-    {v:'lipstick',l:'Batom'},{v:'palette',l:'Paleta'},{v:'eye',l:'Sombra'},{v:'sparkles',l:'Iluminador'},
-    {v:'lips-kiss',l:'Gloss'},{v:'paintbrush',l:'Blush'},{v:'mouth',l:'Contorno'},{v:'cherry-blossom',l:'Pó Compacto'},
-    {v:'ribbon',l:'Primer'},{v:'glowing-star',l:'Corretor'},{v:'theater-masks',l:'Delineador'},{v:'nail-polish',l:'Base'},
+    {v:'lipstick',l:'Batom'},{v:'gloss',l:'Gloss'},{v:'foundation',l:'Base'},{v:'palette',l:'Paleta/Sombra'},
+    {v:'powder',l:'Pó Compacto'},{v:'mascara',l:'Máscara/Cílios'},{v:'blush',l:'Blush'},{v:'cosmetic',l:'Outro'},
   ],
   Skincare:[
-    {v:'droplet',l:'Hidratante'},{v:'lotion-bottle',l:'Sérum'},{v:'bubbles',l:'Limpador'},{v:'sun',l:'Protetor Solar'},
-    {v:'crescent-moon',l:'Noturno'},{v:'herb',l:'Natural'},{v:'test-tube',l:'Ácido'},{v:'wave',l:'Tônico'},
-    {v:'pill',l:'Vitamina C'},{v:'hibiscus',l:'Rosa Hip'},{v:'clover',l:'Aloe Vera'},{v:'sparkles',l:'Retinol'},
+    {v:'serum',l:'Sérum'},{v:'cream',l:'Creme'},{v:'toner',l:'Tônico/Água'},{v:'sunscreen',l:'Protetor'},{v:'cosmetic',l:'Outro'},
   ],
   Perfumaria:[
-    {v:'cherry-blossom',l:'Floral'},{v:'herb',l:'Verde'},{v:'wood-log',l:'Amadeirado'},{v:'citrus',l:'Cítrico'},
-    {v:'rose',l:'Rosa'},{v:'gem',l:'Luxo'},{v:'bamboo',l:'Aquático'},{v:'candle',l:'Baunilha'},
-    {v:'strawberry',l:'Frutado'},{v:'crescent-moon',l:'Oriental'},{v:'lightning-bolt',l:'Intenso'},{v:'hibiscus',l:'Exótico'},
+    {v:'perfume',l:'Floral/Doce'},{v:'perfumeWood',l:'Amadeirado'},{v:'cosmetic',l:'Outro'},
   ],
   Cabelos:[
-    {v:'face-massage',l:'Máscara'},{v:'oil-lamp',l:'Óleo'},{v:'wave',l:'Condicionador'},{v:'fire',l:'Restaurador'},
-    {v:'gem',l:'Brilho'},{v:'herb',l:'Natural'},{v:'lotion-bottle',l:'Shampoo'},{v:'sparkles',l:'Finalizador'},
-    {v:'flexed-bicep',l:'Fortalecedor'},{v:'hibiscus',l:'Tratamento'},{v:'ribbon',l:'Liso'},{v:'crescent-moon',l:'Noturno'},
+    {v:'shampoo',l:'Shampoo/Condic.'},{v:'hairoil',l:'Óleo'},{v:'cream',l:'Máscara/Creme'},{v:'cosmetic',l:'Outro'},
   ],
   'Corpo e Banho':[
-    {v:'bathtub',l:'Banho'},{v:'lotion-bottle',l:'Hidratante'},{v:'cherry-blossom',l:'Esfoliante'},{v:'honey-pot',l:'Manteiga'},
-    {v:'soap',l:'Sabonete'},{v:'herb',l:'Natural'},{v:'face-massage',l:'Óleo'},{v:'sparkles',l:'Body Splash'},
-    {v:'wave',l:'Gel'},{v:'rose',l:'Rosa'},{v:'lemon',l:'Citrus'},{v:'bamboo',l:'Bamboo'},
+    {v:'lotion',l:'Hidratante'},{v:'soap',l:'Sabonete'},{v:'cream',l:'Manteiga/Creme'},{v:'hairoil',l:'Óleo'},{v:'cosmetic',l:'Outro'},
+  ],
+  Corpo:[
+    {v:'lotion',l:'Hidratante'},{v:'soap',l:'Sabonete'},{v:'cream',l:'Manteiga/Creme'},{v:'hairoil',l:'Óleo'},{v:'cosmetic',l:'Outro'},
   ],
   Unhas:[
-    {v:'nail-polish',l:'Esmalte'},{v:'sparkles',l:'Glitter'},{v:'cherry-blossom',l:'Rosa'},{v:'circle-red',l:'Vermelho'},
-    {v:'circle-purple',l:'Roxo'},{v:'circle-white',l:'Nude'},{v:'heart-black',l:'Escuro'},{v:'wave',l:'Azul'},
-    {v:'gem',l:'Perolado'},{v:'herb',l:'Verde'},{v:'palette',l:'Arte'},{v:'trophy',l:'Top Coat'},
+    {v:'nail',l:'Esmalte Rosa'},{v:'nailRed',l:'Esmalte Vermelho'},{v:'cosmetic',l:'Outro'},
+  ],
+  'Proteção Solar':[
+    {v:'sunscreen',l:'Protetor Solar'},{v:'cream',l:'Creme'},{v:'cosmetic',l:'Outro'},
   ],
   'Sobrancelhas e Cílios':[
-    {v:'eye',l:'Máscara'},{v:'pencil',l:'Delineador'},{v:'palette',l:'Pomada'},{v:'glowing-star',l:'Sérum'},
-    {v:'lipstick',l:'Lápis'},{v:'sparkles',l:'Gel Fix'},{v:'cherry-blossom',l:'Henna'},{v:'flexed-bicep',l:'Alongador'},
+    {v:'mascara',l:'Máscara/Delineador'},{v:'cosmetic',l:'Outro'},
   ],
   Masculino:[
-    {v:'beard',l:'Barba'},{v:'flexed-bicep',l:'Desodorante'},{v:'herb',l:'Natural'},{v:'wood-log',l:'Amadeirado'},
-    {v:'lightning-bolt',l:'Energizante'},{v:'wave',l:'Aquático'},{v:'trophy',l:'Premium'},{v:'scissors',l:'Pomada'},
+    {v:'men',l:'Cuidado Masc.'},{v:'perfumeWood',l:'Perfume'},{v:'shampoo',l:'Shampoo'},{v:'cosmetic',l:'Outro'},
   ],
   Outros:[
-    {v:'gift',l:'Kit'},{v:'cherry-blossom',l:'Floral'},{v:'sparkles',l:'Especial'},{v:'gem',l:'Premium'},
-    {v:'herb',l:'Natural'},{v:'ribbon',l:'Presente'},{v:'trophy',l:'Top'},{v:'star',l:'Destaque'},
+    {v:'gift',l:'Kit/Presente'},{v:'cosmetic',l:'Especial'},
   ],
 }
 
@@ -880,8 +868,8 @@ function abrirFormProduto(id){
   const prevContent=_prodImgSel
     ? (/^(https?:|data:)/.test(_prodImgSel)
         ? `<img src="${_prodImgSel}" style="width:100%;height:100%;object-fit:cover">`
-        : icon(_prodImgSel,'ic-xl'))
-    : icon(PROD_IMGS[catInicial]?.[0]?.v||'package','ic-xl')
+        : prodArt(_prodImgSel))
+    : prodArt(PROD_IMGS[catInicial]?.[0]?.v||'cosmetic')
 
   openModal(p?'Editar Produto':'Novo Produto',`
     <div class="form-group">
@@ -959,7 +947,7 @@ function updateImgGrid(cat){
   }
   grid.innerHTML=opts.map(o=>`
     <div class="img-opt${_prodImgSel===o.v?' selected':''}" onclick="selectProdImg('${o.v}',this)" title="${o.l}">
-      <span class="img-opt-em">${icon(o.v,'ic-lg')}</span>
+      <span class="img-opt-em">${prodArt(o.v)}</span>
       <span class="img-opt-lb">${o.l}</span>
     </div>
   `).join('')
@@ -967,7 +955,7 @@ function updateImgGrid(cat){
   const urlEl=document.getElementById('img-url')
   if(urlEl&&!urlEl.value){
     const prev=document.getElementById('img-preview')
-    if(prev)prev.innerHTML=icon(_prodImgSel||opts[0].v,'ic-xl')
+    if(prev)prev.innerHTML=prodArt(_prodImgSel||opts[0].v)
   }
 }
 
@@ -978,7 +966,7 @@ function selectProdImg(v,el){
   document.querySelectorAll('.img-opt').forEach(x=>x.classList.remove('selected'))
   if(el)el.classList.add('selected')
   const prev=document.getElementById('img-preview')
-  if(prev)prev.innerHTML=icon(v,'ic-xl')
+  if(prev)prev.innerHTML=prodArt(v)
 }
 
 function previewImgUrl(url){

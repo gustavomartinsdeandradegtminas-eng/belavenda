@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="bv-icons.js"></script>
 <script src="bv-seed.js"></script>
+<script src="bv-art.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -454,14 +455,8 @@ function renderReviewsSection(avs){
 const CAT_EMOJI_FB={Maquiagem:'lipstick',Perfumaria:'perfume',Skincare:'droplet',Cabelos:'hair-comb','Corpo e Banho':'lotion',Unhas:'nail-polish','Proteção Solar':'sun',Solar:'sun','Sobrancelhas e Cílios':'eye',Masculino:'person-beard',Cuidados:'sparkles',Outros:'sparkles'}
 
 function getProdImg(p){
-  // Render: URL/data URI -> <img>; senão é um NOME DE ÍCONE -> icon()
-  const imagem=p.imagem
-  if(imagem&&/^(https?:|data:)/.test(imagem)){
-    const fb=CAT_EMOJI_FB[p.categoria]||'sparkles'
-    return`<img src="${imagem}" style="width:100%;height:100%;object-fit:cover;border-radius:0" loading="lazy" onerror="this.parentElement.innerHTML=icon('${fb}','ic-xl');">`
-  }
-  if(imagem) return icon(imagem,'ic-xl')
-  return icon(CAT_EMOJI_FB[p.categoria]||'sparkles','ic-xl')
+  // URL/data URI -> <img>; senão ilustração colorida do produto (bv-art.js)
+  return prodImg(p.imagem, p.categoria)
 }
 
 function renderProdCards(){
@@ -473,7 +468,7 @@ function renderProdCards(){
   return list.map(p=>{
     const qty=cart[p.id]||0
     return`<div class="prod-card">
-      <div class="prod-img" style="${p.imagem&&(p.imagem.startsWith('http')||p.imagem.startsWith('data:'))?'padding:0;overflow:hidden':''}">${getProdImg(p)}</div>
+      <div class="prod-img" style="overflow:hidden">${getProdImg(p)}</div>
       <div class="prod-body">
         <div class="prod-brand">${p.marca}</div>
         <div class="prod-name">${p.nome}</div>
