@@ -386,6 +386,45 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   cursor:pointer;font-family:inherit;text-decoration:none;transition:background .2s;
 }
 .wa-btn:hover{background:#128C7E}
+.btn-track{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 13px;background:#fff;color:var(--rose);
+  border:1.5px solid var(--rose-l);border-radius:9px;font-size:.78rem;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:all .2s;
+}
+.btn-track:hover{background:var(--rose-xl);border-color:var(--rose-mid);transform:translateY(-1px)}
+
+/* ══════════════════════════════════════════════════════
+   RASTREAMENTO (timeline do pedido)
+══════════════════════════════════════════════════════ */
+.track-pedido-sub{font-size:.82rem;color:var(--muted);margin-bottom:16px;font-weight:600}
+.track-moto{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,var(--rose-xl),#fff);border:1.5px solid var(--rose-l);border-radius:14px;padding:14px;margin-bottom:18px}
+.track-moto-av{width:48px;height:48px;border-radius:50%;background:var(--grad-primary);display:grid;place-items:center;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(233,30,140,.32)}
+.track-moto-av .ic{font-size:1.3rem}
+.track-moto-eta{margin-left:auto;text-align:right;flex-shrink:0}
+.track-moto-eta b{display:block;font-size:1.2rem;font-weight:800;color:var(--rose-d);font-family:'Playfair Display',Georgia,serif;line-height:1}
+.track-moto-eta span{font-size:.66rem;color:var(--muted)}
+.track-steps{position:relative;margin:4px 0 8px}
+.track-step{display:flex;gap:14px;position:relative;padding-bottom:24px}
+.track-step:last-child{padding-bottom:0}
+.track-step::before{content:'';position:absolute;left:14px;top:30px;bottom:0;width:2px;background:var(--border2)}
+.track-step:last-child::before{display:none}
+.track-step.done::before{background:var(--rose-mid)}
+.track-dot{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;background:#fff;border:2px solid var(--border2);color:var(--muted-l);z-index:1;transition:all .3s}
+.track-dot .ic{font-size:.85rem}
+.track-step.done .track-dot{background:var(--grad-primary);border-color:transparent;color:#fff}
+.track-step.active .track-dot{background:var(--grad-primary);border-color:transparent;color:#fff;box-shadow:0 0 0 5px rgba(233,30,140,.16);animation:trackpulse 1.8s ease-in-out infinite}
+@keyframes trackpulse{0%,100%{box-shadow:0 0 0 4px rgba(233,30,140,.18)}50%{box-shadow:0 0 0 9px rgba(233,30,140,.05)}}
+.track-body{flex:1;padding-top:4px}
+.track-title{font-size:.92rem;font-weight:700;color:var(--text)}
+.track-step.pending .track-title{color:var(--muted-l);font-weight:600}
+.track-sub2{font-size:.76rem;color:var(--muted);margin-top:2px}
+.track-info{background:var(--bg);border-radius:12px;padding:6px 14px;margin:6px 0 16px}
+.track-info-row{display:flex;justify-content:space-between;gap:12px;font-size:.82rem;padding:9px 0;border-bottom:1px solid var(--border)}
+.track-info-row:last-child{border-bottom:none}
+.track-info-row .k{color:var(--muted);flex-shrink:0}
+.track-info-row .v{font-weight:600;color:var(--text);text-align:right}
+.track-cancel{background:var(--danger-l);color:#b91c1c;border-radius:12px;padding:18px;text-align:center;font-weight:700;font-size:.9rem;margin-bottom:16px}
 
 /* Empty state */
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
@@ -885,6 +924,11 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   </div>
 </div>
 
+<!-- MODAL RASTREAMENTO -->
+<div class="modal-overlay" id="track-modal" onclick="fecharRastreamento(event)">
+  <div class="modal" id="track-modal-box" style="max-width:440px"></div>
+</div>
+
 <!-- MODAL PREFERÊNCIAS DE MATCH -->
 <div class="modal-overlay" id="prefs-modal" onclick="fecharPrefsModal(event)">
   <div class="modal" id="prefs-modal-box" style="max-width:480px">
@@ -1045,6 +1089,8 @@ window.onload=function(){
   document.addEventListener('keydown',e=>{
     if(document.getElementById('prefs-modal').classList.contains('open'))return
     if(document.getElementById('cep-modal').classList.contains('open'))return
+    if(document.getElementById('track-modal').classList.contains('open'))return
+    if(document.getElementById('av-modal').classList.contains('open'))return
     if(e.key==='ArrowLeft')swipe('left')
     if(e.key==='ArrowRight')swipe('right')
   })
@@ -1799,12 +1845,95 @@ function renderPedidos(){
       <div class="pedido-foot">
         <span class="pedido-total">${fmtMoeda(p.valorTotal)} · ${p.formaPagamento||''}</span>
         <div style="display:flex;gap:7px;flex-wrap:wrap">
+          ${p.status!=='CANCELADO'?`<button class="btn-track" onclick="abrirRastreamento('${p.id}','${p._rId}')">${icon('route')} Rastrear</button>`:''}
           ${podeAvaliar?`<button class="btn-ver" style="font-size:.78rem;background:#ffc107;color:#000" onclick="abrirAvModal('${p.id}','${p._rId}','${p._rNome}')">${icon('star')} Avaliar</button>`:''}
           <button class="btn-ver" style="font-size:.78rem" onclick="location.href='loja.html?slug=${p._rSlug}'">Ver Loja</button>
           ${p._rTel?`<a class="wa-btn" href="https://wa.me/${(p._rTel||'').replace(/\D/g,'')}?text=${encodeURIComponent('Olá! Sobre o pedido #'+p.id.slice(0,8).toUpperCase())}" target="_blank">${icon('chat-bubble')} WA</a>`:''}
         </div>
       </div>
     </div>`}).join('')
+}
+
+// ─── RASTREAMENTO DO PEDIDO ───────────────────────────────
+function trackInfoBlock(p,entLabel){
+  const pg=p.pagamento?.status
+  const pgLbl=pg==='PAGO'?icon('circle-check')+' Pago':pg==='AGUARDANDO_PIX'?icon('hourglass')+' PIX pendente':pg==='AGUARDANDO_BOLETO'?icon('document')+' Boleto pendente':(p.formaPagamento||'—')
+  return`<div class="track-info">
+    <div class="track-info-row"><span class="k">${icon('truck')} Entrega</span><span class="v">${entLabel}</span></div>
+    ${p.clienteEndereco?`<div class="track-info-row"><span class="k">${icon('map-pin')} Endereço</span><span class="v">${p.clienteEndereco}</span></div>`:''}
+    <div class="track-info-row"><span class="k">${icon('money-bag')} Total</span><span class="v">${fmtMoeda(p.valorTotal)}</span></div>
+    <div class="track-info-row"><span class="k">${icon('credit-card')} Pagamento</span><span class="v">${(p.formaPagamento||'')} · ${pgLbl}</span></div>
+  </div>`
+}
+async function abrirRastreamento(pedidoId,revId){
+  const peds=JSON.parse(localStorage.getItem('bv_pedidos_'+revId)||'[]')
+  const p=peds.find(x=>x.id===pedidoId)
+  const rev=getRevs().find(r=>r.id===revId)
+  if(!p||!rev)return
+  const box=document.getElementById('track-modal-box')
+  const idShort='#'+p.id.slice(0,8).toUpperCase()
+  const ent=p.entrega
+  const entLabel=ent?((ent.carrier?ent.carrier+' ':'')+(ent.service||'')).trim():'A combinar'
+  const isRetirada=ent&&/retir/i.test((ent.service||'')+' '+(ent.carrier||''))
+  const isRevEntrega=ent&&/revendedora/i.test((ent.service||'')+' '+(ent.carrier||''))
+
+  if(p.status==='CANCELADO'){
+    box.innerHTML=`<h3>${icon('route')} Rastrear pedido</h3>
+      <p class="track-pedido-sub">${idShort} · ${rev.nome}</p>
+      <div class="track-cancel">${icon('x-circle')} Este pedido foi cancelado.</div>
+      ${trackInfoBlock(p,entLabel)}
+      <button class="modal-btn-sec" style="width:100%" onclick="fecharRastreamento()">Fechar</button>`
+    document.getElementById('track-modal').classList.add('open')
+    return
+  }
+
+  const STEPS=[
+    {t:'Pedido recebido', s:'A revendedora foi notificada do seu pedido', ic:'circle-check'},
+    {t:'Em preparação', s:'Separando e embalando seus produtos', ic:'shopping-bag'},
+    {t:isRetirada?'Pronto para retirada':(isRevEntrega?'Saiu para entrega':'Motoboy a caminho'),
+     s:isRetirada?'Combine o horário de retirada com a revendedora':'Seu pedido está a caminho do endereço', ic:isRetirada?'storefront':'motorcycle'},
+    {t:'Entregue', s:'Pedido concluído. Aproveite!', ic:'handshake'},
+  ]
+  const idxByStatus={NOVO:0,SEPARANDO:1,EM_TRANSITO:2,ENTREGUE:3}
+  const cur=idxByStatus[p.status]??0
+  const entregue=p.status==='ENTREGUE'
+  const stepsHTML=STEPS.map((st,i)=>{
+    const cls=entregue?'done':(i<cur?'done':i===cur?'active':'pending')
+    const dot=cls==='done'?icon('check'):icon(st.ic)
+    return`<div class="track-step ${cls}"><div class="track-dot">${dot}</div>
+      <div class="track-body"><div class="track-title">${st.t}</div><div class="track-sub2">${st.s}</div></div></div>`
+  }).join('')
+  const motoSlot=(p.status==='EM_TRANSITO'&&!isRetirada)?`
+    <div class="track-moto" id="track-moto-slot">
+      <div class="track-moto-av">${icon('motorcycle','ic-lg')}</div>
+      <div><div style="font-weight:700;font-size:.9rem" id="moto-name">Localizando entregador…</div><div class="track-sub2" id="moto-status">Conectando ao rastreio</div></div>
+      <div class="track-moto-eta" id="moto-eta"></div>
+    </div>`:''
+
+  box.innerHTML=`<h3>${icon('route')} Rastrear pedido</h3>
+    <p class="track-pedido-sub">${idShort} · ${rev.nome}</p>
+    ${motoSlot}
+    <div class="track-steps">${stepsHTML}</div>
+    ${trackInfoBlock(p,entLabel)}
+    <button class="modal-btn-sec" style="width:100%" onclick="fecharRastreamento()">Fechar</button>`
+  document.getElementById('track-modal').classList.add('open')
+
+  // dados do entregador em tempo real (API de entrega)
+  if(p.status==='EM_TRANSITO'&&!isRetirada&&window.BV&&BV.delivery){
+    try{
+      const info=await BV.delivery.track('BV'+p.id.slice(-6).toUpperCase())
+      const nameEl=document.getElementById('moto-name')
+      if(info&&nameEl){
+        nameEl.textContent=info.driverName||'Entregador'
+        const stEl=document.getElementById('moto-status'); if(stEl)stEl.textContent=info.statusLabel||'A caminho'
+        const etaEl=document.getElementById('moto-eta'); if(etaEl&&info.etaMinutes)etaEl.innerHTML=`<b>${info.etaMinutes} min</b><span>estimado</span>`
+      }
+    }catch(e){}
+  }
+}
+function fecharRastreamento(e){
+  if(!e||e.target===document.getElementById('track-modal'))
+    document.getElementById('track-modal').classList.remove('open')
 }
 
 // ─── MINHAS LOJAS ─────────────────────────────────────────
