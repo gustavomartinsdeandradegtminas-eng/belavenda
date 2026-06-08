@@ -215,7 +215,8 @@ section{padding:100px 0;position:relative}
 .step:hover::before{transform:scaleX(1)}
 .step-num{font-family:'Playfair Display',serif;font-weight:800;font-size:54px;color:var(--rose-l);line-height:.8;position:absolute;top:22px;right:24px;transition:color .3s}
 .step:hover .step-num{color:var(--rose-xl)}
-.step-icon{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--rose-xl),var(--rose-l));display:grid;place-items:center;color:var(--rose-d);margin-bottom:18px}
+.step-icon{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--rose-xl),var(--rose-l));display:grid;place-items:center;color:var(--rose-d);margin-bottom:18px;box-shadow:inset 0 0 0 1px rgba(194,24,91,.1),0 8px 18px rgba(194,24,91,.13);transition:transform .3s,box-shadow .3s}
+.step:hover .step-icon{transform:scale(1.06) rotate(-3deg);box-shadow:inset 0 0 0 1px rgba(194,24,91,.14),0 12px 24px rgba(194,24,91,.2)}
 .step-icon .ic{font-size:26px}
 .step h3{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:10px}
 .step p{font-size:14.5px;color:var(--muted);line-height:1.62}
@@ -238,8 +239,8 @@ section{padding:100px 0;position:relative}
 .feat-card:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:var(--rose-l)}
 .feat-card .fc-icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;margin-bottom:16px;transition:transform .3s}
 .feat-card:hover .fc-icon{transform:scale(1.08) rotate(-4deg)}
-.fc-icon.rose{background:var(--rose-xl);color:var(--rose)}
-.fc-icon.violet{background:var(--violet-l);color:var(--violet)}
+.fc-icon.rose{background:linear-gradient(145deg,var(--rose-xl),var(--rose-l));color:var(--rose);box-shadow:inset 0 0 0 1px rgba(194,24,91,.1),0 6px 14px rgba(194,24,91,.14)}
+.fc-icon.violet{background:linear-gradient(145deg,var(--violet-l),#e0d8fb);color:var(--violet);box-shadow:inset 0 0 0 1px rgba(124,58,237,.1),0 6px 14px rgba(124,58,237,.14)}
 .feat-card h4{font-size:16px;font-weight:700;margin-bottom:7px;color:var(--text)}
 .feat-card p{font-size:13.5px;color:var(--muted);line-height:1.55}
 
@@ -254,7 +255,7 @@ section{padding:100px 0;position:relative}
 .testi-stars{color:var(--gold);display:flex;gap:2px;margin:8px 0 16px}
 .testi p{font-size:15.5px;color:var(--text2);line-height:1.68;font-style:italic;flex:1}
 .testi-author{display:flex;align-items:center;gap:13px;margin-top:24px;padding-top:22px;border-top:1px solid var(--border)}
-.testi-av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-family:'Playfair Display',serif;font-size:18px}
+.testi-av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-family:'Playfair Display',serif;font-size:18px;box-shadow:0 6px 16px rgba(136,14,79,.2)}
 .testi-name{font-weight:700;font-size:15px}
 .testi-role{font-size:13px;color:var(--muted)}
 
