@@ -308,6 +308,8 @@ if(!session){location.replace('login.html');throw new Error('unauthenticated')}
 const REV_ID=session.revendedoraId
 
 function logout(){localStorage.removeItem('bv_session');location.href='login.html'}
+// URL absoluta do catálogo, baseada na PASTA atual (funciona em /belavenda/ ou na raiz)
+function catalogUrl(){return location.origin+location.pathname.replace(/[^/]*$/,'')+'loja.html?slug='+session.slugLoja}
 function openLoja(){window.open('loja.html?slug='+session.slugLoja,'_blank')}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
 
@@ -453,11 +455,11 @@ function renderDashboard(){
         <div class="card-header"><span class="card-title">Link do Catálogo</span></div>
         <div class="card-body">
           <p style="font-size:.88rem;color:var(--muted);margin-bottom:12px">Compartilhe este link com suas clientes para que elas vejam seus produtos e façam pedidos.</p>
-          <div style="background:var(--bg);border-radius:8px;padding:12px 16px;font-size:.85rem;font-family:monospace;word-break:break-all;margin-bottom:12px;border:1px solid var(--border)">${location.origin}/loja.html?slug=${session.slugLoja}</div>
+          <div style="background:var(--bg);border-radius:8px;padding:12px 16px;font-size:.85rem;font-family:monospace;word-break:break-all;margin-bottom:12px;border:1px solid var(--border)">${catalogUrl()}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-primary" onclick="openLoja()">Abrir Catálogo</button>
             <button class="btn btn-secondary" onclick="copiarLink()">Copiar Link</button>
-            <a class="wa-btn" href="https://wa.me/?text=${encodeURIComponent('Olá! Veja meu catálogo de produtos de beleza: '+location.origin+'/loja.html?slug='+session.slugLoja)}" target="_blank">WhatsApp</a>
+            <a class="wa-btn" href="https://wa.me/?text=${encodeURIComponent('Olá! Veja meu catálogo de produtos de beleza: '+catalogUrl())}" target="_blank">WhatsApp</a>
           </div>
         </div>
       </div>
@@ -466,7 +468,7 @@ function renderDashboard(){
 }
 function setDashPeriodo(v){dashPeriodo=v;renderDashboard()}
 function copiarLink(){
-  navigator.clipboard.writeText(location.origin+'/loja.html?slug='+session.slugLoja)
+  navigator.clipboard.writeText(catalogUrl())
   alert('Link copiado!')
 }
 function calcDashboard(pedidos,clientes,periodo){
