@@ -431,6 +431,10 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .wish-actions .btn-ver{font-size:.74rem;padding:7px 10px}
 .wish-del{background:none;border:1.5px solid var(--border);border-radius:8px;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;color:var(--muted-l);flex-shrink:0}
 .wish-del:hover{color:var(--danger);border-color:var(--danger)}
+.match-pill{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:20px;white-space:nowrap;margin-bottom:7px}
+.match-pill.great{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
+.match-pill.good{background:var(--grad-primary);color:#fff}
+.match-pill.ok{background:var(--rose-l);color:var(--rose-d)}
 .loja-seals{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0 2px}
 .loja-seal{display:inline-flex;align-items:center;gap:4px;font-size:.66rem;font-weight:800;background:linear-gradient(135deg,var(--rose-l),#fff);color:var(--rose-d);border:1px solid var(--rose-l);border-radius:20px;padding:2px 9px}
 .loja-seal .ic{color:var(--rose)}
@@ -1927,6 +1931,8 @@ function lojaCardHTML({rev,prods,match,dist}){
   const lojaAberta=rev.lojaAberta!==false
   const fav=isFav(rev.id)
   const seals=selosLojaCli(rev,prods,avs)
+  let mp=''
+  try{const sc=calcMatch(rev,prods,getSession()||{},getPrefs()).score;const tier=sc>=80?'great':sc>=60?'good':'ok';mp=`<span class="match-pill ${tier}">${icon('heart-gift')} ${sc}%</span>`}catch(e){}
   return`<div class="loja-card${!lojaAberta?' loja-fechada-card-dim':''}" onclick="location.href='loja.html?slug=${rev.slugLoja}'" style="${!lojaAberta?'opacity:.78':''}">
     <div class="loja-avatar">${revFoto(rev)}</div>
     <div class="loja-info">
@@ -1946,6 +1952,7 @@ function lojaCardHTML({rev,prods,match,dist}){
     </div>
     <button class="fav-btn ${fav?'on':''}" title="${fav?'Remover dos favoritos':'Adicionar aos favoritos'}" onclick="event.stopPropagation();toggleFav('${rev.id}')">${icon('heart')}</button>
     <div class="loja-right">
+      ${mp}
       <span class="dist-badge${dist===null?' no-data':''}">${dist!==null?icon('map-pin')+' '+fmtDist(dist):'?'}</span>
       <button class="btn-ver">${lojaAberta?'Ver Catálogo':'Ver Produtos'}</button>
     </div>
