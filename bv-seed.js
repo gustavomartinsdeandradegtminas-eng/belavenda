@@ -12,7 +12,7 @@
 ;(function () {
   'use strict';
   try {
-    var SEED_VERSION = '2';
+    var SEED_VERSION = '3';
     if (localStorage.getItem('bv_demo_seeded') === SEED_VERSION) return;
 
     // IDs das revendedoras de demonstração (não mexemos em contas reais)
@@ -50,6 +50,12 @@
       R('r5',  'studio-bella-pele',  'Studio Bella Pele',        'bella@belavenda.app',    '5531987650005', '30112000', 'Belo Horizonte', 'MG', -19.9390, -43.9330, true),
       R('r6',  'renascer-cosmeticos','Renascer Cosméticos',      'renascer@belavenda.app', '5551987650006', '90450000', 'Porto Alegre',   'RS', -30.0240, -51.2030, false)
     ];
+    // Fotos de perfil (retratos genéricos do Pexels, sem marcas)
+    var FOTOS = [3769136, 1104758, 5905902, 8727399, 6634221, 3769021];
+    revs.forEach(function (r, i) {
+      var id = FOTOS[i % FOTOS.length];
+      r.foto = 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id + '.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=240&h=240';
+    });
 
     var prods = {
       r1: [

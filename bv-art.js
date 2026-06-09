@@ -135,6 +135,15 @@
     return w.prodArt(key);
   };
 
+  // Avatar da revendedora: foto (se houver) ou iniciais — para preencher
+  // um container redondo já estilizado (.loja-avatar, .store-avatar, etc.)
+  w.revFoto = function (rev) {
+    if (rev && rev.foto && /^(https?:|data:)/.test(rev.foto))
+      return '<img src="' + rev.foto + '" class="av-img" alt="" loading="lazy" onerror="this.outerHTML=this.getAttribute(\'data-ini\')||\'?\'" data-ini="' + revIni(rev) + '">';
+    return revIni(rev);
+  };
+  function revIni(rev){ var n=(rev&&rev.nome)?rev.nome:''; return n.split(' ').map(function(x){return x[0];}).join('').slice(0,2).toUpperCase()||'?'; }
+
   // chaves disponíveis (para montar seletores no painel)
   w.PROD_ART_KEYS = Object.keys(ART);
 
@@ -147,6 +156,7 @@
       '.prod-art{display:block;width:auto;height:78%;max-width:80%;margin:auto}' +
       '.prod-photo{width:100%;height:100%;object-fit:cover;background:linear-gradient(100deg,#f1e3ec 25%,#fbeef5 50%,#f1e3ec 75%);background-size:200% 100%;animation:bv-imgshimmer 1.25s linear infinite}' +
       '.prod-photo.bvloaded{animation:none;background:none}' +
+      '.av-img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}' +
       '@keyframes bv-imgshimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}' +
       '.prod-img-cell .prod-art,.img-opt .prod-art{height:100%;width:100%;max-width:100%}' +
       '.img-opt .prod-art{padding:4px}' +

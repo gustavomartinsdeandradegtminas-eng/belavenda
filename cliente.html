@@ -1059,7 +1059,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 </div>
 
 <script src="belavenda-api.js"></script>
-<script src="bv-art.js?v=5"></script>
+<script src="bv-art.js?v=6"></script>
 <script src="bv-notify.js"></script>
 <script>
 // ─── UTILS ────────────────────────────────────────────────
@@ -1582,7 +1582,7 @@ function buildCard({rev,prods,dist,score,breakdown},isFront){
     <div class="card-overlay-nope" id="overlay-nope-${rev.id}">PASSAR ${icon('x-mark')}</div>
     <div class="card-top">
       <div class="card-avatar-row">
-        <div class="card-avatar">${ini}</div>
+        <div class="card-avatar">${revFoto(rev)}</div>
         <div class="card-name">
           <h2>${rev.nome}
             ${!lojaAberta?`<span style="font-size:.7rem;background:#fce4ec;color:#b71c1c;border-radius:8px;padding:2px 8px;font-weight:700;vertical-align:middle;margin-left:6px">${icon('lock-closed')} Fechada</span>`:''}
@@ -1928,7 +1928,7 @@ function lojaCardHTML({rev,prods,match,dist}){
   const fav=isFav(rev.id)
   const seals=selosLojaCli(rev,prods,avs)
   return`<div class="loja-card${!lojaAberta?' loja-fechada-card-dim':''}" onclick="location.href='loja.html?slug=${rev.slugLoja}'" style="${!lojaAberta?'opacity:.78':''}">
-    <div class="loja-avatar">${ini}</div>
+    <div class="loja-avatar">${revFoto(rev)}</div>
     <div class="loja-info">
       <h3>${rev.nome}
         ${!lojaAberta?`<span style="font-size:.68rem;background:#fce4ec;color:#b71c1c;border-radius:6px;padding:2px 7px;font-weight:700;margin-left:6px;vertical-align:middle">${icon('lock-closed')} Fechada</span>`:''}
@@ -2046,7 +2046,7 @@ function renderInicio(){
     </div>`:''}
     ${favs.length?`<div class="inicio-sec">
       <div class="inicio-sec-h"><h3>${icon('heart-filled')} Suas favoritas</h3><a onclick="showTab('favoritas')">Ver todas</a></div>
-      <div class="inicio-chips">${favs.slice(0,10).map(r=>`<div class="fav-chip" onclick="location.href='loja.html?slug=${r.slugLoja}'" title="${r.nome}"><div class="fav-chip-av">${r.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div><span>${r.nome.split(' ')[0]}</span></div>`).join('')}</div>
+      <div class="inicio-chips">${favs.slice(0,10).map(r=>`<div class="fav-chip" onclick="location.href='loja.html?slug=${r.slugLoja}'" title="${r.nome}"><div class="fav-chip-av">${revFoto(r)}</div><span>${r.nome.split(' ')[0]}</span></div>`).join('')}</div>
     </div>`:''}
     <div class="inicio-sec">
       <div class="inicio-sec-h"><h3>${icon('sparkles')} Recomendadas pra você</h3><a onclick="showTab('explorar')">Explorar</a></div>
@@ -2249,7 +2249,7 @@ function renderMinhasLojas(){
     const ini=rev.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
     const lojaAberta=rev.lojaAberta!==false
     return`<div class="loja-card" onclick="location.href='loja.html?slug=${rev.slugLoja}'">
-      <div class="loja-avatar">${ini}</div>
+      <div class="loja-avatar">${revFoto(rev)}</div>
       <div class="loja-info">
         <h3>${rev.nome}
           ${!lojaAberta?`<span style="font-size:.68rem;background:#fce4ec;color:#b71c1c;border-radius:6px;padding:2px 7px;font-weight:700;margin-left:6px;vertical-align:middle">${icon('lock-closed')} Fechada</span>`:''}

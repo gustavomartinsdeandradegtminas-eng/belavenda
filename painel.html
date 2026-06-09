@@ -17,7 +17,7 @@
 <script src="bv-toast.js"></script>
 <script src="bv-icons.js"></script>
 <script src="bv-seed.js"></script>
-<script src="bv-art.js?v=5"></script>
+<script src="bv-art.js?v=6"></script>
 <script src="bv-notify.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -53,7 +53,9 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .nav-badge.warn{background:linear-gradient(135deg,#d97706,#f59e0b);box-shadow:0 2px 8px rgba(245,158,11,.5)}
 .sidebar-footer{padding:14px;border-top:1px solid rgba(255,255,255,.07)}
 .user-info{display:flex;align-items:center;gap:11px;margin-bottom:12px;padding:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06)}
-.user-avatar{width:38px;height:38px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;box-shadow:0 3px 10px rgba(194,24,91,.4)}
+.user-avatar{position:relative;width:38px;height:38px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;box-shadow:0 3px 10px rgba(194,24,91,.4);border:none;cursor:pointer;padding:0;overflow:hidden;font-family:inherit}
+.user-avatar:hover .user-avatar-cam{opacity:1}
+.user-avatar-cam{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;color:#fff;opacity:0;transition:opacity .2s;font-size:.85rem}
 .user-name{color:#fff;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .user-sub{color:rgba(255,255,255,.42);font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .btn-logout{width:100%;padding:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:9px;color:rgba(255,255,255,.72);cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
@@ -299,7 +301,8 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   </div>
   <div class="sidebar-footer">
     <div class="user-info">
-      <div class="user-avatar" id="user-avatar">--</div>
+      <button class="user-avatar" id="user-avatar" onclick="document.getElementById('foto-loja-input').click()" title="Alterar foto da loja">--<span class="user-avatar-cam"><svg class="ic"><use href="#ic-pencil"/></svg></span></button>
+      <input type="file" id="foto-loja-input" accept="image/*" style="display:none" onchange="uploadFotoLoja(this)">
       <div>
         <div class="user-name" id="user-name">Carregando...</div>
         <div class="user-sub" id="user-slug"></div>
@@ -402,7 +405,27 @@ function updateLojaStatusUI(){
 const rev=DB.getRev()
 document.getElementById('user-name').textContent=session.nome
 document.getElementById('user-slug').textContent='/loja/'+session.slugLoja
-document.getElementById('user-avatar').textContent=session.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
+renderUserAvatar()
+function renderUserAvatar(){const r=DB.getRev();document.getElementById('user-avatar').innerHTML=revFoto(r)+'<span class="user-avatar-cam"><svg class="ic"><use href="#ic-pencil"/></svg></span>'}
+function uploadFotoLoja(input){
+  const file=input.files&&input.files[0]; if(!file)return
+  if(!/^image\//.test(file.type)){bvToast('Selecione uma imagem.','error');return}
+  const reader=new FileReader()
+  reader.onload=function(e){
+    const img=new Image()
+    img.onload=function(){
+      const S=256,cv=document.createElement('canvas');cv.width=S;cv.height=S
+      const ctx=cv.getContext('2d'),m=Math.min(img.width,img.height),sx=(img.width-m)/2,sy=(img.height-m)/2
+      ctx.drawImage(img,sx,sy,m,m,0,0,S,S)
+      const dataUrl=cv.toDataURL('image/jpeg',0.82)
+      const revs=JSON.parse(localStorage.getItem('bv_revendedoras')||'[]')
+      const r=revs.find(x=>x.id===REV_ID); if(r){r.foto=dataUrl;localStorage.setItem('bv_revendedoras',JSON.stringify(revs))}
+      renderUserAvatar();bvToast('Foto da loja atualizada!','success')
+    }
+    img.src=e.target.result
+  }
+  reader.readAsDataURL(file)
+}
 updateLojaStatusUI()
 
 let currentSection='dashboard'
