@@ -360,6 +360,9 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .fav-btn .ic{font-size:1.1rem}
 .loja-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .loja-tag{font-size:.68rem;font-weight:700;background:var(--rose-l);color:var(--rose-d);border-radius:8px;padding:2px 8px}
+.loja-seals{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0 2px}
+.loja-seal{display:inline-flex;align-items:center;gap:4px;font-size:.66rem;font-weight:800;background:linear-gradient(135deg,var(--rose-l),#fff);color:var(--rose-d);border:1px solid var(--rose-l);border-radius:20px;padding:2px 9px}
+.loja-seal .ic{color:var(--rose)}
 
 /* ══════════════════════════════════════════════════════
    PEDIDO CARDS
@@ -1712,6 +1715,15 @@ function lojasFiltradas(){
   return lista
 }
 
+function selosLojaCli(rev,prods,avs){
+  const out=[], avg=avs.length?avs.reduce((s,a)=>s+a.estrelas,0)/avs.length:0
+  if(avg>=4.5&&avs.length>=3)out.push({ic:'star-filled',label:'Bem avaliada'})
+  const dias=rev.criadoEm?(Date.now()-new Date(rev.criadoEm).getTime())/86400000:999
+  if(dias<=30)out.push({ic:'sparkles',label:'Nova'})
+  if(prods.length>=8)out.push({ic:'shopping-bags',label:'Variada'})
+  if(avs.length>=5)out.push({ic:'heart-filled',label:'Querida'})
+  return out.slice(0,2)
+}
 function lojaCardHTML({rev,prods,match,dist}){
   const ini=rev.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
   const marcas=[...new Set(prods.map(p=>p.marca))].slice(0,3)
@@ -1719,6 +1731,7 @@ function lojaCardHTML({rev,prods,match,dist}){
   const avgStar=avs.length?avs.reduce((s,a)=>s+a.estrelas,0)/avs.length:0
   const lojaAberta=rev.lojaAberta!==false
   const fav=isFav(rev.id)
+  const seals=selosLojaCli(rev,prods,avs)
   return`<div class="loja-card${!lojaAberta?' loja-fechada-card-dim':''}" onclick="location.href='loja.html?slug=${rev.slugLoja}'" style="${!lojaAberta?'opacity:.78':''}">
     <div class="loja-avatar">${ini}</div>
     <div class="loja-info">
@@ -1729,6 +1742,7 @@ function lojaCardHTML({rev,prods,match,dist}){
         ${lojaAberta?`<span style="color:#43a047;font-weight:700"> · ${icon('dot')} Aberta</span>`:''}
       </div>
       ${avs.length?`<div style="font-size:.76rem;margin-bottom:3px">${starsHTML(avgStar)} <span style="color:var(--muted)">${avgStar.toFixed(1)} (${avs.length})</span></div>`:`<div style="font-size:.74rem;color:var(--muted-l);margin-bottom:3px">Sem avaliações ainda</div>`}
+      ${seals.length?`<div class="loja-seals">${seals.map(s=>`<span class="loja-seal">${icon(s.ic)} ${s.label}</span>`).join('')}</div>`:''}
       <div class="loja-tags">
         <span class="loja-tag">${icon('shopping-bag')} ${prods.length} produto(s)</span>
         ${marcas.map(m=>`<span class="loja-tag" style="background:#f3f0ff;color:#6d28d9">${m}</span>`).join('')}
