@@ -66,7 +66,14 @@
     '#bv-theme-btn:hover{transform:scale(1.1) rotate(-8deg)}' +
     '#bv-theme-btn:focus-visible{outline:3px solid rgba(194,24,91,.5);outline-offset:2px}' +
     '[data-theme=dark] #bv-theme-btn{background:#2a1524;color:#fbcfe8;border-color:var(--border);box-shadow:0 6px 22px rgba(0,0,0,.55)}' +
-    '@media(max-width:640px){#bv-theme-btn{width:44px;height:44px;right:14px;bottom:14px}}';
+    '@media(max-width:640px){#bv-theme-btn{width:44px;height:44px;right:14px;bottom:14px}}' +
+    // skeletons de carregamento (compartilhado)
+    '.skel{position:relative;overflow:hidden;background:#efe2ea;border-radius:8px}' +
+    '.skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.65) 50%,transparent 80%);animation:bv-skel 1.2s infinite}' +
+    '@keyframes bv-skel{100%{transform:translateX(100%)}}' +
+    '[data-theme=dark] .skel{background:#2a1524}' +
+    '[data-theme=dark] .skel::after{background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.08) 50%,transparent 80%)}' +
+    '[data-theme=dark] .prod-photo:not(.bvloaded){background:linear-gradient(100deg,#2a1524 25%,#3a2030 50%,#2a1524 75%);background-size:200% 100%}';
 
   var st = d.createElement('style');
   st.id = 'bv-theme-css';

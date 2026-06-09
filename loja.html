@@ -24,7 +24,7 @@
 <script src="bv-theme.js"></script>
 <script src="bv-icons.js"></script>
 <script src="bv-seed.js"></script>
-<script src="bv-art.js?v=4"></script>
+<script src="bv-art.js?v=5"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -456,11 +456,31 @@ function renderPage(){
         <button class="filter-chip${marcaFiltro==='Todas'?' active':''}" onclick="setMarca('Todas')">Todas</button>
         ${marcas.map(m=>`<button class="filter-chip${marcaFiltro===m?' active':''}" onclick="setMarca('${m}')">${m}</button>`).join('')}
       </div>
-      <div class="prod-grid" id="prod-grid">${renderProdCards()}</div>
+      <div class="prod-grid" id="prod-grid">${skeletonProds(Math.min(produtos.length||6,8))}</div>
     </div>`
 
   renderReviewsSection(avs)
   updateCartBadge()
+  // mostra skeleton por 1 frame e então renderiza os cards reais.
+  // rAF (rápido quando visível) + setTimeout (fallback garantido em aba em background, onde rAF fica pausado)
+  let _gridDone=false
+  const _doGrid=()=>{if(_gridDone)return;_gridDone=true;reRenderGrid()}
+  requestAnimationFrame(()=>requestAnimationFrame(_doGrid))
+  setTimeout(_doGrid,150)
+}
+function skeletonProds(n){
+  let s=''
+  for(let i=0;i<(n||6);i++)s+=`<div class="prod-card" style="pointer-events:none">
+    <div class="prod-img"><div class="skel" style="width:100%;height:100%;border-radius:0"></div></div>
+    <div class="prod-body">
+      <div class="skel" style="width:40%;height:10px;margin-bottom:10px"></div>
+      <div class="skel" style="width:85%;height:13px;margin-bottom:8px"></div>
+      <div class="skel" style="width:55%;height:10px;margin-bottom:12px"></div>
+      <div class="skel" style="width:45%;height:18px;margin-bottom:12px"></div>
+      <div class="skel" style="width:100%;height:38px;border-radius:9px"></div>
+    </div>
+  </div>`
+  return s
 }
 
 function renderReviewsSection(avs){

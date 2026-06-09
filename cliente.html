@@ -97,6 +97,8 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
   content:'';position:absolute;font-size:7rem;opacity:.07;
   top:-16px;right:-16px;line-height:1;pointer-events:none;
 }
+.auth-home{position:absolute;top:14px;left:14px;z-index:2;display:inline-flex;align-items:center;gap:5px;color:#fff;font-size:.78rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:20px;transition:background .2s,transform .2s}
+.auth-home:hover{background:rgba(255,255,255,.3);transform:translateX(-2px)}
 .auth-logo{
   font-size:2rem;font-weight:900;letter-spacing:-1.5px;
   color:#fff;margin-bottom:5px;text-shadow:0 2px 10px rgba(0,0,0,.2);
@@ -806,6 +808,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 <div class="auth-page" id="auth-screen">
   <div class="auth-card">
     <div class="auth-card-header">
+      <a class="auth-home" href="index.html">← Página inicial</a>
       <div class="auth-logo">Bela<span>Venda</span></div>
       <div class="auth-subtitle">Área do Cliente</div>
     </div>
@@ -1684,9 +1687,26 @@ function renderExplorar(){
       </div>
       <div class="toggle-pill ${soAbertas?'on':''}" id="toggle-abertas" onclick="toggleSoAbertas()"><span class="dotsw"></span> Só lojas abertas</div>
     </div>
-    <div id="lojas-resultado"><div class="empty"><div class="spinner"></div><p>Buscando...</p></div></div>
+    <div id="lojas-resultado">${skeletonLojas(5)}</div>
   `
-  filtrarLojas()
+  // skeleton por 1 frame; rAF quando visível + setTimeout como fallback (rAF pausa em aba em background)
+  let _lojasDone=false
+  const _doLojas=()=>{if(_lojasDone)return;_lojasDone=true;filtrarLojas()}
+  requestAnimationFrame(()=>requestAnimationFrame(_doLojas))
+  setTimeout(_doLojas,150)
+}
+function skeletonLojas(n){
+  let s=''
+  for(let i=0;i<(n||4);i++)s+=`<div class="loja-card" style="pointer-events:none">
+    <div class="skel" style="width:54px;height:54px;border-radius:50%;flex-shrink:0"></div>
+    <div class="loja-info" style="flex:1">
+      <div class="skel" style="width:55%;height:14px;margin-bottom:9px"></div>
+      <div class="skel" style="width:82%;height:10px;margin-bottom:9px"></div>
+      <div class="skel" style="width:38%;height:10px"></div>
+    </div>
+    <div class="skel" style="width:74px;height:32px;border-radius:9px;flex-shrink:0"></div>
+  </div>`
+  return s
 }
 function setRaio(v){raio=parseInt(v);const el=document.getElementById('raio-label');if(el)el.textContent=(raio>=5000?'tudo':raio+' km');filtrarLojas()}
 function setBusca(v){buscaProd=v.trim().toLowerCase();filtrarLojas()}

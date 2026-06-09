@@ -123,12 +123,12 @@
     var arr = PHOTO[key];
     if (!arr || !arr.length) return w.prodArt(key);
     var id = arr[hashStr(seed) % arr.length];
-    return '<img src="' + photoUrl(id) + '" class="prod-photo" loading="lazy" alt="" onerror="bvImgFallback(this,\'' + key + '\')">';
+    return '<img src="' + photoUrl(id) + '" class="prod-photo" loading="lazy" alt="" onload="this.classList.add(\'bvloaded\')" onerror="bvImgFallback(this,\'' + key + '\')">';
   }
 
   w.prodImg = function (imagem, categoria, seed) {
     if (imagem && /^(https?:|data:)/.test(imagem)) {
-      return '<img src="' + imagem + '" class="prod-photo" loading="lazy" alt="">';
+      return '<img src="' + imagem + '" class="prod-photo" loading="lazy" alt="" onload="this.classList.add(\'bvloaded\')">';
     }
     var key = resolveKey(imagem, categoria);
     if (PHOTO[key]) return prodPhoto(key, seed != null ? seed : (imagem || key));
@@ -145,7 +145,9 @@
     s.id = 'bv-art-css';
     s.textContent =
       '.prod-art{display:block;width:auto;height:78%;max-width:80%;margin:auto}' +
-      '.prod-photo{width:100%;height:100%;object-fit:cover}' +
+      '.prod-photo{width:100%;height:100%;object-fit:cover;background:linear-gradient(100deg,#f1e3ec 25%,#fbeef5 50%,#f1e3ec 75%);background-size:200% 100%;animation:bv-imgshimmer 1.25s linear infinite}' +
+      '.prod-photo.bvloaded{animation:none;background:none}' +
+      '@keyframes bv-imgshimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}' +
       '.prod-img-cell .prod-art,.img-opt .prod-art{height:100%;width:100%;max-width:100%}' +
       '.img-opt .prod-art{padding:4px}' +
       '.img-opt .prod-photo,.prod-img-cell .prod-photo{border-radius:6px}';
