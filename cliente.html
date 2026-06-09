@@ -865,6 +865,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
     <div class="topbar-logo"><svg class="ic"><use href="#ic-lipstick"/></svg> BelaVenda <em>| Área do Cliente</em></div>
     <div class="topbar-right">
       <span class="topbar-nome" id="topbar-nome"></span>
+      <div id="bv-notify-slot"></div>
       <button class="btn-sair" onclick="logout()">Sair</button>
     </div>
   </div>
@@ -982,6 +983,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 </div>
 
 <script src="belavenda-api.js"></script>
+<script src="bv-notify.js"></script>
 <script>
 // ─── UTILS ────────────────────────────────────────────────
 const fmtMoeda=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')
@@ -1125,6 +1127,20 @@ function showPainel(){
   renderPedidos()
   renderMinhasLojas()
   atualizarBadgeFav()
+  if(window.BVNotify)BVNotify.mount({mountSel:'#bv-notify-slot',storageKey:'bv_notif_seen_'+(s.whatsapp||'cli'),compute:computeClienteNotifs,emptyText:'Sem novidades por enquanto.'})
+}
+function computeClienteNotifs(){
+  const out=[], s=getSession(); if(!s)return out
+  const STX={SEPARANDO:{t:'Pedido em preparação',ic:'shopping-bag'},EM_TRANSITO:{t:'Pedido a caminho',ic:'motorcycle'},ENTREGUE:{t:'Pedido entregue',ic:'handshake'},CANCELADO:{t:'Pedido cancelado',ic:'x-circle'}}
+  getRevs().forEach(rev=>{
+    JSON.parse(localStorage.getItem('bv_pedidos_'+rev.id)||'[]')
+      .filter(p=>p.clienteTelefone===s.whatsapp||p.clienteNome===s.nome)
+      .forEach(p=>{
+        if(STX[p.status])out.push({id:'st-'+p.id+'-'+p.status,ic:icon(STX[p.status].ic),title:STX[p.status].t,text:rev.nome+' · #'+p.id.slice(0,6).toUpperCase(),ts:p.dataCriacao})
+        if(p.status==='ENTREGUE'&&!p.avaliado)out.push({id:'rate-'+p.id,ic:icon('star'),title:'Avalie sua compra',text:'Conte como foi em '+rev.nome,ts:p.dataCriacao})
+      })
+  })
+  return out.sort((a,b)=>new Date(b.ts||0)-new Date(a.ts||0))
 }
 
 // ─── TABS ─────────────────────────────────────────────────

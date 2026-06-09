@@ -17,6 +17,7 @@
 <script src="bv-icons.js"></script>
 <script src="bv-seed.js"></script>
 <script src="bv-art.js?v=5"></script>
+<script src="bv-notify.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -314,7 +315,10 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
       <button class="hamburger" onclick="toggleSidebar()"><svg class="ic"><use href="#ic-menu"/></svg></button>
       <span class="topbar-title" id="topbar-title">Dashboard</span>
     </div>
-    <div class="topbar-actions" id="topbar-actions"></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div id="bv-notify-slot"></div>
+      <div class="topbar-actions" id="topbar-actions"></div>
+    </div>
   </div>
   <div class="content" id="content">
     <div class="empty"><div class="empty-icon"><svg class="ic ic-xl"><use href="#ic-hourglass"/></svg></div><p>Carregando...</p></div>
@@ -422,6 +426,17 @@ function atualizarBadgesSidebar(){
   const low=DB.getProdos().filter(p=>p.estoque!=null&&p.estoque<=3).length
   const bpr=document.getElementById('badge-produtos')
   if(bpr){if(low>0){bpr.textContent=low;bpr.style.display='flex'}else{bpr.style.display='none'}}
+  if(window.BVNotify)BVNotify.refresh()
+}
+function computePainelNotifs(){
+  const out=[]
+  DB.getPedidos().filter(p=>p.status==='NOVO').forEach(p=>out.push({id:'ped-'+p.id,ic:icon('package'),title:'Novo pedido recebido',text:(p.clienteNome||'Cliente')+' · '+fmtMoeda(p.valorTotal),ts:p.dataCriacao}))
+  JSON.parse(localStorage.getItem('bv_avaliacoes_'+REV_ID)||'[]').forEach(a=>out.push({id:'av-'+a.id,ic:icon('star'),title:'Nova avaliação '+a.estrelas+'★',text:(a.clienteNome||'Cliente')+(a.comentario?': "'+a.comentario.slice(0,40)+'"':''),ts:a.data}))
+  DB.getProdos().forEach(p=>{
+    if(p.estoque===0)out.push({id:'stk0-'+p.id,ic:icon('alert-triangle'),title:'Produto esgotado',text:p.nome})
+    else if(p.estoque!=null&&p.estoque<=3)out.push({id:'stklow-'+p.id,ic:icon('alert-triangle'),title:'Estoque baixo',text:p.nome+' · '+p.estoque+' restante(s)'})
+  })
+  return out.sort((a,b)=>new Date(b.ts||0)-new Date(a.ts||0))
 }
 
 // ─── MODAL ────────────────────────────────────────────────
@@ -1475,6 +1490,7 @@ function renderAvaliacoes(){
 }
 
 // ─── START ────────────────────────────────────────────────
+if(window.BVNotify)BVNotify.mount({mountSel:'#bv-notify-slot',storageKey:'bv_notif_seen_'+REV_ID,compute:computePainelNotifs,emptyText:'Tudo em dia! Sem novidades.'})
 navigate('dashboard')
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
