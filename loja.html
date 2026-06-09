@@ -22,6 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="bv-theme.js"></script>
+<script src="bv-toast.js"></script>
 <script src="bv-icons.js"></script>
 <script src="bv-seed.js"></script>
 <script src="bv-art.js?v=5"></script>
@@ -640,7 +641,7 @@ function fecharCheckout(){
 function abrirCheckout(){
   if(!cartCount())return
   if(!isLojaAberta()){
-    alert('Esta loja está fechada no momento e não aceita pedidos. Tente novamente mais tarde.')
+    bvToast('Esta loja está fechada no momento e não aceita pedidos.','info')
     return
   }
   closeCart();chStep=1;chInfo={};chMetodo='PIX'
@@ -781,7 +782,7 @@ function nextStep1(){
   // Se há opções de entrega disponíveis mas nenhuma foi selecionada, exigir seleção
   const deliveryWrap=document.getElementById('delivery-section-wrap')
   if(deliveryWrap&&deliveryWrap.querySelector('.delivery-opt')&&!chInfo.entrega){
-    alert('Por favor, selecione um método de entrega.')
+    bvToast('Selecione um método de entrega.','error')
     deliveryWrap.scrollIntoView({behavior:'smooth',block:'center'})
     return
   }
@@ -951,7 +952,7 @@ function processPagarCartao(){
   const exp=document.getElementById('card-exp')?.value||''
   const cvv=(document.getElementById('card-cvv')?.value||'').replace(/\D/g,'')
   if(num.length<16||!name||exp.length<5||cvv.length<3){
-    alert('Preencha todos os dados do cartão corretamente.');return
+    bvToast('Preencha todos os dados do cartão corretamente.','error');return
   }
   const parc=parseInt(document.getElementById('card-parc')?.value||1)
   const total=cartTotal()+(chInfo.entrega?.price||0)

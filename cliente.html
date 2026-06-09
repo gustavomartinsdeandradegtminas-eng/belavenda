@@ -12,6 +12,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="BelaVenda">
 <script src="bv-theme.js"></script>
+<script src="bv-toast.js"></script>
 <style>
 /* ═══════════════════════════════════════════════════════
    BELAVENDA CLIENTE — Design Premium 2.0
@@ -1319,7 +1320,7 @@ function renderPerfilBody(){
 }
 function salvarPerfilDados(){
   const nome=document.getElementById('pf-nome').value.trim(), wa=document.getElementById('pf-wa').value.trim()
-  if(!nome){alert('Informe seu nome.');return}
+  if(!nome){bvToast('Informe seu nome.','error');return}
   const s=getSession(); setSession({...s,nome,whatsapp:wa||s.whatsapp})
   document.getElementById('topbar-nome').textContent='Olá, '+nome.split(' ')[0]
   showNotif&&showNotif('like','Dados atualizados!')
@@ -2087,7 +2088,7 @@ function submitAvaliacao(){
   if(!avStars||!avRevId)return
   const s=getSession()
   const avs=getAvaliacoes(avRevId)
-  if(avs.find(a=>a.pedidoId===avPedidoId)){alert('Você já avaliou este pedido.');return}
+  if(avs.find(a=>a.pedidoId===avPedidoId)){bvToast('Você já avaliou este pedido.','info');return}
   avs.push({id:crypto.randomUUID(),pedidoId:avPedidoId,clienteNome:s.nome,clienteWa:s.whatsapp,estrelas:avStars,comentario:document.getElementById('av-comentario').value.trim(),data:new Date().toISOString()})
   localStorage.setItem('bv_avaliacoes_'+avRevId,JSON.stringify(avs))
   // Marcar pedido como avaliado
@@ -2106,7 +2107,7 @@ function recomprar(pedidoId,revId,slug){
   const peds=JSON.parse(localStorage.getItem('bv_pedidos_'+revId)||'[]')
   const p=peds.find(x=>x.id===pedidoId)
   const itens=(p&&p.itens)?p.itens.filter(it=>it.produtoId):[]
-  if(!itens.length){alert('Não foi possível recomprar: itens indisponíveis.');return}
+  if(!itens.length){bvToast('Não foi possível recomprar: itens indisponíveis.','error');return}
   localStorage.setItem('bv_recompra_'+revId,JSON.stringify(itens.map(it=>({id:it.produtoId,qty:it.quantidade||1}))))
   location.href='loja.html?slug='+slug+'&recompra=1'
 }

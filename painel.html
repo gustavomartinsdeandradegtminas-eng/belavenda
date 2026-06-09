@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="bv-theme.js"></script>
+<script src="bv-toast.js"></script>
 <script src="bv-icons.js"></script>
 <script src="bv-seed.js"></script>
 <script src="bv-art.js?v=5"></script>
@@ -584,13 +585,14 @@ function renderDashboard(){
 function setDashPeriodo(v){dashPeriodo=v;renderDashboard()}
 // ─── META DE VENDAS + GRÁFICO ─────────────────────────────
 function getMeta(){return parseFloat(localStorage.getItem('bv_meta_'+REV_ID)||'0')||0}
-function setMetaPrompt(){
+async function setMetaPrompt(){
   const atual=getMeta()
-  const v=prompt('Defina sua meta de vendas para este mês (R$):',atual||'2000')
+  const v=await bvPrompt({title:'Meta de vendas do mês',label:'Quanto você quer vender este mês?',value:atual||2000,type:'number',prefix:'R$',okText:'Salvar meta'})
   if(v===null)return
   const n=parseFloat(String(v).replace(/[^\d,.-]/g,'').replace('.','').replace(',','.'))||parseFloat(String(v).replace(/[^\d.]/g,''))||0
   localStorage.setItem('bv_meta_'+REV_ID,String(Math.max(0,n)))
   renderDashboard()
+  bvToast('Meta atualizada!','success')
 }
 function vendasMes(pedidos){
   const ini=new Date();ini.setDate(1);ini.setHours(0,0,0,0)
@@ -619,7 +621,7 @@ function vendas7dias(pedidos){
 }
 function copiarLink(){
   navigator.clipboard.writeText(catalogUrl())
-  alert('Link copiado!')
+  bvToast('Link copiado!','success')
 }
 function calcDashboard(pedidos,clientes,periodo){
   const agora=new Date()
@@ -812,7 +814,7 @@ function renderItensNP(){
 }
 function salvarNovoPedido(){
   const itens=window._npItens
-  if(!itens.length){alert('Adicione ao menos um produto.');return}
+  if(!itens.length){bvToast('Adicione ao menos um produto.','error');return}
   const cliSel=document.getElementById('np-cliente')
   const cliOpt=cliSel.options[cliSel.selectedIndex]
   const clientes=DB.getClients()
@@ -881,7 +883,7 @@ function abrirFormCliente(id){
 }
 function salvarCliente(id){
   const nome=document.getElementById('fc-nome').value.trim()
-  if(!nome){alert('Nome obrigatório.');return}
+  if(!nome){bvToast('Nome obrigatório.','error');return}
   const clientes=DB.getClients()
   if(id){
     const c=clientes.find(x=>x.id===id)
@@ -889,11 +891,11 @@ function salvarCliente(id){
   }else{
     clientes.push({id:uid(),revendedoraId:REV_ID,nome,telefone:document.getElementById('fc-tel').value,endereco:document.getElementById('fc-end').value,aniversario:document.getElementById('fc-aniv').value,criadoEm:now()})
   }
-  DB.saveClients(clientes);closeModal();renderClientes()
+  DB.saveClients(clientes);closeModal();renderClientes();bvToast('Cliente salva!','success')
 }
-function excluirCliente(id){
-  if(!confirm('Excluir esta cliente?'))return
-  DB.saveClients(DB.getClients().filter(c=>c.id!==id));renderClientes()
+async function excluirCliente(id){
+  if(!await bvConfirm('Esta cliente será removida da sua lista.',{title:'Excluir cliente?',okText:'Excluir',danger:true}))return
+  DB.saveClients(DB.getClients().filter(c=>c.id!==id));renderClientes();bvToast('Cliente excluída.','info')
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1153,7 +1155,7 @@ function previewImgUrl(url){
 function handleImgUpload(input){
   const file=input.files[0]
   if(!file)return
-  if(file.size>600*1024){alert('Imagem muito grande. Use uma imagem até 600KB.');return}
+  if(file.size>600*1024){bvToast('Imagem muito grande. Use até 600KB.','error');return}
   const reader=new FileReader()
   reader.onload=e=>{
     _prodImgSel=e.target.result
@@ -1182,7 +1184,7 @@ function calcMargemProd(){
 
 function salvarProduto(id){
   const nome=document.getElementById('fp-nome').value.trim()
-  if(!nome){alert('Nome do produto é obrigatório.');return}
+  if(!nome){bvToast('Nome do produto é obrigatório.','error');return}
   const prods=DB.getProdos()
   const imgUrl=document.getElementById('img-url').value.trim()
   const cat=document.getElementById('fp-cat').value
@@ -1200,12 +1202,12 @@ function salvarProduto(id){
   }
   if(id){const p=prods.find(x=>x.id===id);if(p)Object.assign(p,data)}
   else prods.push({id:uid(),revendedoraId:REV_ID,...data,criadoEm:now()})
-  DB.saveProdos(prods);closeModal();renderProdutos()
+  DB.saveProdos(prods);closeModal();renderProdutos();bvToast(id?'Produto atualizado!':'Produto adicionado!','success')
 }
 
-function excluirProduto(id){
-  if(!confirm('Excluir este produto permanentemente?'))return
-  DB.saveProdos(DB.getProdos().filter(p=>p.id!==id));renderProdutos()
+async function excluirProduto(id){
+  if(!await bvConfirm('Este produto será removido do seu catálogo permanentemente.',{title:'Excluir produto?',okText:'Excluir',danger:true}))return
+  DB.saveProdos(DB.getProdos().filter(p=>p.id!==id));renderProdutos();bvToast('Produto excluído.','info')
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1251,7 +1253,7 @@ function abrirNovaEntrega(){
 }
 function criarEntrega(){
   const pedidoId=document.getElementById('ne-pedido').value
-  if(!pedidoId){alert('Selecione um pedido.');return}
+  if(!pedidoId){bvToast('Selecione um pedido.','error');return}
   const servico=document.getElementById('ne-servico').value
   const extId='EXT-'+Math.random().toString(36).slice(2,8).toUpperCase()
   const entrega={id:uid(),pedidoId,servico,status:'SOLICITADO',externalId:extId,urlTracking:`https://tracking.simulado.com/${extId}`,criadoEm:now()}
