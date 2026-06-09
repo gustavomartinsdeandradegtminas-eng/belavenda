@@ -190,8 +190,12 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
   height:62px;position:sticky;top:0;z-index:200;
   box-shadow:0 4px 20px rgba(233,30,140,.25);
 }
-.topbar-logo{font-size:1.15rem;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
-.topbar-logo em{opacity:.6;font-style:normal;font-weight:400;font-size:.78rem;margin-left:4px}
+.topbar-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.tb-mark{width:36px;height:36px;border-radius:11px;background:#fff;color:var(--rose-d);display:grid;place-items:center;font-family:'Playfair Display',Georgia,serif;font-weight:800;font-size:1.35rem;line-height:1;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.22),inset 0 0 0 1px rgba(194,24,91,.1)}
+.tb-word{font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;font-weight:800;letter-spacing:-.3px;color:#fff;line-height:1}
+.tb-word i{font-style:italic;font-weight:600;opacity:.85}
+.tb-sub{font-family:'Inter',sans-serif;font-size:.74rem;font-weight:500;opacity:.62;color:#fff;border-left:1px solid rgba(255,255,255,.4);padding-left:10px;margin-left:4px}
+@media(max-width:560px){.tb-sub{display:none}.tb-word{font-size:1.15rem}}
 .topbar-right{display:flex;align-items:center;gap:10px;font-size:.85rem}
 .topbar-nome{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:inherit;cursor:pointer;border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;transition:background .2s}
 .topbar-nome:hover{background:rgba(255,255,255,.28)}
@@ -936,7 +940,11 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 <!-- ═══ PAINEL ═══ -->
 <div class="painel" id="painel-screen">
   <div class="topbar">
-    <div class="topbar-logo"><svg class="ic"><use href="#ic-lipstick"/></svg> BelaVenda <em>| Área do Cliente</em></div>
+    <div class="topbar-logo">
+      <span class="tb-mark">B</span>
+      <span class="tb-word">Bela<i>Venda</i></span>
+      <span class="tb-sub">Área do Cliente</span>
+    </div>
     <div class="topbar-right">
       <button class="topbar-nome" id="topbar-nome" onclick="abrirPerfil()" title="Minha conta"></button>
       <div id="bv-notify-slot"></div>
