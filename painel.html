@@ -57,6 +57,14 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .user-avatar:hover .user-avatar-cam{opacity:1}
 .user-avatar-cam{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;color:#fff;opacity:0;transition:opacity .2s;font-size:.85rem}
 .pl-foto{width:88px;height:88px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.7rem;overflow:hidden;flex-shrink:0;box-shadow:0 5px 16px rgba(194,24,91,.35);font-family:'Playfair Display',Georgia,serif}
+.onboard-card{border:1.5px solid var(--primary-l)!important;background:linear-gradient(160deg,#fff,var(--primary-l))!important}
+.onboard-steps{display:flex;flex-direction:column;gap:10px}
+.onboard-step{display:flex;align-items:center;gap:11px;font-size:.9rem;color:var(--text)}
+.ob-check{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--border2);background:#fff;display:grid;place-items:center;color:#fff;font-size:.66rem}
+.onboard-step.done .ob-check{background:var(--grad);border-color:transparent}
+.onboard-step.done .ob-label{color:var(--muted);text-decoration:line-through}
+.ob-label{flex:1;min-width:0}
+.onboard-step .btn,.onboard-step>span:last-child{margin-left:auto;flex:none}
 .user-name{color:#fff;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .user-sub{color:rgba(255,255,255,.42);font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .btn-logout{width:100%;padding:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:9px;color:rgba(255,255,255,.72);cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
@@ -531,6 +539,7 @@ function renderDashboard(){
   const clientes=DB.getClients()
   const filtro=calcDashboard(pedidos,clientes,dashPeriodo)
   content.innerHTML=`
+    ${onboardingHTML()}
     <div class="filter-bar">
       <span style="font-size:.85rem;font-weight:600;color:var(--muted)">Período:</span>
       ${[{l:'Hoje',v:0},{l:'7 dias',v:7},{l:'30 dias',v:30}].map(f=>`
@@ -689,6 +698,32 @@ function checkMetaCelebration(){
   localStorage.setItem(key,'1')
   if(window.bvConfetti)bvConfetti()
   if(window.bvToast)bvToast('Meta do mês batida! Parabéns!','success')
+}
+function onboardingHTML(){
+  const r=DB.getRev()
+  const steps=[
+    {ok:!!(r.foto&&r.bio), label:'Complete o perfil da loja (foto + descrição)', action:"navigate('perfilLoja')", cta:'Perfil'},
+    {ok:DB.getProdos().length>0, label:'Cadastre seu primeiro produto', action:"navigate('produtos')", cta:'Produtos'},
+    {ok:getMeta()>0, label:'Defina sua meta de vendas do mês', action:"setMetaPrompt()", cta:'Definir'},
+    {ok:getLojaSituacao(), label:'Abra sua loja para receber pedidos', action:"toggleLoja()", cta:'Abrir'}
+  ]
+  const done=steps.filter(s=>s.ok).length, total=steps.length
+  if(done>=total)return ''
+  const pct=Math.round(done/total*100)
+  return `<div class="card onboard-card" style="margin-bottom:24px"><div class="card-body">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-weight:800;font-family:'Playfair Display',Georgia,serif;font-size:1.1rem">${icon('sparkles')} Comece por aqui</span>
+      <span style="font-size:.82rem;color:var(--primary);font-weight:800">${done}/${total} concluído</span>
+    </div>
+    <div class="meta-track" style="margin-bottom:15px"><div class="meta-fill" style="width:${pct}%"></div></div>
+    <div class="onboard-steps">
+      ${steps.map(s=>`<div class="onboard-step ${s.ok?'done':''}">
+        <span class="ob-check">${s.ok?icon('check'):''}</span>
+        <span class="ob-label">${s.label}</span>
+        ${s.ok?`<span style="font-size:.75rem;color:var(--success);font-weight:700">${icon('check')} feito</span>`:`<button class="btn btn-sm btn-primary" onclick="${s.action}">${s.cta}</button>`}
+      </div>`).join('')}
+    </div>
+  </div></div>`
 }
 function copiarLink(){
   navigator.clipboard.writeText(catalogUrl())
