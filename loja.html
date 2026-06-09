@@ -92,6 +92,10 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .prod-tag{position:absolute;top:10px;right:10px;z-index:2;font-size:.66rem;font-weight:800;padding:4px 10px;border-radius:20px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.18);letter-spacing:.2px;display:inline-flex;align-items:center;gap:4px}
 .prod-tag.sell{background:linear-gradient(135deg,#d97706,#f59e0b)}
 .prod-tag.new{background:linear-gradient(135deg,#7c3aed,#a855f7)}
+.wish-btn{position:absolute;bottom:10px;right:10px;z-index:3;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.93);color:var(--muted);display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.18);transition:all .2s;padding:0}
+.wish-btn:hover{color:var(--primary);transform:scale(1.1)}
+.wish-btn.on{background:var(--grad);color:#fff}
+.wish-btn .ic{font-size:1rem}
 .prod-img .prod-photo{transition:transform .5s cubic-bezier(.2,.6,.2,1)}
 .prod-card:hover .prod-img .prod-photo{transform:scale(1.07)}
 .prod-body{padding:16px 18px 18px}
@@ -340,6 +344,17 @@ function getProds(revId){return JSON.parse(localStorage.getItem('bv_produtos_'+r
 function savePedido(p,revId){const k='bv_pedidos_'+revId,a=JSON.parse(localStorage.getItem(k)||'[]');a.push(p);localStorage.setItem(k,JSON.stringify(a))}
 function getAvaliacoes(revId){return JSON.parse(localStorage.getItem('bv_avaliacoes_'+revId)||'[]')}
 function getClienteSession(){return JSON.parse(localStorage.getItem('bv_cliente_session')||'null')}
+// ─── Lista de desejos (por cliente) ───
+function wishKey(){const c=getClienteSession();return c&&c.whatsapp?'bv_wishlist_'+c.whatsapp:null}
+function loadWish(){const k=wishKey();return k?JSON.parse(localStorage.getItem(k)||'[]'):[]}
+function isWished(pid){return loadWish().some(w=>w.prodId===pid)}
+function toggleWish(pid){
+  const k=wishKey(); if(!k)return
+  let w=loadWish(); const i=w.findIndex(x=>x.prodId===pid)
+  if(i>=0)w.splice(i,1)
+  else{const p=produtos.find(x=>x.id===pid)||JSON.parse(localStorage.getItem('bv_produtos_'+revendedora.id)||'[]').find(x=>x.id===pid);if(p)w.push({prodId:p.id,revId:revendedora.id,slug:revendedora.slugLoja,loja:revendedora.nome,nome:p.nome,marca:p.marca,categoria:p.categoria,preco:p.precoVenda,imagem:p.imagem})}
+  localStorage.setItem(k,JSON.stringify(w)); reRenderGrid()
+}
 
 // ─── STARS ────────────────────────────────────────────────
 function starsHTML(n,max=5,gold='#ffc107',empty='#e0e0e0'){
@@ -388,6 +403,18 @@ window.onload=function(){
   if(!revendedora){showNotFound(`Loja "${slug}" não encontrada.`);return}
   produtos=getProds(revendedora.id)
   renderPage()
+  aplicarRecompra()
+}
+// Recompra: se veio com ?recompra=1, pré-carrega o carrinho e abre
+function aplicarRecompra(){
+  if(params.get('recompra')!=='1')return
+  const k='bv_recompra_'+revendedora.id
+  let itens=[]; try{itens=JSON.parse(localStorage.getItem(k)||'[]')}catch(e){}
+  localStorage.removeItem(k)
+  if(!itens.length||!isLojaAberta())return
+  let add=0
+  itens.forEach(it=>{const p=produtos.find(x=>x.id===it.id);if(p){const max=(p.estoque!=null)?p.estoque:Infinity;const q=Math.min(it.qty||1,max);if(q>0){cart[p.id]=q;add++;}}})
+  if(add){reRenderGrid();updateCartBadge();setTimeout(openCart,300)}
 }
 
 function isLojaAberta(){return revendedora?.lojaAberta!==false}
@@ -532,6 +559,7 @@ function getProdImg(p){
 function renderProdCards(){
   const aberta=isLojaAberta()
   const topNomes=topVendidos(revendedora.id)
+  const cli=getClienteSession()
   let list=produtos
   if(marcaFiltro!=='Todas')list=list.filter(p=>p.marca===marcaFiltro)
   if(buscaQ)list=list.filter(p=>p.nome.toLowerCase().includes(buscaQ)||p.marca.toLowerCase().includes(buscaQ))
@@ -543,8 +571,10 @@ function renderProdCards(){
     const noMax=(est!=null&&qty>=est)
     const novo=p.criadoEm&&(Date.now()-new Date(p.criadoEm).getTime())/86400000<=21
     const prodTag=topNomes.includes(p.nome)?`<span class="prod-tag sell">${icon('trophy')} Mais vendido</span>`:(novo?`<span class="prod-tag new">${icon('sparkles')} Novidade</span>`:'')
+    const wished=cli&&isWished(p.id)
+    const wishBtn=cli?`<button class="wish-btn${wished?' on':''}" onclick="toggleWish('${p.id}')" title="${wished?'Remover dos desejos':'Adicionar à lista de desejos'}">${icon('heart')}</button>`:''
     return`<div class="prod-card">
-      <div class="prod-img" style="overflow:hidden">${getProdImg(p)}${lowBadge}${prodTag}</div>
+      <div class="prod-img" style="overflow:hidden">${getProdImg(p)}${lowBadge}${prodTag}${wishBtn}</div>
       <div class="prod-body">
         <div class="prod-brand">${p.marca}</div>
         <div class="prod-name">${p.nome}</div>

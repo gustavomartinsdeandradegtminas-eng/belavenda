@@ -409,6 +409,24 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .fav-chip-av{width:56px;height:56px;border-radius:50%;background:var(--grad-primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.05rem;box-shadow:0 4px 12px rgba(233,30,140,.3);border:2px solid rgba(255,255,255,.8);transition:transform .2s}
 .fav-chip:hover .fav-chip-av{transform:scale(1.08)}
 .fav-chip span{font-size:.72rem;color:var(--text);font-weight:600;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+/* ── Toggle Favoritas / Desejos ── */
+.fav-toggle{display:flex;gap:8px;margin-bottom:16px}
+.fav-tg{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:11px;border:1.5px solid var(--border);background:var(--surface);font-size:.84rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s}
+.fav-tg.on{border-color:transparent;background:var(--grad-primary);color:#fff;box-shadow:0 4px 13px rgba(233,30,140,.3)}
+/* ── Cards de desejo (produtos) ── */
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.wish-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .15s}
+.wish-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px)}
+.wish-img{height:120px;background:linear-gradient(135deg,var(--rose-l),#fff);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
+.wish-body{padding:11px 12px 12px}
+.wish-brand{font-size:.64rem;font-weight:800;color:var(--rose);text-transform:uppercase;letter-spacing:.4px}
+.wish-name{font-size:.84rem;font-weight:700;color:var(--text);line-height:1.25;margin:2px 0 4px;min-height:2.1em}
+.wish-loja{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:4px;margin-bottom:6px}
+.wish-price{font-size:1.05rem;font-weight:800;font-family:'Playfair Display',Georgia,serif;background:var(--grad-primary);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:9px}
+.wish-actions{display:flex;gap:6px;align-items:center}
+.wish-actions .btn-ver{font-size:.74rem;padding:7px 10px}
+.wish-del{background:none;border:1.5px solid var(--border);border-radius:8px;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;color:var(--muted-l);flex-shrink:0}
+.wish-del:hover{color:var(--danger);border-color:var(--danger)}
 .loja-seals{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0 2px}
 .loja-seal{display:inline-flex;align-items:center;gap:4px;font-size:.66rem;font-weight:800;background:linear-gradient(135deg,var(--rose-l),#fff);color:var(--rose-d);border:1px solid var(--rose-l);border-radius:20px;padding:2px 9px}
 .loja-seal .ic{color:var(--rose)}
@@ -1036,6 +1054,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 </div>
 
 <script src="belavenda-api.js"></script>
+<script src="bv-art.js?v=5"></script>
 <script src="bv-notify.js"></script>
 <script>
 // ─── UTILS ────────────────────────────────────────────────
@@ -1941,13 +1960,42 @@ function filtrarLojas(){
 }
 
 // ─── FAVORITAS ────────────────────────────────────────────
+function loadWishCli(){return JSON.parse(localStorage.getItem('bv_wishlist_'+(getSession()||{}).whatsapp)||'[]')}
+function removeWishCli(pid){const k='bv_wishlist_'+(getSession()||{}).whatsapp;localStorage.setItem(k,JSON.stringify(loadWishCli().filter(w=>w.prodId!==pid)));renderFavoritas()}
+function wishCardHTML(w){
+  return`<div class="wish-card">
+    <div class="wish-img" onclick="location.href='loja.html?slug=${w.slug}'">${prodImg(w.imagem,w.categoria,w.prodId)}</div>
+    <div class="wish-body">
+      <div class="wish-brand">${w.marca||''}</div>
+      <div class="wish-name">${w.nome}</div>
+      <div class="wish-loja">${icon('storefront')} ${w.loja}</div>
+      <div class="wish-price">${fmtMoeda(w.preco)}</div>
+      <div class="wish-actions">
+        <button class="btn-ver" style="flex:1" onclick="location.href='loja.html?slug=${w.slug}'">Ver na loja</button>
+        <button class="wish-del" onclick="removeWishCli('${w.prodId}')" aria-label="Remover">${icon('trash')}</button>
+      </div>
+    </div>
+  </div>`
+}
+let favView='lojas'
+function setFavView(v){favView=v;renderFavoritas()}
 function renderFavoritas(){
   const el=document.getElementById('tab-favoritas')
   if(!el)return
   const s=getSession(), temLoc=s&&s.lat&&s.lng
-  const favs=loadFavoritas()
+  const favs=loadFavoritas(), wish=loadWishCli()
+  const toggle=`<div class="fav-toggle">
+    <button class="fav-tg${favView==='lojas'?' on':''}" onclick="setFavView('lojas')">${icon('storefront')} Lojas (${favs.length})</button>
+    <button class="fav-tg${favView==='produtos'?' on':''}" onclick="setFavView('produtos')">${icon('heart-filled')} Desejos (${wish.length})</button>
+  </div>`
+  if(favView==='produtos'){
+    el.innerHTML=toggle+(wish.length
+      ?`<div class="wish-grid">${wish.map(wishCardHTML).join('')}</div>`
+      :`<div class="empty"><div class="empty-icon">${icon('heart','ic-xl')}</div><p><strong>Sua lista de desejos está vazia.</strong><br>Toque no ${icon('heart')} nos produtos de uma loja para salvá-los aqui.</p><button class="btn-ver" style="margin-top:16px" onclick="showTab('explorar')">${icon('magnifying-glass')} Explorar lojas</button></div>`)
+    return
+  }
   if(!favs.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">${icon('heart','ic-xl')}</div><p><strong>Você ainda não favoritou nenhuma loja.</strong><br>Toque no ${icon('heart')} nos cards da aba <b>Explorar</b> para salvar suas lojas preferidas aqui.</p><button class="btn-ver" style="margin-top:16px" onclick="showTab('explorar')">${icon('magnifying-glass')} Explorar lojas</button></div>`
+    el.innerHTML=toggle+`<div class="empty"><div class="empty-icon">${icon('heart','ic-xl')}</div><p><strong>Você ainda não favoritou nenhuma loja.</strong><br>Toque no ${icon('heart')} nos cards da aba <b>Explorar</b> para salvar suas lojas preferidas aqui.</p><button class="btn-ver" style="margin-top:16px" onclick="showTab('explorar')">${icon('magnifying-glass')} Explorar lojas</button></div>`
     return
   }
   const lista=favs.map(id=>getRevs().find(r=>r.id===id)).filter(Boolean).map(rev=>{
@@ -1955,7 +2003,7 @@ function renderFavoritas(){
     const dist=(temLoc&&rev.lat&&rev.lng)?haversine(s.lat,s.lng,rev.lat,rev.lng):null
     return{rev,prods,match:[],dist}
   })
-  el.innerHTML=`<div class="resultado-header">${icon('heart-filled')} ${lista.length} loja(s) favorita(s)</div>`+lista.map(lojaCardHTML).join('')
+  el.innerHTML=toggle+`<div class="resultado-header">${icon('heart-filled')} ${lista.length} loja(s) favorita(s)</div>`+lista.map(lojaCardHTML).join('')
 }
 
 // ─── INÍCIO (FEED) ────────────────────────────────────────
@@ -2051,6 +2099,14 @@ function submitAvaliacao(){
   matchDeck=[]; matchIndex=0; renderMatch()
 }
 
+function recomprar(pedidoId,revId,slug){
+  const peds=JSON.parse(localStorage.getItem('bv_pedidos_'+revId)||'[]')
+  const p=peds.find(x=>x.id===pedidoId)
+  const itens=(p&&p.itens)?p.itens.filter(it=>it.produtoId):[]
+  if(!itens.length){alert('Não foi possível recomprar: itens indisponíveis.');return}
+  localStorage.setItem('bv_recompra_'+revId,JSON.stringify(itens.map(it=>({id:it.produtoId,qty:it.quantidade||1}))))
+  location.href='loja.html?slug='+slug+'&recompra=1'
+}
 function renderPedidos(){
   const s=getSession()
   const todos=getRevs().flatMap(rev=>{
@@ -2082,6 +2138,7 @@ function renderPedidos(){
         <span class="pedido-total">${fmtMoeda(p.valorTotal)} · ${p.formaPagamento||''}</span>
         <div style="display:flex;gap:7px;flex-wrap:wrap">
           ${p.status!=='CANCELADO'?`<button class="btn-track" onclick="abrirRastreamento('${p.id}','${p._rId}')">${icon('route')} Rastrear</button>`:''}
+          ${(p.itens&&p.itens.length)?`<button class="btn-track" onclick="recomprar('${p.id}','${p._rId}','${p._rSlug}')">${icon('arrows-rotate')} Recomprar</button>`:''}
           ${podeAvaliar?`<button class="btn-ver" style="font-size:.78rem;background:#ffc107;color:#000" onclick="abrirAvModal('${p.id}','${p._rId}','${p._rNome}')">${icon('star')} Avaliar</button>`:''}
           <button class="btn-ver" style="font-size:.78rem" onclick="location.href='loja.html?slug=${p._rSlug}'">Ver Loja</button>
           ${p._rTel?`<a class="wa-btn" href="https://wa.me/${(p._rTel||'').replace(/\D/g,'')}?text=${encodeURIComponent('Olá! Sobre o pedido #'+p.id.slice(0,8).toUpperCase())}" target="_blank">${icon('chat-bubble')} WA</a>`:''}
