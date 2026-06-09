@@ -264,11 +264,13 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 }
 .tabs::-webkit-scrollbar{display:none}
 .tab{
-  flex:1;padding:9px 12px;font-size:.82rem;font-weight:600;
+  flex:1 1 0;min-width:0;padding:9px 8px;font-size:.82rem;font-weight:600;
   color:var(--muted);cursor:pointer;border-radius:11px;
   border:none;background:transparent;transition:all .2s;
-  font-family:inherit;white-space:nowrap;flex-shrink:0;min-width:0;
+  font-family:inherit;white-space:nowrap;text-align:center;
+  overflow:hidden;text-overflow:ellipsis;
 }
+.tab .ic{margin-right:3px;vertical-align:-.12em}
 .tab.active{
   background:var(--grad-primary);color:#fff;
   box-shadow:0 4px 14px rgba(233,30,140,.3);
@@ -849,6 +851,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   .auth-card{border-radius:20px;margin:8px}
   .auth-body{padding:20px 18px 24px}
   .auth-card-header{padding:24px 18px 20px}
+  .tab{flex:0 0 auto;padding:9px 13px}
   .filter-controls{flex-direction:column}
   .slider-wrap,.busca-wrap{width:100%;min-width:unset}
   .loja-card{flex-wrap:wrap;position:relative}
@@ -950,7 +953,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
       <button class="tab"         onclick="showTab('explorar')"><svg class="ic"><use href="#ic-magnifying-glass"/></svg> Explorar</button>
       <button class="tab"         onclick="showTab('favoritas')"><svg class="ic"><use href="#ic-heart"/></svg> Favoritas<span id="fav-tab-count"></span></button>
       <button class="tab"         onclick="showTab('pedidos')"><svg class="ic"><use href="#ic-package"/></svg> Pedidos</button>
-      <button class="tab"         onclick="showTab('lojas')"><svg class="ic"><use href="#ic-storefront"/></svg> Minhas Lojas</button>
+      <button class="tab"         onclick="showTab('lojas')"><svg class="ic"><use href="#ic-storefront"/></svg> Lojas</button>
     </div>
 
     <div id="tab-inicio"></div>
