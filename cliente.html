@@ -363,6 +363,27 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .fav-btn .ic{font-size:1.1rem}
 .loja-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
 .loja-tag{font-size:.68rem;font-weight:700;background:var(--rose-l);color:var(--rose-d);border-radius:8px;padding:2px 8px}
+/* ── INÍCIO (FEED) ── */
+.inicio-hero{background:var(--grad-primary);color:#fff;border-radius:18px;padding:20px 22px;margin-bottom:18px;box-shadow:0 8px 24px rgba(233,30,140,.25);position:relative;overflow:hidden}
+.inicio-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(140% 130% at 100% 0%,rgba(255,255,255,.22),transparent 55%);pointer-events:none}
+.inicio-greet{font-size:1.3rem;font-weight:800;font-family:'Playfair Display',Georgia,serif;position:relative}
+.inicio-sub{font-size:.82rem;opacity:.92;margin-top:5px;position:relative}
+.inicio-cep-btn{margin-top:12px;background:rgba(255,255,255,.95);color:var(--rose-d);border:none;border-radius:10px;padding:8px 16px;font-size:.82rem;font-weight:800;cursor:pointer;font-family:inherit;position:relative}
+.inicio-sec{margin-bottom:22px}
+.inicio-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.inicio-sec h3{font-size:1rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px}
+.inicio-sec-h a{font-size:.8rem;font-weight:700;color:var(--rose);cursor:pointer}
+.inicio-sec-h a:hover{text-decoration:underline}
+.inicio-order{display:flex;align-items:center;gap:12px;background:var(--grad-card);border:1.5px solid var(--border);border-radius:14px;padding:13px 15px;margin-bottom:10px;cursor:pointer;transition:box-shadow .2s,transform .15s;box-shadow:var(--shadow-sm)}
+.inicio-order:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.io-ic{width:40px;height:40px;border-radius:11px;background:var(--rose-l);display:grid;place-items:center;flex-shrink:0;font-size:1.05rem}
+.io-loja{font-size:.9rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.io-st{font-size:.76rem;color:var(--muted);margin-top:1px}
+.inicio-chips{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
+.fav-chip{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;width:64px}
+.fav-chip-av{width:56px;height:56px;border-radius:50%;background:var(--grad-primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.05rem;box-shadow:0 4px 12px rgba(233,30,140,.3);border:2px solid rgba(255,255,255,.8);transition:transform .2s}
+.fav-chip:hover .fav-chip-av{transform:scale(1.08)}
+.fav-chip span{font-size:.72rem;color:var(--text);font-weight:600;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
 .loja-seals{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0 2px}
 .loja-seal{display:inline-flex;align-items:center;gap:4px;font-size:.66rem;font-weight:800;background:linear-gradient(135deg,var(--rose-l),#fff);color:var(--rose-d);border:1px solid var(--rose-l);border-radius:20px;padding:2px 9px}
 .loja-seal .ic{color:var(--rose)}
@@ -880,14 +901,16 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
     </div>
 
     <div class="tabs">
-      <button class="tab active"  onclick="showTab('match')"><svg class="ic"><use href="#ic-heart-gift"/></svg> Match</button>
+      <button class="tab active"  onclick="showTab('inicio')"><svg class="ic"><use href="#ic-sparkles"/></svg> Início</button>
+      <button class="tab"         onclick="showTab('match')"><svg class="ic"><use href="#ic-heart-gift"/></svg> Match</button>
       <button class="tab"         onclick="showTab('explorar')"><svg class="ic"><use href="#ic-magnifying-glass"/></svg> Explorar</button>
       <button class="tab"         onclick="showTab('favoritas')"><svg class="ic"><use href="#ic-heart"/></svg> Favoritas<span id="fav-tab-count"></span></button>
       <button class="tab"         onclick="showTab('pedidos')"><svg class="ic"><use href="#ic-package"/></svg> Pedidos</button>
       <button class="tab"         onclick="showTab('lojas')"><svg class="ic"><use href="#ic-storefront"/></svg> Minhas Lojas</button>
     </div>
 
-    <div id="tab-match"></div>
+    <div id="tab-inicio"></div>
+    <div id="tab-match" style="display:none"></div>
     <div id="tab-explorar" style="display:none"></div>
     <div id="tab-favoritas" style="display:none"></div>
     <div id="tab-pedidos"  style="display:none"></div>
@@ -1121,6 +1144,7 @@ function showPainel(){
   document.getElementById('topbar-nome').textContent='Olá, '+s.nome.split(' ')[0]
   const semCep=!s.lat||!s.lng
   document.getElementById('banner-cep').style.display=semCep?'flex':'none'
+  renderInicio()
   renderMatch()
   renderExplorar()
   renderFavoritas()
@@ -1144,12 +1168,14 @@ function computeClienteNotifs(){
 }
 
 // ─── TABS ─────────────────────────────────────────────────
-const TAB_NAMES=['match','explorar','favoritas','pedidos','lojas']
+const TAB_NAMES=['inicio','match','explorar','favoritas','pedidos','lojas']
 function showTab(t){
   document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',TAB_NAMES[i]===t))
   TAB_NAMES.forEach(n=>document.getElementById('tab-'+n).style.display=n===t?'':'none')
+  if(t==='inicio')renderInicio()
   if(t==='favoritas')renderFavoritas()
   if(t==='explorar')renderExplorar()
+  window.scrollTo(0,0)
 }
 
 // ─── MODAL CEP ────────────────────────────────────────────
@@ -1167,7 +1193,7 @@ function salvarCepModal(){
   document.getElementById('cep-modal').classList.remove('open')
   document.getElementById('banner-cep').style.display='none'
   matchDeck=[]; matchIndex=0; curtidas=loadCurtidas()
-  renderMatch(); renderExplorar(); renderMinhasLojas()
+  renderInicio(); renderMatch(); renderExplorar(); renderMinhasLojas()
 }
 
 // ─── DADOS ────────────────────────────────────────────────
@@ -1822,6 +1848,50 @@ function renderFavoritas(){
     return{rev,prods,match:[],dist}
   })
   el.innerHTML=`<div class="resultado-header">${icon('heart-filled')} ${lista.length} loja(s) favorita(s)</div>`+lista.map(lojaCardHTML).join('')
+}
+
+// ─── INÍCIO (FEED) ────────────────────────────────────────
+function saudacao(){const h=new Date().getHours();return h<12?'Bom dia':h<18?'Boa tarde':'Boa noite'}
+function renderInicio(){
+  const el=document.getElementById('tab-inicio'); if(!el)return
+  const s=getSession()||{}, temLoc=s.lat&&s.lng
+  const nome=(s.nome||'cliente').split(' ')[0]
+  const todos=getRevs().flatMap(rev=>JSON.parse(localStorage.getItem('bv_pedidos_'+rev.id)||'[]')
+      .filter(p=>p.clienteTelefone===s.whatsapp||p.clienteNome===s.nome)
+      .map(p=>({...p,_rNome:rev.nome,_rId:rev.id,_rSlug:rev.slugLoja})))
+      .sort((a,b)=>new Date(b.dataCriacao)-new Date(a.dataCriacao))
+  const ativos=todos.filter(p=>['NOVO','SEPARANDO','EM_TRANSITO'].indexOf(p.status)>=0)
+  const favs=loadFavoritas().map(id=>getRevs().find(r=>r.id===id)).filter(Boolean)
+  const recs=getRevs().filter(r=>r.lojaAberta!==false).map(rev=>{
+      const dist=(temLoc&&rev.lat&&rev.lng)?haversine(s.lat,s.lng,rev.lat,rev.lng):null
+      return{rev,prods:getProdos(rev.id),match:[],dist}
+    }).filter(x=>x.prods.length&&(x.dist===null||x.dist<=5000))
+    .filter(x=>loadFavoritas().indexOf(x.rev.id)<0)
+    .sort((a,b)=>(a.dist??9999)-(b.dist??9999)).slice(0,4)
+  const STAT={NOVO:{t:'Pedido recebido',ic:'circle-check',cor:'#2563eb'},SEPARANDO:{t:'Em preparação',ic:'shopping-bag',cor:'#d97706'},EM_TRANSITO:{t:'A caminho',ic:'motorcycle',cor:'#059669'}}
+  el.innerHTML=`
+    <div class="inicio-hero">
+      <div class="inicio-greet">${saudacao()}, <b>${nome}</b> ${icon('hand-wave')}</div>
+      <div class="inicio-sub">${temLoc?icon('map-pin')+' '+s.cidade+', '+s.estado:icon('map-pin')+' Adicione seu CEP para ver lojas pertinho de você'}</div>
+      ${!temLoc?`<button class="inicio-cep-btn" onclick="abrirModalCep()">${icon('mailbox')} Informar CEP</button>`:''}
+    </div>
+    ${ativos.length?`<div class="inicio-sec">
+      <div class="inicio-sec-h"><h3>${icon('motorcycle')} Em andamento</h3><a onclick="showTab('pedidos')">Ver pedidos</a></div>
+      ${ativos.slice(0,3).map(p=>{const st=STAT[p.status]||STAT.NOVO;return`<div class="inicio-order" onclick="abrirRastreamento('${p.id}','${p._rId}')">
+        <div class="io-ic" style="color:${st.cor}">${icon(st.ic)}</div>
+        <div style="flex:1;min-width:0"><div class="io-loja">${p._rNome}</div><div class="io-st">${st.t} · #${p.id.slice(0,6).toUpperCase()}</div></div>
+        <button class="btn-track" onclick="event.stopPropagation();abrirRastreamento('${p.id}','${p._rId}')">${icon('route')} Rastrear</button>
+      </div>`}).join('')}
+    </div>`:''}
+    ${favs.length?`<div class="inicio-sec">
+      <div class="inicio-sec-h"><h3>${icon('heart-filled')} Suas favoritas</h3><a onclick="showTab('favoritas')">Ver todas</a></div>
+      <div class="inicio-chips">${favs.slice(0,10).map(r=>`<div class="fav-chip" onclick="location.href='loja.html?slug=${r.slugLoja}'" title="${r.nome}"><div class="fav-chip-av">${r.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div><span>${r.nome.split(' ')[0]}</span></div>`).join('')}</div>
+    </div>`:''}
+    <div class="inicio-sec">
+      <div class="inicio-sec-h"><h3>${icon('sparkles')} Recomendadas pra você</h3><a onclick="showTab('explorar')">Explorar</a></div>
+      ${recs.length?recs.map(lojaCardHTML).join(''):`<div class="empty" style="padding:30px 16px"><div class="empty-icon">${icon('storefront','ic-xl')}</div><p>${temLoc?'Nenhuma loja aberta por perto agora.':'Informe seu CEP para ver recomendações.'}</p>${temLoc?`<button class="btn-ver" style="margin-top:12px" onclick="showTab('match')">${icon('heart-gift')} Descobrir no Match</button>`:''}</div>`}
+    </div>
+  `
 }
 
 // ─── MEUS PEDIDOS ─────────────────────────────────────────
