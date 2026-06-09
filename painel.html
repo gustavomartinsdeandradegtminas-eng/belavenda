@@ -419,6 +419,7 @@ function navigate(section){
   if(renderers[section])renderers[section]()
   atualizarBadgesSidebar()
   if(window.bvAnimate)bvAnimate(document.getElementById('content'))
+  if(section==='dashboard')setTimeout(checkMetaCelebration,350)
   if(window.innerWidth<900)document.getElementById('sidebar').classList.remove('open')
 }
 function atualizarBadgesSidebar(){
@@ -619,6 +620,15 @@ function vendas7dias(pedidos){
   for(let i=6;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);const o={k:key(d),label:lbls[d.getDay()],vendas:0};dias.push(o);map[o.k]=o}
   pedidos.filter(p=>p.status==='ENTREGUE').forEach(p=>{const k=key(p.dataCriacao);if(map[k])map[k].vendas+=p.valorTotal||0})
   return dias
+}
+function checkMetaCelebration(){
+  const meta=getMeta(); if(!meta)return
+  if(vendasMes(DB.getPedidos())<meta)return
+  const key='bv_meta_won_'+REV_ID+'_'+mesAtual()
+  if(localStorage.getItem(key))return
+  localStorage.setItem(key,'1')
+  if(window.bvConfetti)bvConfetti()
+  if(window.bvToast)bvToast('Meta do mês batida! Parabéns!','success')
 }
 function copiarLink(){
   navigator.clipboard.writeText(catalogUrl())

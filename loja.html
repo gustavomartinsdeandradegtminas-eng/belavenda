@@ -1011,25 +1011,7 @@ function confirmarBoleto(){
   criarPedido({metodo:'BOLETO',status:'AGUARDANDO_BOLETO',txId:'BOL'+uid().replace(/-/g,'').slice(0,12).toUpperCase(),dataPagamento:null})
 }
 
-// ─── CONFETE ──────────────────────────────────────────────
-function bvConfetti(){
-  const cores=['#c2185b','#e91e8c','#f59e0b','#7c3aed','#10b981','#f48fb1']
-  let layer=document.getElementById('bv-confetti')
-  if(!layer){layer=document.createElement('div');layer.id='bv-confetti';document.body.appendChild(layer)}
-  const N=90
-  for(let i=0;i<N;i++){
-    const c=document.createElement('i')
-    const size=6+Math.floor(Math.random()*8)
-    c.style.cssText='position:fixed;top:-20px;left:'+(Math.random()*100)+'vw;width:'+size+'px;height:'+(size*0.6)+'px;background:'+cores[i%cores.length]+';opacity:'+(0.8+Math.random()*0.2)+';border-radius:2px;z-index:9999;pointer-events:none;transform:rotate('+(Math.random()*360)+'deg)'
-    const dur=2.2+Math.random()*1.6, delay=Math.random()*0.5, drift=(Math.random()*2-1)*160
-    c.animate([
-      {transform:c.style.transform+' translate(0,0)',opacity:1},
-      {transform:'translate('+drift+'px,'+(window.innerHeight+60)+'px) rotate('+(720+Math.random()*360)+'deg)',opacity:1}
-    ],{duration:dur*1000,delay:delay*1000,easing:'cubic-bezier(.2,.6,.4,1)',fill:'forwards'})
-    layer.appendChild(c)
-    setTimeout(()=>c.remove(),(dur+delay)*1000+200)
-  }
-}
+// ─── CONFETE (compartilhado em bv-toast.js) ───────────────
 
 // ─── CRIAR PEDIDO ─────────────────────────────────────────
 function criarPedido(pagamento){
