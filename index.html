@@ -268,6 +268,26 @@ section{padding:100px 0;position:relative}
 .feat-card h4{font-size:16px;font-weight:700;margin-bottom:7px;color:var(--text)}
 .feat-card p{font-size:13.5px;color:var(--muted);line-height:1.55}
 
+/* ===== VITRINES ===== */
+.vitrines-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:46px}
+.vit-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .3s,box-shadow .3s}
+.vit-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.vit-top{position:relative;height:66px;background:var(--grad)}
+.vit-top::after{content:"";position:absolute;inset:0;background:radial-gradient(130% 120% at 90% 0%,rgba(255,255,255,.25),transparent 55%)}
+.vit-match{position:absolute;top:10px;right:10px;z-index:2;background:rgba(255,255,255,.95);color:var(--rose-d);font-size:12px;font-weight:800;padding:4px 10px;border-radius:20px;box-shadow:0 3px 8px rgba(0,0,0,.16)}
+.vit-photo{position:absolute;left:18px;bottom:-26px;z-index:2;width:64px;height:64px;border-radius:50%;border:3px solid var(--surface);object-fit:cover;box-shadow:0 5px 14px rgba(0,0,0,.2)}
+.vit-body{padding:34px 18px 18px}
+.vit-name{font-family:'Playfair Display',serif;font-weight:800;font-size:18px;color:var(--text)}
+.vit-meta{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:4px;margin:3px 0 7px}
+.vit-stars{color:var(--gold);font-size:14px;margin-bottom:11px;display:flex;align-items:center;gap:5px}
+.vit-stars b{color:var(--text);font-weight:700}.vit-stars span{color:var(--muted);font-size:12px;font-weight:500}
+.vit-brands{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:15px}
+.vit-brands span{font-size:11px;font-weight:700;background:var(--rose-l);color:var(--rose-d);border-radius:20px;padding:3px 10px}
+.vit-btn{display:block;text-align:center;background:var(--rose-xl);color:var(--rose-d);border-radius:11px;padding:11px;font-weight:700;font-size:13.5px;transition:background .2s,transform .15s}
+.vit-btn:hover{background:var(--rose-l);transform:translateY(-1px)}
+@media(max-width:900px){.vitrines-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.vitrines-grid{grid-template-columns:1fr}}
+
 /* ===== TESTIMONIALS ===== */
 .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .testi{
@@ -562,6 +582,62 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
   <div class="marquee">
     <div class="marquee-track" id="marquee">
       <!-- duplicated via JS for seamless loop -->
+    </div>
+  </div>
+</section>
+
+<!-- ===== VITRINES EM DESTAQUE ===== -->
+<section id="vitrines">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><svg class="ic"><use href="#ic-storefront"/></svg>Vitrines em destaque</span>
+      <h2>Revendedoras <em>perto de você</em></h2>
+      <p>Exemplos de quem já vende pelo BelaVenda — com avaliações reais das clientes e entrega no mesmo dia.</p>
+    </div>
+    <div class="vitrines-grid">
+      <div class="vit-card reveal">
+        <div class="vit-top"><span class="vit-match">94% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/3769136/pexels-photo-3769136.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
+        <div class="vit-body">
+          <div class="vit-name">Camila Beauty</div>
+          <div class="vit-meta"><svg class="ic"><use href="#ic-map-pin"/></svg> Vila Mariana, SP · 1,2 km</div>
+          <div class="vit-stars"><svg class="ic"><use href="#ic-star-filled"/></svg> <b>4,7</b> <span>(128 avaliações)</span></div>
+          <div class="vit-brands"><span>Ruby Rose</span><span>Vult</span><span>Dailus</span></div>
+          <a class="vit-btn" href="loja.html?slug=camila-beauty">Ver vitrine</a>
+        </div>
+      </div>
+      <div class="vit-card reveal">
+        <div class="vit-top"><span class="vit-match">91% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/1104758/pexels-photo-1104758.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
+        <div class="vit-body">
+          <div class="vit-name">Glamour by Paula</div>
+          <div class="vit-meta"><svg class="ic"><use href="#ic-map-pin"/></svg> Moema, SP · 2,3 km</div>
+          <div class="vit-stars"><svg class="ic"><use href="#ic-star-filled"/></svg> <b>4,9</b> <span>(96 avaliações)</span></div>
+          <div class="vit-brands"><span>Mary Kay</span><span>Dailus</span><span>Vult</span></div>
+          <a class="vit-btn" href="loja.html?slug=glamour-paula">Ver vitrine</a>
+        </div>
+      </div>
+      <div class="vit-card reveal">
+        <div class="vit-top"><span class="vit-match">88% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/5905902/pexels-photo-5905902.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
+        <div class="vit-body">
+          <div class="vit-name">Pele Viva by Aline</div>
+          <div class="vit-meta"><svg class="ic"><use href="#ic-map-pin"/></svg> Santana, SP · 3,1 km</div>
+          <div class="vit-stars"><svg class="ic"><use href="#ic-star-filled"/></svg> <b>4,8</b> <span>(74 avaliações)</span></div>
+          <div class="vit-brands"><span>Payot</span><span>Natura</span><span>Avon</span></div>
+          <a class="vit-btn" href="loja.html?slug=pele-viva-aline">Ver vitrine</a>
+        </div>
+      </div>
+      <div class="vit-card reveal">
+        <div class="vit-top"><span class="vit-match">85% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/8727399/pexels-photo-8727399.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
+        <div class="vit-body">
+          <div class="vit-name">Studio Make Bruna</div>
+          <div class="vit-meta"><svg class="ic"><use href="#ic-map-pin"/></svg> Itaim Bibi, SP · 4,4 km</div>
+          <div class="vit-stars"><svg class="ic"><use href="#ic-star-filled"/></svg> <b>4,6</b> <span>(52 avaliações)</span></div>
+          <div class="vit-brands"><span>Mary Kay</span><span>Quem Disse Berenice</span></div>
+          <a class="vit-btn" href="loja.html?slug=studio-make-bruna">Ver vitrine</a>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px" class="reveal">
+      <a class="btn btn-primary btn-lg" href="cliente.html">Descobrir revendedoras perto de mim</a>
     </div>
   </div>
 </section>
