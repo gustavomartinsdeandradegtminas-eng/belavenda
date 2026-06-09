@@ -84,6 +84,7 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .prod-card:hover{transform:translateY(-6px);box-shadow:0 8px 16px rgba(136,14,79,.1),0 24px 50px rgba(136,14,79,.16);border-color:var(--primary-l)}
 .prod-img{height:160px;background:linear-gradient(135deg,var(--primary-l),#fff);display:flex;align-items:center;justify-content:center;font-size:3.5rem;overflow:hidden;position:relative}
 .prod-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 62%,rgba(136,14,79,.10));pointer-events:none}
+.stock-badge{position:absolute;top:10px;left:10px;z-index:2;background:rgba(239,68,68,.95);color:#fff;font-size:.68rem;font-weight:800;padding:4px 10px;border-radius:20px;box-shadow:0 3px 8px rgba(239,68,68,.4);letter-spacing:.2px}
 .prod-img .prod-photo{transition:transform .5s cubic-bezier(.2,.6,.2,1)}
 .prod-card:hover .prod-img .prod-photo{transform:scale(1.07)}
 .prod-body{padding:16px 18px 18px}
@@ -328,7 +329,7 @@ let revendedora=null, produtos=[], cart={}, marcaFiltro='Todas', buscaQ=''
 
 // ─── DB ───────────────────────────────────────────────────
 function findRev(slug){return(JSON.parse(localStorage.getItem('bv_revendedoras')||'[]')).find(r=>r.slugLoja===slug)||null}
-function getProds(revId){return JSON.parse(localStorage.getItem('bv_produtos_'+revId)||'[]').filter(p=>p.visivelCatalogo)}
+function getProds(revId){return JSON.parse(localStorage.getItem('bv_produtos_'+revId)||'[]').filter(p=>p.visivelCatalogo&&p.estoque!==0)}
 function savePedido(p,revId){const k='bv_pedidos_'+revId,a=JSON.parse(localStorage.getItem(k)||'[]');a.push(p);localStorage.setItem(k,JSON.stringify(a))}
 function getAvaliacoes(revId){return JSON.parse(localStorage.getItem('bv_avaliacoes_'+revId)||'[]')}
 function getClienteSession(){return JSON.parse(localStorage.getItem('bv_cliente_session')||'null')}
@@ -493,8 +494,11 @@ function renderProdCards(){
   if(!list.length)return`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">`+icon('search','ic-xl')+`</div><p>Nenhum produto encontrado</p></div>`
   return list.map(p=>{
     const qty=cart[p.id]||0
+    const est=p.estoque
+    const lowBadge=(est!=null&&est>0&&est<=5)?`<span class="stock-badge">Só ${est} restante${est>1?'s':''}!</span>`:''
+    const noMax=(est!=null&&qty>=est)
     return`<div class="prod-card">
-      <div class="prod-img" style="overflow:hidden">${getProdImg(p)}</div>
+      <div class="prod-img" style="overflow:hidden">${getProdImg(p)}${lowBadge}</div>
       <div class="prod-body">
         <div class="prod-brand">${p.marca}</div>
         <div class="prod-name">${p.nome}</div>
@@ -504,7 +508,7 @@ function renderProdCards(){
           ${!aberta
             ?`<button class="add-btn" disabled style="opacity:.4;cursor:not-allowed;width:100%">Loja fechada</button>`
             :qty>0
-              ?`<div class="qty-ctrl"><button onclick="decQty('${p.id}')">−</button><span>${qty}</span><button onclick="incQty('${p.id}')">+</button></div>`
+              ?`<div class="qty-ctrl"><button onclick="decQty('${p.id}')">−</button><span>${qty}</span><button onclick="incQty('${p.id}')" ${noMax?'disabled style="opacity:.35;cursor:not-allowed"':''}>+</button></div>${noMax?`<span style="font-size:.68rem;color:var(--danger);font-weight:700;margin-left:6px">máx</span>`:''}`
               :`<button class="add-btn" onclick="addToCart('${p.id}')">Adicionar</button>`
           }
         </div>
@@ -516,8 +520,9 @@ function setMarca(m){marcaFiltro=m;reRenderGrid()}
 function setBusca(q){buscaQ=q.toLowerCase();reRenderGrid()}
 
 // ─── CART ─────────────────────────────────────────────────
-function addToCart(id){cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge()}
-function incQty(id){cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge();renderCartItems()}
+function stockOf(id){const p=produtos.find(x=>x.id===id);return (p&&p.estoque!=null)?p.estoque:Infinity}
+function addToCart(id){if((cart[id]||0)>=stockOf(id))return;cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge()}
+function incQty(id){if((cart[id]||0)>=stockOf(id))return;cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge();renderCartItems()}
 function decQty(id){cart[id]=(cart[id]||1)-1;if(cart[id]<=0)delete cart[id];reRenderGrid();updateCartBadge();renderCartItems()}
 function removeFromCart(id){delete cart[id];reRenderGrid();updateCartBadge();renderCartItems()}
 function cartItems(){return Object.keys(cart).map(id=>({...produtos.find(p=>p.id===id),qty:cart[id]})).filter(x=>x&&x.id)}
