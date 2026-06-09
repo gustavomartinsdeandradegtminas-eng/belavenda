@@ -192,7 +192,32 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .topbar-logo{font-size:1.15rem;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;gap:8px}
 .topbar-logo em{opacity:.6;font-style:normal;font-weight:400;font-size:.78rem;margin-left:4px}
 .topbar-right{display:flex;align-items:center;gap:10px;font-size:.85rem}
-.topbar-nome{background:rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;font-size:.8rem;font-weight:600}
+.topbar-nome{background:rgba(255,255,255,.15);border:none;color:#fff;font-family:inherit;cursor:pointer;border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;transition:background .2s}
+.topbar-nome:hover{background:rgba(255,255,255,.28)}
+/* ── PERFIL / MINHA CONTA ── */
+.perfil-head{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.perfil-av{width:52px;height:52px;border-radius:50%;background:var(--grad-primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.15rem;flex-shrink:0;box-shadow:0 4px 12px rgba(233,30,140,.3)}
+.perfil-nome{font-size:1.1rem;font-weight:800;font-family:'Playfair Display',Georgia,serif;color:var(--text)}
+.perfil-wa{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.bvn-close{margin-left:auto;background:var(--bg);border:1px solid var(--border);border-radius:10px;width:34px;height:34px;display:grid;place-items:center;cursor:pointer;color:var(--muted);flex-shrink:0}
+.bvn-close:hover{color:var(--rose);border-color:var(--rose-l)}
+.perfil-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.perfil-stat{background:var(--grad-card);border:1px solid var(--border);border-radius:13px;padding:12px 8px;text-align:center}
+.ps-v{font-size:1.05rem;font-weight:800;color:var(--rose);font-family:'Playfair Display',Georgia,serif;line-height:1.1}
+.ps-k{font-size:.7rem;color:var(--muted);font-weight:600;margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
+.perfil-sec{margin-bottom:18px;border-top:1px solid var(--border);padding-top:14px}
+.perfil-sec h4{font-size:.92rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.end-card{display:flex;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+.end-card.ativo{border-color:var(--rose);background:var(--rose-xl)}
+.end-label{font-size:.85rem;font-weight:700;color:var(--text)}
+.end-badge{font-size:.62rem;background:var(--rose);color:#fff;border-radius:10px;padding:1px 7px;font-weight:700;vertical-align:middle;margin-left:4px}
+.end-addr{font-size:.74rem;color:var(--muted);margin-top:2px}
+.end-btn{background:var(--grad-primary);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.end-del{background:none;border:none;cursor:pointer;color:var(--muted-l);padding:4px;flex-shrink:0}
+.end-del:hover{color:var(--danger)}
+.pele-chips{display:flex;flex-wrap:wrap;gap:7px}
+.pele-chip{background:var(--bg);border:1.5px solid var(--border2);border-radius:20px;padding:7px 14px;font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s}
+.pele-chip.sel{border-color:transparent;background:var(--grad-primary);color:#fff}
 .btn-sair{
   background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
   color:rgba(255,255,255,.9);border-radius:8px;padding:6px 14px;
@@ -885,7 +910,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   <div class="topbar">
     <div class="topbar-logo"><svg class="ic"><use href="#ic-lipstick"/></svg> BelaVenda <em>| Área do Cliente</em></div>
     <div class="topbar-right">
-      <span class="topbar-nome" id="topbar-nome"></span>
+      <button class="topbar-nome" id="topbar-nome" onclick="abrirPerfil()" title="Minha conta"></button>
       <div id="bv-notify-slot"></div>
       <button class="btn-sair" onclick="logout()">Sair</button>
     </div>
@@ -965,6 +990,11 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 <!-- MODAL RASTREAMENTO -->
 <div class="modal-overlay" id="track-modal" onclick="fecharRastreamento(event)">
   <div class="modal" id="track-modal-box" style="max-width:440px"></div>
+</div>
+
+<!-- MODAL PERFIL / MINHA CONTA -->
+<div class="modal-overlay" id="perfil-modal" onclick="fecharPerfil(event)">
+  <div class="modal" id="perfil-modal-box" style="max-width:460px"></div>
 </div>
 
 <!-- MODAL PREFERÊNCIAS DE MATCH -->
@@ -1190,11 +1220,89 @@ function fecharModalCep(e){
 function salvarCepModal(){
   if(!modalCepCoords)return
   const s=getSession(); setSession({...s,...modalCepCoords})
+  addEndereco(modalCepCoords)
   document.getElementById('cep-modal').classList.remove('open')
   document.getElementById('banner-cep').style.display='none'
   matchDeck=[]; matchIndex=0; curtidas=loadCurtidas()
   renderInicio(); renderMatch(); renderExplorar(); renderMinhasLojas()
+  if(document.getElementById('perfil-modal').classList.contains('open'))renderPerfilBody()
 }
+
+// ─── ENDEREÇOS (agenda) ───────────────────────────────────
+function loadEnderecos(){return JSON.parse(localStorage.getItem('bv_enderecos_'+(getSession()||{}).whatsapp)||'[]')}
+function saveEnderecos(a){localStorage.setItem('bv_enderecos_'+(getSession()||{}).whatsapp,JSON.stringify(a))}
+function addEndereco(coords,label){
+  const a=loadEnderecos(), ex=a.find(e=>e.cep===coords.cep)
+  if(ex){Object.assign(ex,coords); if(label)ex.label=label}
+  else a.push({id:coords.cep,label:label||(a.length?'Endereço '+(a.length+1):'Principal'),...coords})
+  saveEnderecos(a)
+}
+function usarEndereco(cep){
+  const e=loadEnderecos().find(x=>x.cep===cep); if(!e)return
+  const s=getSession(); setSession({...s,cep:e.cep,lat:e.lat,lng:e.lng,cidade:e.cidade,estado:e.estado})
+  matchDeck=[]; matchIndex=0; curtidas=loadCurtidas()
+  renderInicio(); renderMatch(); renderExplorar(); renderMinhasLojas(); renderPerfilBody()
+}
+function removerEndereco(cep){
+  saveEnderecos(loadEnderecos().filter(e=>e.cep!==cep)); renderPerfilBody()
+}
+
+// ─── PERFIL / MINHA CONTA ─────────────────────────────────
+const PELE_TIPOS=['Seca','Oleosa','Mista','Sensível','Normal']
+function statsCliente(){
+  const s=getSession()||{}
+  let gasto=0, pedidos=0
+  getRevs().forEach(rev=>JSON.parse(localStorage.getItem('bv_pedidos_'+rev.id)||'[]')
+    .filter(p=>p.clienteTelefone===s.whatsapp||p.clienteNome===s.nome)
+    .forEach(p=>{pedidos++; if(p.status==='ENTREGUE')gasto+=p.valorTotal||0}))
+  return {gasto, pedidos, favoritas:loadFavoritas().length}
+}
+function abrirPerfil(){renderPerfilBody();document.getElementById('perfil-modal').classList.add('open')}
+function fecharPerfil(e){if(!e||e.target===document.getElementById('perfil-modal'))document.getElementById('perfil-modal').classList.remove('open')}
+function renderPerfilBody(){
+  const s=getSession()||{}, st=statsCliente(), ends=loadEnderecos(), pele=s.peleTipo||''
+  const ini=(s.nome||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
+  document.getElementById('perfil-modal-box').innerHTML=`
+    <div class="perfil-head">
+      <div class="perfil-av">${ini}</div>
+      <div><div class="perfil-nome">${s.nome||'Cliente'}</div><div class="perfil-wa">${icon('whatsapp')} ${s.whatsapp||'—'}</div></div>
+      <button class="bvn-close" onclick="fecharPerfil()" aria-label="Fechar">${icon('x')}</button>
+    </div>
+    <div class="perfil-stats">
+      <div class="perfil-stat"><div class="ps-v">${fmtMoeda(st.gasto)}</div><div class="ps-k">Total gasto</div></div>
+      <div class="perfil-stat"><div class="ps-v">${st.pedidos}</div><div class="ps-k">Pedidos</div></div>
+      <div class="perfil-stat"><div class="ps-v">${st.favoritas}</div><div class="ps-k">Favoritas</div></div>
+    </div>
+    <div class="perfil-sec">
+      <h4>${icon('user')} Meus dados</h4>
+      <div class="form-group"><label>Nome</label><input id="pf-nome" type="text" value="${(s.nome||'').replace(/"/g,'&quot;')}"></div>
+      <div class="form-group"><label>WhatsApp</label><input id="pf-wa" type="tel" value="${(s.whatsapp||'').replace(/"/g,'&quot;')}"></div>
+      <button class="btn-next" style="margin-top:2px" onclick="salvarPerfilDados()">Salvar dados</button>
+    </div>
+    <div class="perfil-sec">
+      <div class="inicio-sec-h"><h4>${icon('map-pin')} Meus endereços</h4><a onclick="abrirModalCep()">+ adicionar</a></div>
+      ${ends.length?ends.map(e=>{const ativo=e.cep===s.cep;return`<div class="end-card${ativo?' ativo':''}">
+        <div style="flex:1;min-width:0"><div class="end-label">${e.label}${ativo?' <span class="end-badge">em uso</span>':''}</div><div class="end-addr">${e.cidade}, ${e.estado} · CEP ${(e.cep||'').replace(/(\d{5})(\d{3})/,'$1-$2')}</div></div>
+        ${ativo?'':`<button class="end-btn" onclick="usarEndereco('${e.cep}')">Usar</button>`}
+        <button class="end-del" onclick="removerEndereco('${e.cep}')" aria-label="Remover">${icon('trash')}</button>
+      </div>`}).join(''):`<p style="font-size:.82rem;color:var(--muted)">Nenhum endereço salvo. Toque em "adicionar" para informar um CEP.</p>`}
+    </div>
+    <div class="perfil-sec">
+      <h4>${icon('sparkles')} Meu perfil de beleza</h4>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">Tipo de pele (ajuda nas recomendações):</p>
+      <div class="pele-chips">${PELE_TIPOS.map(t=>`<button class="pele-chip${pele===t?' sel':''}" onclick="setPele('${t}')">${t}</button>`).join('')}</div>
+    </div>
+  `
+}
+function salvarPerfilDados(){
+  const nome=document.getElementById('pf-nome').value.trim(), wa=document.getElementById('pf-wa').value.trim()
+  if(!nome){alert('Informe seu nome.');return}
+  const s=getSession(); setSession({...s,nome,whatsapp:wa||s.whatsapp})
+  document.getElementById('topbar-nome').textContent='Olá, '+nome.split(' ')[0]
+  showNotif&&showNotif('like','Dados atualizados!')
+  renderInicio(); renderPerfilBody()
+}
+function setPele(t){const s=getSession();setSession({...s,peleTipo:s.peleTipo===t?'':t});renderPerfilBody()}
 
 // ─── DADOS ────────────────────────────────────────────────
 function getRevs(){return JSON.parse(localStorage.getItem('bv_revendedoras')||'[]')}
