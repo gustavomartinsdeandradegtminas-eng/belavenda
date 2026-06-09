@@ -46,6 +46,8 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .nav-item.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:4px;height:22px;border-radius:0 4px 4px 0;background:var(--grad);box-shadow:0 0 10px rgba(233,30,140,.75)}
 .nav-item.active .nav-item-icon{color:#fff}
 .nav-item-icon{font-size:1.15rem;width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);transition:color .2s;flex-shrink:0}
+.nav-badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:11px;background:var(--grad);color:#fff;font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(233,30,140,.5)}
+.nav-badge.warn{background:linear-gradient(135deg,#d97706,#f59e0b);box-shadow:0 2px 8px rgba(245,158,11,.5)}
 .sidebar-footer{padding:14px;border-top:1px solid rgba(255,255,255,.07)}
 .user-info{display:flex;align-items:center;gap:11px;margin-bottom:12px;padding:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06)}
 .user-avatar{width:38px;height:38px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;box-shadow:0 3px 10px rgba(194,24,91,.4)}
@@ -160,6 +162,16 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 /* META */
 .meta-track{height:16px;background:var(--border);border-radius:10px;overflow:hidden;box-shadow:inset 0 1px 3px rgba(136,14,79,.08)}
 .meta-fill{height:100%;background:var(--grad);border-radius:10px;transition:width .7s cubic-bezier(.4,0,.2,1);box-shadow:0 2px 8px rgba(194,24,91,.3)}
+/* INSIGHTS */
+.insights-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.insight{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:13px;background:linear-gradient(160deg,#fff,#fff7fb);border:1px solid var(--border)}
+.insight-ic{width:40px;height:40px;border-radius:11px;background:linear-gradient(145deg,var(--primary-l),#fff);display:grid;place-items:center;color:var(--primary);flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(194,24,91,.12)}
+.insight-ic .ic{width:1.2rem;height:1.2rem}
+.insight-k{font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.insight-v{font-size:1.05rem;font-weight:800;color:var(--text);font-family:'Playfair Display',Georgia,serif;line-height:1.25;word-break:break-word}
+.insight-sub{font-size:.72rem;color:var(--muted);margin-top:2px}
+@media(max-width:900px){.insights-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.insights-grid{grid-template-columns:1fr}}
 /* DETAIL VIEW */
 .detail-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
 .back-btn{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--text)}
@@ -249,6 +261,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
     </a>
     <a class="nav-item" onclick="navigate('pedidos')" id="nav-pedidos">
       <span class="nav-item-icon"><svg class="ic"><use href="#ic-package"/></svg></span> Pedidos
+      <span class="nav-badge" id="badge-pedidos" style="display:none"></span>
     </a>
     <div class="nav-section">Cadastros</div>
     <a class="nav-item" onclick="navigate('clientes')" id="nav-clientes">
@@ -256,6 +269,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
     </a>
     <a class="nav-item" onclick="navigate('produtos')" id="nav-produtos">
       <span class="nav-item-icon"><svg class="ic"><use href="#ic-shopping-bag"/></svg></span> Produtos
+      <span class="nav-badge warn" id="badge-produtos" style="display:none"></span>
     </a>
     <a class="nav-item" onclick="navigate('entregas')" id="nav-entregas">
       <span class="nav-item-icon"><svg class="ic"><use href="#ic-truck"/></svg></span> Entregas
@@ -397,7 +411,16 @@ function navigate(section){
   document.getElementById('topbar-actions').innerHTML=''
   const renderers={dashboard:renderDashboard,pedidos:renderPedidos,clientes:renderClientes,produtos:renderProdutos,entregas:renderEntregas,relatorios:renderRelatorios,calculadora:renderCalculadora,avaliacoes:renderAvaliacoes}
   if(renderers[section])renderers[section]()
+  atualizarBadgesSidebar()
   if(window.innerWidth<900)document.getElementById('sidebar').classList.remove('open')
+}
+function atualizarBadgesSidebar(){
+  const novos=DB.getPedidos().filter(p=>p.status==='NOVO').length
+  const bp=document.getElementById('badge-pedidos')
+  if(bp){if(novos>0){bp.textContent=novos;bp.style.display='flex'}else{bp.style.display='none'}}
+  const low=DB.getProdos().filter(p=>p.estoque!=null&&p.estoque<=3).length
+  const bpr=document.getElementById('badge-produtos')
+  if(bpr){if(low>0){bpr.textContent=low;bpr.style.display='flex'}else{bpr.style.display='none'}}
 }
 
 // ─── MODAL ────────────────────────────────────────────────
@@ -473,6 +496,24 @@ function renderDashboard(){
         <div class="kpi-icon">${aberta?icon('circle-green','ic-xl'):icon('circle-red','ic-xl')}</div>
       </div>`})()}
     </div>
+    ${(()=>{
+      const ins=insightsDashboard(pedidos)
+      const vA=vendasMes(pedidos), vP=vendasMesAnterior(pedidos)
+      let mom='—', momCor='var(--muted)'
+      if(vP>0){const d=Math.round((vA-vP)/vP*100);mom=(d>=0?'▲ +':'▼ ')+d+'%';momCor=d>=0?'var(--success)':'var(--danger)'}
+      else if(vA>0){mom='▲ novo';momCor='var(--success)'}
+      return`<div class="card" style="margin-bottom:24px">
+        <div class="card-header"><span class="card-title">Destaques do mês</span></div>
+        <div class="card-body">
+          <div class="insights-grid">
+            <div class="insight"><div class="insight-ic">${icon('money-bag')}</div><div><div class="insight-k">Ticket médio</div><div class="insight-v">${fmtMoeda(ins.ticket)}</div></div></div>
+            <div class="insight"><div class="insight-ic">${icon('shopping-bag')}</div><div><div class="insight-k">Mais vendido</div><div class="insight-v">${ins.topProd||'—'}</div>${ins.topProd?`<div class="insight-sub">${ins.topQ} un. vendidas</div>`:''}</div></div>
+            <div class="insight"><div class="insight-ic">${icon('star')}</div><div><div class="insight-k">Melhor cliente</div><div class="insight-v">${ins.topCli||'—'}</div>${ins.topCli?`<div class="insight-sub">${fmtMoeda(ins.topV)} em compras</div>`:''}</div></div>
+            <div class="insight"><div class="insight-ic">${icon('trending-up')}</div><div><div class="insight-k">vs mês anterior</div><div class="insight-v" style="color:${momCor}">${mom}</div><div class="insight-sub">${fmtMoeda(vA)} vs ${fmtMoeda(vP)}</div></div></div>
+          </div>
+        </div>
+      </div>`
+    })()}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
       <div class="card">
         <div class="card-header"><span class="card-title">Últimos Pedidos</span><button class="btn btn-sm btn-secondary" onclick="navigate('pedidos')">Ver todos</button></div>
@@ -538,6 +579,20 @@ function setMetaPrompt(){
 function vendasMes(pedidos){
   const ini=new Date();ini.setDate(1);ini.setHours(0,0,0,0)
   return pedidos.filter(p=>p.status==='ENTREGUE'&&new Date(p.dataCriacao)>=ini).reduce((s,p)=>s+(p.valorTotal||0),0)
+}
+function vendasMesAnterior(pedidos){
+  const ini=new Date();ini.setDate(1);ini.setHours(0,0,0,0)
+  const iniPrev=new Date(ini);iniPrev.setMonth(iniPrev.getMonth()-1)
+  return pedidos.filter(p=>{if(p.status!=='ENTREGUE')return false;const d=new Date(p.dataCriacao);return d>=iniPrev&&d<ini}).reduce((s,p)=>s+(p.valorTotal||0),0)
+}
+function insightsDashboard(pedidos){
+  const entregues=pedidos.filter(p=>p.status==='ENTREGUE')
+  const ticket=entregues.length?entregues.reduce((s,p)=>s+(p.valorTotal||0),0)/entregues.length:0
+  const prodQ={}; entregues.forEach(p=>(p.itens||[]).forEach(it=>{const n=it.nome||'—';prodQ[n]=(prodQ[n]||0)+(it.quantidade||1)}))
+  let topProd=null,topQ=0; for(const n in prodQ){if(prodQ[n]>topQ){topQ=prodQ[n];topProd=n}}
+  const cliT={}; entregues.forEach(p=>{const n=p.clienteNome||'—';cliT[n]=(cliT[n]||0)+(p.valorTotal||0)})
+  let topCli=null,topV=0; for(const n in cliT){if(cliT[n]>topV){topV=cliT[n];topCli=n}}
+  return{ticket,topProd,topQ,topCli,topV}
 }
 function vendas7dias(pedidos){
   const lbls=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'], dias=[], map={}
