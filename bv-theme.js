@@ -73,12 +73,23 @@
     '@keyframes bv-skel{100%{transform:translateX(100%)}}' +
     '[data-theme=dark] .skel{background:#2a1524}' +
     '[data-theme=dark] .skel::after{background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.08) 50%,transparent 80%)}' +
-    '[data-theme=dark] .prod-photo:not(.bvloaded){background:linear-gradient(100deg,#2a1524 25%,#3a2030 50%,#2a1524 75%);background-size:200% 100%}';
+    '[data-theme=dark] .prod-photo:not(.bvloaded){background:linear-gradient(100deg,#2a1524 25%,#3a2030 50%,#2a1524 75%);background-size:200% 100%}' +
+    // micro-interações: fade-in de conteúdo ao trocar de aba/seção
+    '@keyframes bv-fade-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
+    '.bv-anim{animation:bv-fade-up .34s cubic-bezier(.2,.7,.3,1) both}' +
+    // acessibilidade: foco visível por teclado
+    ':focus-visible{outline:2.5px solid var(--primary,#c2185b);outline-offset:2px;border-radius:6px}' +
+    'button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}' +
+    // respeita preferência de menos movimento
+    '@media(prefers-reduced-motion:reduce){.bv-anim,.prod-photo,.skel::after,.dot-aberta{animation:none!important}*{scroll-behavior:auto!important}}';
 
   var st = d.createElement('style');
   st.id = 'bv-theme-css';
   st.textContent = css;
   (d.head || d.documentElement).appendChild(st);
+
+  // re-dispara a animação de entrada num elemento (troca de aba/seção)
+  w.bvAnimate = function (el) { if (!el) return; el.classList.remove('bv-anim'); void el.offsetWidth; el.classList.add('bv-anim'); };
 
   // 3) Botão flutuante
   var MOON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';

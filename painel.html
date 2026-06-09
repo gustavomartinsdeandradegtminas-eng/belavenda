@@ -418,6 +418,7 @@ function navigate(section){
   const renderers={dashboard:renderDashboard,pedidos:renderPedidos,clientes:renderClientes,produtos:renderProdutos,entregas:renderEntregas,relatorios:renderRelatorios,calculadora:renderCalculadora,avaliacoes:renderAvaliacoes}
   if(renderers[section])renderers[section]()
   atualizarBadgesSidebar()
+  if(window.bvAnimate)bvAnimate(document.getElementById('content'))
   if(window.innerWidth<900)document.getElementById('sidebar').classList.remove('open')
 }
 function atualizarBadgesSidebar(){

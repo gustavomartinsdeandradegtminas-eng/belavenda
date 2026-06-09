@@ -1229,6 +1229,7 @@ function showTab(t){
   if(t==='inicio')renderInicio()
   if(t==='favoritas')renderFavoritas()
   if(t==='explorar')renderExplorar()
+  if(window.bvAnimate)bvAnimate(document.getElementById('tab-'+t))
   window.scrollTo(0,0)
 }
 
