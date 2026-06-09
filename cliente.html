@@ -404,6 +404,17 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .inicio-greet{font-size:1.3rem;font-weight:800;font-family:'Playfair Display',Georgia,serif;position:relative}
 .inicio-sub{font-size:.82rem;opacity:.92;margin-top:5px;position:relative}
 .inicio-cep-btn{margin-top:12px;background:rgba(255,255,255,.95);color:var(--rose-d);border:none;border-radius:10px;padding:8px 16px;font-size:.82rem;font-weight:800;cursor:pointer;font-family:inherit;position:relative}
+/* Programa de fidelidade */
+.fid-card{background:linear-gradient(135deg,#2a0e1f,#5b1138 55%,#7c1d4e);color:#fff;border-radius:18px;padding:18px 20px;margin-bottom:18px;box-shadow:0 8px 24px rgba(123,20,60,.3);position:relative;overflow:hidden}
+.fid-card::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 120% at 100% 0%,rgba(255,255,255,.12),transparent 55%);pointer-events:none}
+.fid-head{display:flex;align-items:center;gap:12px;margin-bottom:13px;position:relative}
+.fid-ic{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:1.2rem;color:#ffd9ec;flex-shrink:0}
+.fid-level{font-size:1.05rem;font-weight:800;font-family:'Playfair Display',Georgia,serif}
+.fid-pts{font-size:.78rem;opacity:.82}
+.fid-tag{font-size:.66rem;font-weight:800;background:rgba(255,255,255,.18);padding:4px 9px;border-radius:20px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.fid-track{height:9px;background:rgba(255,255,255,.18);border-radius:10px;overflow:hidden;position:relative}
+.fid-fill{height:100%;background:linear-gradient(90deg,#f9a8d4,#fff);border-radius:10px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.fid-foot{font-size:.8rem;margin-top:9px;opacity:.92;position:relative}
 .inicio-sec{margin-bottom:22px}
 .inicio-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .inicio-sec h3{font-size:1rem;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px}
@@ -1298,6 +1309,28 @@ function statsCliente(){
     .forEach(p=>{pedidos++; if(p.status==='ENTREGUE')gasto+=p.valorTotal||0}))
   return {gasto, pedidos, favoritas:loadFavoritas().length}
 }
+// ─── PROGRAMA DE FIDELIDADE ───────────────────────────────
+const NIVEIS=[{n:'Bronze',min:0,ic:'heart-filled'},{n:'Prata',min:300,ic:'star-filled'},{n:'Ouro',min:800,ic:'trophy'},{n:'Diamante',min:1500,ic:'gem'}]
+function fidelidade(){
+  const pts=Math.round(statsCliente().gasto)
+  let cur=NIVEIS[0], nxt=NIVEIS[1]||null
+  for(let i=0;i<NIVEIS.length;i++){ if(pts>=NIVEIS[i].min){cur=NIVEIS[i]; nxt=NIVEIS[i+1]||null} }
+  const falta=nxt?nxt.min-pts:0
+  const pct=nxt?Math.max(4,Math.round(((pts-cur.min)/(nxt.min-cur.min))*100)):100
+  return {pts,cur,nxt,falta,pct}
+}
+function fidelidadeCardHTML(){
+  const f=fidelidade()
+  return `<div class="fid-card">
+    <div class="fid-head">
+      <span class="fid-ic">${icon(f.cur.ic)}</span>
+      <div style="flex:1"><div class="fid-level">Nível ${f.cur.n}</div><div class="fid-pts">${f.pts} pontos acumulados</div></div>
+      <span class="fid-tag">${icon('sparkles')} Programa Bela</span>
+    </div>
+    <div class="fid-track"><div class="fid-fill" style="width:${f.pct}%"></div></div>
+    <div class="fid-foot">${f.nxt?`Faltam <b>${f.falta} pts</b> para o nível <b>${f.nxt.n}</b>`:`${icon('trophy')} Você alcançou o nível máximo. Parabéns!`}</div>
+  </div>`
+}
 function abrirPerfil(){renderPerfilBody();document.getElementById('perfil-modal').classList.add('open')}
 function fecharPerfil(e){if(!e||e.target===document.getElementById('perfil-modal'))document.getElementById('perfil-modal').classList.remove('open')}
 function renderPerfilBody(){
@@ -2068,6 +2101,7 @@ function renderInicio(){
       <div class="inicio-sub">${temLoc?icon('map-pin')+' '+s.cidade+', '+s.estado:icon('map-pin')+' Adicione seu CEP para ver lojas pertinho de você'}</div>
       ${!temLoc?`<button class="inicio-cep-btn" onclick="abrirModalCep()">${icon('mailbox')} Informar CEP</button>`:''}
     </div>
+    ${fidelidadeCardHTML()}
     ${ativos.length?`<div class="inicio-sec">
       <div class="inicio-sec-h"><h3>${icon('motorcycle')} Em andamento</h3><a onclick="showTab('pedidos')">Ver pedidos</a></div>
       ${ativos.slice(0,3).map(p=>{const st=STAT[p.status]||STAT.NOVO;return`<div class="inicio-order" onclick="abrirRastreamento('${p.id}','${p._rId}')">
