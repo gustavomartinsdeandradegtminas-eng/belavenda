@@ -6,10 +6,10 @@
  * Recursos de outros domínios (Google Fonts, fotos Pexels) NÃO são
  * interceptados — o navegador cuida deles normalmente.
  */
-const CACHE = 'belavenda-v1';
+const CACHE = 'belavenda-v2';
 const CORE = [
   './', './index.html', './loja.html', './cliente.html', './painel.html', './login.html',
-  './bv-icons.js', './bv-seed.js', './belavenda-api.js',
+  './bv-theme.js', './bv-icons.js', './bv-seed.js', './belavenda-api.js',
   './manifest.json', './icon-192.png', './icon-512.png'
 ];
 
