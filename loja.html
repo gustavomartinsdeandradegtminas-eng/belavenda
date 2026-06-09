@@ -145,6 +145,16 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .review-stars{font-size:.95rem;color:#ffc107;margin-bottom:6px}
 .review-stars .empty{color:#e0e0e0}
 .review-text{font-size:.88rem;color:var(--text);line-height:1.5}
+.review-foto{margin-top:10px;max-width:160px;width:100%;border-radius:10px;cursor:pointer;display:block;border:1px solid var(--border);transition:transform .2s}
+.review-foto:hover{transform:scale(1.02)}
+.reviews-fotos{margin:4px 0 22px}
+.rf-title{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.rf-grid{display:flex;gap:10px;flex-wrap:wrap}
+.rf-thumb{width:84px;height:84px;object-fit:cover;border-radius:12px;cursor:pointer;border:1px solid var(--border);transition:transform .2s,box-shadow .2s}
+.rf-thumb:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+#bv-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+#bv-lightbox.open{display:flex}
+#bv-lightbox img{max-width:92vw;max-height:88vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 
 /* CART DRAWER */
 .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;visibility:hidden;transition:all .3s}
@@ -521,6 +531,7 @@ function renderReviewsSection(avs){
   // distribuição por estrelas
   const dist=[5,4,3,2,1].map(n=>({n,count:avs.filter(a=>a.estrelas===n).length}))
   const maxCount=Math.max(...dist.map(d=>d.count),1)
+  const fotos=avs.filter(a=>a.foto)
   root.innerHTML=`
     <div class="reviews-section">
       <h2><span style="color:#ffc107">`+icon('star')+`</span> Avaliações <span style="font-size:.9rem;font-weight:400;color:var(--muted)">(${avs.length})</span></h2>
@@ -540,6 +551,10 @@ function renderReviewsSection(avs){
           </div>`).join('')}
         </div>
       </div>
+      ${fotos.length?`<div class="reviews-fotos">
+        <div class="rf-title">${icon('eye')} Fotos das clientes (${fotos.length})</div>
+        <div class="rf-grid">${fotos.map(a=>`<img src="${a.foto}" class="rf-thumb" alt="" loading="lazy" onclick="bvLightbox(this.src)">`).join('')}</div>
+      </div>`:''}
       ${avs.slice().sort((a,b)=>new Date(b.data)-new Date(a.data)).map(a=>`
         <div class="review-card">
           <div class="review-head">
@@ -548,8 +563,15 @@ function renderReviewsSection(avs){
           </div>
           <div class="review-stars">${starsHTML(a.estrelas)}</div>
           ${a.comentario?`<div class="review-text">"${a.comentario}"</div>`:''}
+          ${a.foto?`<img src="${a.foto}" class="review-foto" alt="" loading="lazy" onclick="bvLightbox(this.src)">`:''}
         </div>`).join('')}
     </div>`
+}
+function bvLightbox(src){
+  let ov=document.getElementById('bv-lightbox')
+  if(!ov){ov=document.createElement('div');ov.id='bv-lightbox';ov.onclick=function(){ov.classList.remove('open')};document.body.appendChild(ov)}
+  ov.innerHTML='<img src="'+src+'" alt="">'
+  ov.classList.add('open')
 }
 
 // ─── PRODUCTS ─────────────────────────────────────────────
