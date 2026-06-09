@@ -373,6 +373,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .cat-chip{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:22px;border:1.5px solid var(--border2);background:var(--surface);font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;font-family:inherit}
 .cat-chip:hover{border-color:var(--rose-l);color:var(--rose)}
 .cat-chip.active{border-color:transparent;background:var(--grad-primary);color:#fff;box-shadow:0 4px 12px rgba(233,30,140,.3)}
+.cat-chip.marca.active{background:linear-gradient(135deg,#6d28d9,#a855f7);box-shadow:0 4px 12px rgba(124,58,237,.3)}
 .sort-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
 .sort-field{flex:1;min-width:170px}
 .sort-field label{display:block;font-size:.7rem;font-weight:700;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
@@ -1810,11 +1811,16 @@ function salvarPrefs(){
 }
 
 // ─── EXPLORAR ─────────────────────────────────────────────
-let raio=5000, buscaProd='', catFiltro='', ordenar='dist', soAbertas=false
+let raio=5000, buscaProd='', catFiltro='', marcaFiltro='', ordenar='dist', soAbertas=false
 
 function todasCategorias(){
   const set=new Set()
   getRevs().forEach(r=>getProdos(r.id).forEach(p=>{if(p.categoria)set.add(p.categoria)}))
+  return [...set].sort((a,b)=>a.localeCompare(b))
+}
+function todasMarcas(){
+  const set=new Set()
+  getRevs().forEach(r=>getProdos(r.id).forEach(p=>{if(p.marca)set.add(p.marca)}))
   return [...set].sort((a,b)=>a.localeCompare(b))
 }
 
@@ -1824,6 +1830,7 @@ function renderExplorar(){
   if(!el)return
   const locText=temLoc?`${icon('map-pin')} ${s.cidade}, ${s.estado} — CEP ${(s.cep||'').replace(/(\d{5})(\d{3})/,'$1-$2')}`:`${icon('map-pin')} Localização não definida`
   const cats=todasCategorias()
+  const marcas=todasMarcas()
   el.innerHTML=`
     <div class="loc-chip" onclick="abrirModalCep()" title="Clique para atualizar seu CEP">
       <span>${icon('map-pin')}</span>${locText}<span style="font-size:.75rem;opacity:.6">${icon('pencil')}</span>
@@ -1851,6 +1858,10 @@ function renderExplorar(){
     <div class="cat-scroll">
       <button class="cat-chip ${catFiltro===''?'active':''}" data-cat="" onclick="setCat('')">${icon('sparkles')} Todas</button>
       ${cats.map(c=>`<button class="cat-chip ${catFiltro===c?'active':''}" data-cat="${c}" onclick="setCat('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('')}
+    </div>
+    <div class="cat-scroll">
+      <button class="cat-chip marca ${marcaFiltro===''?'active':''}" data-marca="" onclick="setMarcaEx('')">${icon('tag')} Todas as marcas</button>
+      ${marcas.map(m=>`<button class="cat-chip marca ${marcaFiltro===m?'active':''}" data-marca="${m}" onclick="setMarcaEx('${m.replace(/'/g,"\\'")}')">${m}</button>`).join('')}
     </div>
     <div class="sort-row">
       <div class="sort-field">
@@ -1888,7 +1899,8 @@ function skeletonLojas(n){
 }
 function setRaio(v){raio=parseInt(v);const el=document.getElementById('raio-label');if(el)el.textContent=(raio>=5000?'tudo':raio+' km');filtrarLojas()}
 function setBusca(v){buscaProd=v.trim().toLowerCase();filtrarLojas()}
-function setCat(c){catFiltro=c;document.querySelectorAll('#tab-explorar .cat-chip').forEach(ch=>ch.classList.toggle('active',ch.getAttribute('data-cat')===c));filtrarLojas()}
+function setCat(c){catFiltro=c;document.querySelectorAll('#tab-explorar .cat-chip[data-cat]').forEach(ch=>ch.classList.toggle('active',ch.getAttribute('data-cat')===c));filtrarLojas()}
+function setMarcaEx(m){marcaFiltro=m;document.querySelectorAll('#tab-explorar .cat-chip[data-marca]').forEach(ch=>ch.classList.toggle('active',ch.getAttribute('data-marca')===m));filtrarLojas()}
 function setOrdenar(v){ordenar=v;filtrarLojas()}
 function toggleSoAbertas(){soAbertas=!soAbertas;const t=document.getElementById('toggle-abertas');if(t)t.classList.toggle('on',soAbertas);filtrarLojas()}
 
@@ -1902,6 +1914,7 @@ function lojasFiltradas(){
   }).filter(({rev,prods,dist,match})=>{
     if(buscaProd&&!match.length)return false
     if(catFiltro&&!prods.some(p=>p.categoria===catFiltro))return false
+    if(marcaFiltro&&!prods.some(p=>p.marca===marcaFiltro))return false
     if(soAbertas&&rev.lojaAberta===false)return false
     return dist===null||dist<=raio
   })
