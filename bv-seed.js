@@ -12,7 +12,7 @@
 ;(function () {
   'use strict';
   try {
-    var SEED_VERSION = '3';
+    var SEED_VERSION = '4';
     if (localStorage.getItem('bv_demo_seeded') === SEED_VERSION) return;
 
     // IDs das revendedoras de demonstração (não mexemos em contas reais)
@@ -52,9 +52,23 @@
     ];
     // Fotos de perfil (retratos genéricos do Pexels, sem marcas)
     var FOTOS = [3769136, 1104758, 5905902, 8727399, 6634221, 3769021];
+    var BIOS = {
+      r1:'Especialista em maquiagem e batons de longa duração.',
+      r2:'Perfumaria e cuidados para o corpo, com atendimento personalizado.',
+      r7:'Make profissional e produtos para todos os tons de pele.',
+      r8:'Perfumes nacionais e importados com os melhores preços.',
+      r9:'Skincare e proteção solar — sua pele saudável o ano todo.',
+      r10:'Maquiagem, cabelos e tudo para arrasar no make.',
+      r11:'Unhas, esmaltes e cuidados — beleza que cabe no bolso.',
+      r3:'Skincare e maquiagem, com dicas de beleza pelo WhatsApp.',
+      r4:'Unhas e cabelos: kits completos para o seu autocuidado.',
+      r5:'Perfumaria premium e maquiagem de alto padrão.',
+      r6:'Hidratantes e óleos corporais para bem-estar e autocuidado.'
+    };
     revs.forEach(function (r, i) {
       var id = FOTOS[i % FOTOS.length];
       r.foto = 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id + '.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=240&h=240';
+      r.bio = BIOS[r.id] || '';
     });
 
     var prods = {

@@ -441,6 +441,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .match-pill.great{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
 .match-pill.good{background:var(--grad-primary);color:#fff}
 .match-pill.ok{background:var(--rose-l);color:var(--rose-d)}
+.loja-bio{font-size:.76rem;color:var(--muted);font-style:italic;line-height:1.4;margin:1px 0 5px}
 .loja-seals{display:flex;flex-wrap:wrap;gap:5px;margin:5px 0 2px}
 .loja-seal{display:inline-flex;align-items:center;gap:4px;font-size:.66rem;font-weight:800;background:linear-gradient(135deg,var(--rose-l),#fff);color:var(--rose-d);border:1px solid var(--rose-l);border-radius:20px;padding:2px 9px}
 .loja-seal .ic{color:var(--rose)}
@@ -1966,6 +1967,7 @@ function lojaCardHTML({rev,prods,match,dist}){
         ${lojaAberta?`<span style="color:#43a047;font-weight:700"> · ${icon('dot')} Aberta</span>`:''}
       </div>
       ${avs.length?`<div style="font-size:.76rem;margin-bottom:3px">${starsHTML(avgStar)} <span style="color:var(--muted)">${avgStar.toFixed(1)} (${avs.length})</span></div>`:`<div style="font-size:.74rem;color:var(--muted-l);margin-bottom:3px">Sem avaliações ainda</div>`}
+      ${rev.bio?`<div class="loja-bio">${rev.bio}</div>`:''}
       ${seals.length?`<div class="loja-seals">${seals.map(s=>`<span class="loja-seal">${icon(s.ic)} ${s.label}</span>`).join('')}</div>`:''}
       <div class="loja-tags">
         <span class="loja-tag">${icon('shopping-bag')} ${prods.length} produto(s)</span>

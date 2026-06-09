@@ -56,6 +56,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .user-avatar{position:relative;width:38px;height:38px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;box-shadow:0 3px 10px rgba(194,24,91,.4);border:none;cursor:pointer;padding:0;overflow:hidden;font-family:inherit}
 .user-avatar:hover .user-avatar-cam{opacity:1}
 .user-avatar-cam{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;color:#fff;opacity:0;transition:opacity .2s;font-size:.85rem}
+.pl-foto{width:88px;height:88px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.7rem;overflow:hidden;flex-shrink:0;box-shadow:0 5px 16px rgba(194,24,91,.35);font-family:'Playfair Display',Georgia,serif}
 .user-name{color:#fff;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .user-sub{color:rgba(255,255,255,.42);font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
 .btn-logout{width:100%;padding:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:9px;color:rgba(255,255,255,.72);cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
@@ -292,6 +293,9 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
       <span id="status-text">Loja Aberta</span>
       <span class="loja-toggle-badge">alternar</span>
     </div>
+    <a class="nav-item" onclick="navigate('perfilLoja')" id="nav-perfilLoja">
+      <span class="nav-item-icon"><svg class="ic"><use href="#ic-storefront"/></svg></span> Perfil da Loja
+    </a>
     <a class="nav-item" onclick="navigate('avaliacoes')" id="nav-avaliacoes">
       <span class="nav-item-icon"><svg class="ic"><use href="#ic-star"/></svg></span> Avaliações
     </a>
@@ -421,10 +425,43 @@ function uploadFotoLoja(input){
       const revs=JSON.parse(localStorage.getItem('bv_revendedoras')||'[]')
       const r=revs.find(x=>x.id===REV_ID); if(r){r.foto=dataUrl;localStorage.setItem('bv_revendedoras',JSON.stringify(revs))}
       renderUserAvatar();bvToast('Foto da loja atualizada!','success')
+      const plf=document.getElementById('pl-foto'); if(plf)plf.innerHTML=revFoto(DB.getRev())
     }
     img.src=e.target.result
   }
   reader.readAsDataURL(file)
+}
+function renderPerfilLoja(){
+  const r=DB.getRev()
+  document.getElementById('content').innerHTML=`
+    <div class="card" style="max-width:640px">
+      <div class="card-header"><span class="card-title">Perfil da Loja</span></div>
+      <div class="card-body">
+        <p style="font-size:.86rem;color:var(--muted);margin-bottom:18px">Estas informações aparecem para as clientes na sua loja e nos cards de descoberta.</p>
+        <div style="display:flex;gap:18px;align-items:center;margin-bottom:22px">
+          <div class="pl-foto" id="pl-foto">${revFoto(r)}</div>
+          <div>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('foto-loja-input').click()">${icon('folder-upload')} Alterar foto</button>
+            <div style="font-size:.75rem;color:var(--muted);margin-top:6px">Recortada em quadrado, 256px.</div>
+          </div>
+        </div>
+        <div class="form-group"><label>Nome da loja</label><input id="pl-nome" type="text" maxlength="40" value="${(r.nome||'').replace(/"/g,'&quot;')}"></div>
+        <div class="form-group"><label>Descrição / especialidade</label><textarea id="pl-bio" maxlength="120" placeholder="Ex: Especialista em skincare e perfumes importados.">${(r.bio||'').replace(/</g,'&lt;')}</textarea><div style="font-size:.74rem;color:var(--muted);margin-top:4px">Até 120 caracteres — aparece no topo da sua loja e como especialidade nos cards.</div></div>
+        <div class="form-group"><label>Link da loja</label><input type="text" value="/loja/${r.slugLoja}" readonly style="background:var(--bg);color:var(--muted);cursor:default"></div>
+        <button class="btn btn-primary" onclick="salvarPerfilLoja()">${icon('save')} Salvar perfil</button>
+      </div>
+    </div>`
+}
+function salvarPerfilLoja(){
+  const nome=document.getElementById('pl-nome').value.trim()
+  const bio=document.getElementById('pl-bio').value.trim()
+  if(!nome){bvToast('O nome da loja é obrigatório.','error');return}
+  const revs=JSON.parse(localStorage.getItem('bv_revendedoras')||'[]')
+  const r=revs.find(x=>x.id===REV_ID)
+  if(r){r.nome=nome;r.bio=bio;localStorage.setItem('bv_revendedoras',JSON.stringify(revs))}
+  session.nome=nome;localStorage.setItem('bv_session',JSON.stringify(session))
+  document.getElementById('user-name').textContent=nome
+  bvToast('Perfil da loja atualizado!','success')
 }
 updateLojaStatusUI()
 
@@ -435,10 +472,10 @@ function navigate(section){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'))
   const el=document.getElementById('nav-'+section)
   if(el)el.classList.add('active')
-  const titles={dashboard:'Dashboard',pedidos:'Pedidos',clientes:'Clientes',produtos:'Produtos',entregas:'Entregas',relatorios:'Relatórios',calculadora:'Calculadora de Margem'}
+  const titles={dashboard:'Dashboard',pedidos:'Pedidos',clientes:'Clientes',produtos:'Produtos',entregas:'Entregas',relatorios:'Relatórios',calculadora:'Calculadora de Margem',perfilLoja:'Perfil da Loja'}
   document.getElementById('topbar-title').textContent=titles[section]||section
   document.getElementById('topbar-actions').innerHTML=''
-  const renderers={dashboard:renderDashboard,pedidos:renderPedidos,clientes:renderClientes,produtos:renderProdutos,entregas:renderEntregas,relatorios:renderRelatorios,calculadora:renderCalculadora,avaliacoes:renderAvaliacoes}
+  const renderers={dashboard:renderDashboard,pedidos:renderPedidos,clientes:renderClientes,produtos:renderProdutos,entregas:renderEntregas,relatorios:renderRelatorios,calculadora:renderCalculadora,avaliacoes:renderAvaliacoes,perfilLoja:renderPerfilLoja}
   if(renderers[section])renderers[section]()
   atualizarBadgesSidebar()
   if(window.bvAnimate)bvAnimate(document.getElementById('content'))

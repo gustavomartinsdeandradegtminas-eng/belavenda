@@ -51,6 +51,7 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .store-info{flex:1;min-width:0}
 .store-info h1{font-size:1.5rem;font-weight:800;margin-bottom:4px}
 .store-info p{opacity:.85;font-size:.9rem}
+.store-bio{opacity:.92!important;font-size:.92rem!important;margin-top:8px;max-width:540px;line-height:1.5;font-style:italic}
 .store-brands{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .store-brand{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:3px 12px;font-size:.78rem;font-weight:600}
 .store-brand.bv-logo{background:rgba(255,255,255,.9);color:var(--primary);font-weight:800}
@@ -450,6 +451,7 @@ function renderPage(){
               ?`<span style="margin-left:10px;background:rgba(255,255,255,.2);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700"><span style="color:var(--success)">`+icon('circle-green')+`</span> Aberta</span>`
               :`<span style="margin-left:10px;background:rgba(0,0,0,.25);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:700">`+icon('lock-closed')+` Fechada</span>`}
           </p>
+          ${revendedora.bio?`<p class="store-bio">${revendedora.bio}</p>`:''}
           <div class="store-brands">
             <span class="store-brand bv-logo">BelaVenda</span>
             ${marcas.map(m=>`<span class="store-brand">${m}</span>`).join('')}
