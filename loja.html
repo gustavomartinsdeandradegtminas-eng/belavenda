@@ -297,6 +297,11 @@ input[id="card-num"]{letter-spacing:3px;font-family:'Courier New',monospace;font
   .store-header-inner{flex-direction:column}
   .pay-methods{grid-template-columns:1fr 1fr}
   .modal{border-radius:14px}
+  /* alvos de toque ≥44px (a11y mobile) */
+  .add-btn,.cart-btn{min-height:46px}
+  .qty-ctrl button,.cart-item-ctrl button{min-width:42px;min-height:42px}
+  .cart-close,.cart-item-del,.wish-btn{min-width:42px;min-height:42px}
+  .modal-foot,.cart-footer{position:sticky;bottom:0}
 }
 .empty{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty-icon{font-size:3rem;margin-bottom:12px}
@@ -374,7 +379,7 @@ function toggleWish(pid){
 // ─── STARS ────────────────────────────────────────────────
 function starsHTML(n,max=5,gold='#ffc107',empty='#e0e0e0'){
   const r=Math.round(n)
-  return`<span style="color:${gold}">${icon('star-filled').repeat(r)}</span><span style="color:${empty}">${icon('star').repeat(max-r)}</span>`
+  return`<span role="img" aria-label="${(Math.round(n*10)/10)} de ${max} estrelas"><span style="color:${gold}">${icon('star-filled').repeat(r)}</span><span style="color:${empty}">${icon('star').repeat(max-r)}</span></span>`
 }
 function avgRating(avs){return avs.length?avs.reduce((s,a)=>s+a.estrelas,0)/avs.length:0}
 function selosLoja(rev,prods,avs){

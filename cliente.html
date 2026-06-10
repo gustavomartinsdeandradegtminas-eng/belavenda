@@ -2245,6 +2245,7 @@ function submitAvaliacao(){
   if(idx>=0){peds[idx].avaliado=true;localStorage.setItem(key,JSON.stringify(peds))}
   document.getElementById('av-modal').classList.remove('open')
   showNotif('like','Avaliação enviada!')
+  if(window.bvConfetti)bvConfetti()
   renderPedidos()
   // Rebuild deck para refletir novo rating
   matchDeck=[]; matchIndex=0; renderMatch()
