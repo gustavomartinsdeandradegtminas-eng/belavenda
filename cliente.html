@@ -358,6 +358,8 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   transform:translateY(-3px);
   border-color:var(--rose-mid);
 }
+.loja-card:active,.inicio-order:active,.curtida-card:active{transform:scale(.985)}
+.tab:active,.btn-ver:active,.cat-chip:active,.filter-chip:active{transform:scale(.96)}
 .loja-avatar{
   width:54px;height:54px;border-radius:50%;
   background:var(--grad-primary);
@@ -550,8 +552,19 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .track-cancel{background:var(--danger-l);color:#b91c1c;border-radius:12px;padding:18px;text-align:center;font-weight:700;font-size:.9rem;margin-bottom:16px}
 
 /* Empty state */
-.empty{text-align:center;padding:60px 20px;color:var(--muted)}
-.empty-icon{font-size:3.2rem;margin-bottom:14px}
+.empty{text-align:center;padding:56px 20px;color:var(--muted)}
+.empty p{line-height:1.65}
+.empty-icon{
+  width:94px;height:94px;margin:0 auto 20px;border-radius:50%;display:grid;place-items:center;position:relative;
+  background:linear-gradient(145deg,var(--rose-l),var(--rose-xl));color:var(--rose);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 12px 30px -14px rgba(194,24,91,.3);
+}
+.empty-icon .ic{width:42px;height:42px}
+.empty-icon::before,.empty-icon::after{content:"";position:absolute;border-radius:50%;animation:emptyFloat 4.5s ease-in-out infinite}
+.empty-icon::before{width:11px;height:11px;top:2px;right:4px;background:linear-gradient(135deg,#e6b878,#c9a86a)}
+.empty-icon::after{width:7px;height:7px;bottom:8px;left:-2px;background:var(--rose-mid);animation-delay:-2.2s}
+@keyframes emptyFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+[data-theme=dark] .empty-icon{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 12px 30px -14px rgba(0,0,0,.5);color:#f9a8d4}
 .empty p{font-size:.9rem;line-height:1.6;margin-bottom:18px;color:var(--muted)}
 
 /* Spinner */
@@ -591,8 +604,8 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   overflow:hidden;transition:transform .15s ease;touch-action:none;
   border:1.5px solid var(--border);
 }
-.match-card:nth-child(2){transform:scale(.96) translateY(12px) rotate(-1.5deg);z-index:1}
-.match-card:nth-child(3){transform:scale(.92) translateY(24px) rotate(1.5deg);z-index:0}
+.match-card:nth-child(2){transform:scale(.96) translateY(12px) rotate(-1.5deg);z-index:1;box-shadow:0 10px 24px -14px rgba(136,14,79,.22);opacity:.92}
+.match-card:nth-child(3){transform:scale(.92) translateY(24px) rotate(1.5deg);z-index:0;box-shadow:0 6px 16px -12px rgba(136,14,79,.15);opacity:.8}
 .match-card.front{z-index:10}
 .match-card.dragging{transition:none}
 @keyframes swipeLeft{0%{transform:translateX(0) rotate(0)}100%{transform:translateX(-120vw) rotate(-25deg);opacity:0}}
@@ -2273,7 +2286,7 @@ function renderPedidos(){
   const el=document.getElementById('tab-pedidos')
   const lbl={NOVO:'Novo',SEPARANDO:'Separando',EM_TRANSITO:'Em Trânsito',ENTREGUE:'Entregue',CANCELADO:'Cancelado'}
   const pgtoLbl={PAGO:icon('circle-check')+' Pago',AGUARDANDO_PIX:icon('hourglass')+' PIX pendente',AGUARDANDO_BOLETO:icon('document')+' Boleto pendente'}
-  if(!todos.length){el.innerHTML=`<div class="empty"><div class="empty-icon">${icon('package','ic-xl')}</div><p>Você ainda não fez nenhum pedido.</p></div>`;return}
+  if(!todos.length){el.innerHTML=`<div class="empty"><div class="empty-icon">${icon('package','ic-xl')}</div><p><strong>Você ainda não fez nenhum pedido.</strong><br>Encontre uma revendedora perto de você e faça o primeiro!</p><button class="btn-ver" style="margin-top:16px" onclick="showTab('explorar')">${icon('magnifying-glass')} Descobrir revendedoras</button></div>`;return}
   el.innerHTML=`<div class="resultado-header">${todos.length} pedido(s)</div>`+todos.map(p=>{
     const pgtoStatus=p.pagamento?.status
     const podeAvaliar=p.status==='ENTREGUE'&&!p.avaliado
