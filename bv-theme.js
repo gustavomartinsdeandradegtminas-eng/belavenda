@@ -107,6 +107,25 @@
     // acessibilidade: foco visível por teclado
     ':focus-visible{outline:2.5px solid var(--primary,#c2185b);outline-offset:2px;border-radius:6px}' +
     'button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}' +
+    // ── Couture Rosé · acabamento fino global ──
+    // seleção de texto na cor da marca
+    '::selection{background:rgba(233,30,140,.22);color:inherit;text-shadow:none}' +
+    '[data-theme=dark] ::selection{background:rgba(233,30,140,.40)}' +
+    // rolagem suave para âncoras
+    'html{scroll-behavior:smooth}' +
+    // scrollbar tingida na marca
+    '*{scrollbar-width:thin;scrollbar-color:var(--primary,#c2185b) transparent}' +
+    '::-webkit-scrollbar{width:11px;height:11px}' +
+    '::-webkit-scrollbar-track{background:transparent}' +
+    '::-webkit-scrollbar-thumb{background:linear-gradient(var(--primary,#c2185b),var(--primary-d,#880e4f));border-radius:10px;border:3px solid transparent;background-clip:padding-box}' +
+    '::-webkit-scrollbar-thumb:hover{background:var(--primary-d,#880e4f);background-clip:padding-box;border:3px solid transparent}' +
+    // transição suave ao alternar entre claro/escuro
+    'body{transition:background-color .55s ease,color .45s ease}' +
+    // brilho especular deslizante em botões primários (apenas no hover)
+    '.btn-primary{position:relative;overflow:hidden;isolation:isolate}' +
+    '.btn-primary::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;z-index:-1;background:linear-gradient(100deg,transparent,rgba(255,255,255,.38),transparent);transform:skewX(-18deg);opacity:0}' +
+    '.btn-primary:hover::after{opacity:1;animation:bv-sheen .85s cubic-bezier(.4,0,.2,1)}' +
+    '@keyframes bv-sheen{from{left:-70%}to{left:140%}}' +
     // respeita preferência de menos movimento
     '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}.marquee-track{animation:none!important}}';
 
