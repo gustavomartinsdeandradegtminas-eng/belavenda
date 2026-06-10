@@ -299,6 +299,10 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
   transform:translateY(-1px);
 }
 .tab:hover:not(.active){background:var(--rose-xl);color:var(--rose)}
+.tab-count{display:none;margin-left:5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;
+  background:var(--rose);color:#fff;font-size:.66rem;font-weight:800;line-height:17px;text-align:center;vertical-align:1px}
+.tab-count:not(:empty){display:inline-block}
+.tab.active .tab-count{background:rgba(255,255,255,.28)}
 
 /* LOC CHIP */
 .loc-chip{
@@ -998,7 +1002,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
       <button class="tab active"  onclick="showTab('inicio')"><svg class="ic"><use href="#ic-sparkles"/></svg> Início</button>
       <button class="tab"         onclick="showTab('match')"><svg class="ic"><use href="#ic-heart-gift"/></svg> Match</button>
       <button class="tab"         onclick="showTab('explorar')"><svg class="ic"><use href="#ic-magnifying-glass"/></svg> Explorar</button>
-      <button class="tab"         onclick="showTab('favoritas')"><svg class="ic"><use href="#ic-heart"/></svg> Favoritas</button>
+      <button class="tab"         onclick="showTab('favoritas')"><svg class="ic"><use href="#ic-heart"/></svg> Favoritas<span class="tab-count" id="fav-tab-count"></span></button>
       <button class="tab"         onclick="showTab('pedidos')"><svg class="ic"><use href="#ic-package"/></svg> Pedidos</button>
       <button class="tab"         onclick="showTab('lojas')"><svg class="ic"><use href="#ic-storefront"/></svg> Lojas</button>
     </div>
@@ -1101,10 +1105,10 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
       <h4><svg class="ic"><use href="#ic-map-pin"/></svg> Distância máxima para o Match</h4>
       <div class="slider-header">
         <span style="font-size:.82rem;color:var(--muted)">Raio:</span>
-        <span class="slider-value" id="prefs-raio-label">50 km</span>
+        <span class="slider-value" id="prefs-raio-label">Tudo</span>
       </div>
-      <input type="range" id="prefs-raio" min="1" max="5000" value="5000" oninput="document.getElementById('prefs-raio-label').textContent=this.value+' km'">
-      <div class="slider-ticks"><span>1 km</span><span>50 km</span><span>100 km</span><span>200 km</span></div>
+      <input type="range" id="prefs-raio" min="1" max="5000" value="5000" oninput="var v=+this.value;document.getElementById('prefs-raio-label').textContent=v>=5000?'Tudo':v+' km'">
+      <div class="slider-ticks"><span>1 km</span><span>50 km</span><span>500 km</span><span>Tudo</span></div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:8px">
@@ -1443,7 +1447,6 @@ function getRevs(){return JSON.parse(localStorage.getItem('bv_revendedoras')||'[
 function getProdos(revId){return JSON.parse(localStorage.getItem('bv_produtos_'+revId)||'[]').filter(p=>p.visivelCatalogo)}
 function getAvaliacoes(revId){return JSON.parse(localStorage.getItem('bv_avaliacoes_'+revId)||'[]')}
 function avgRating(revId){const avs=getAvaliacoes(revId);return avs.length?avs.reduce((s,a)=>s+a.estrelas,0)/avs.length:0}
-function starsHTML(n,max=5){const r=Math.round(n);return`<span style="color:#ffc107">${icon('star-filled').repeat(r)}</span><span style="color:#e0e0e0">${icon('star').repeat(max-r)}</span>`}
 
 // ─══════════════════════════════════════════════════════════
 //  SISTEMA DE MATCH
@@ -1486,7 +1489,7 @@ function toggleFav(id){
 function atualizarBadgeFav(){
   const n=loadFavoritas().length
   const b=document.getElementById('fav-tab-count')
-  if(b)b.textContent=n?` (${n})`:''
+  if(b)b.textContent=n>0?String(n):''
 }
 
 // Estado do deck
@@ -1881,8 +1884,8 @@ function abrirPrefsModal(){
       <div><div style="font-weight:700;font-size:.88rem">${p.label}</div><div style="font-size:.76rem;color:var(--muted)">${p.sub}</div></div>
     </label>`).join('')
   // Raio
-  document.getElementById('prefs-raio').value=tmpPrefs.raio||50
-  document.getElementById('prefs-raio-label').textContent=(tmpPrefs.raio||50)+' km'
+  document.getElementById('prefs-raio').value=tmpPrefs.raio||5000
+  document.getElementById('prefs-raio-label').textContent=(tmpPrefs.raio>=5000||!tmpPrefs.raio)?'Tudo':tmpPrefs.raio+' km'
   document.getElementById('prefs-modal').classList.add('open')
 }
 function fecharPrefsModal(e){
@@ -1904,7 +1907,7 @@ function selectPreco(val,label){
 }
 function salvarPrefs(){
   if(!tmpPrefs)return
-  tmpPrefs.raio=parseInt(document.getElementById('prefs-raio').value)||50
+  tmpPrefs.raio=parseInt(document.getElementById('prefs-raio').value)||5000
   savePrefs(tmpPrefs)
   document.getElementById('prefs-modal').classList.remove('open')
   // Resetar deck (manter curtidas, limpar passes para rever com novo critério)
@@ -1951,10 +1954,10 @@ function renderExplorar(){
           <label>Distância máxima</label>
           <div class="slider-header">
             <span style="font-size:.78rem;color:var(--muted)">Raio:</span>
-            <span class="slider-value" id="raio-label">${raio>=5000?'tudo':raio+' km'}</span>
+            <span class="slider-value" id="raio-label">${raio>=5000?'Tudo':raio+' km'}</span>
           </div>
           <input type="range" id="raio-slider" min="1" max="5000" value="${raio}" oninput="setRaio(this.value)">
-          <div class="slider-ticks"><span>1 km</span><span>50 km</span><span>100 km</span><span>tudo</span></div>
+          <div class="slider-ticks"><span>1 km</span><span>50 km</span><span>500 km</span><span>Tudo</span></div>
         </div>
       </div>
     </div>
@@ -2000,7 +2003,7 @@ function skeletonLojas(n){
   </div>`
   return s
 }
-function setRaio(v){raio=parseInt(v);const el=document.getElementById('raio-label');if(el)el.textContent=(raio>=5000?'tudo':raio+' km');filtrarLojas()}
+function setRaio(v){raio=parseInt(v);const el=document.getElementById('raio-label');if(el)el.textContent=(raio>=5000?'Tudo':raio+' km');filtrarLojas()}
 function setBusca(v){buscaProd=v.trim().toLowerCase();filtrarLojas()}
 function setCat(c){catFiltro=c;document.querySelectorAll('#tab-explorar .cat-chip[data-cat]').forEach(ch=>ch.classList.toggle('active',ch.getAttribute('data-cat')===c));filtrarLojas()}
 function setMarcaEx(m){marcaFiltro=m;document.querySelectorAll('#tab-explorar .cat-chip[data-marca]').forEach(ch=>ch.classList.toggle('active',ch.getAttribute('data-marca')===m));filtrarLojas()}
@@ -2204,9 +2207,8 @@ function onAvFoto(input){
 }
 function removeAvFoto(){avFoto=null;document.getElementById('av-foto-prev').innerHTML=icon('eye');document.getElementById('av-foto-rm').style.display='none'}
 
-function getAvaliacoes(revId){return JSON.parse(localStorage.getItem('bv_avaliacoes_'+revId)||'[]')}
 function avgRatingRev(revId){const avs=getAvaliacoes(revId);return avs.length?avs.reduce((s,a)=>s+a.estrelas,0)/avs.length:0}
-function starsHTML(n,max=5){const r=Math.round(n);return`<span class="stars-display">${icon('star-filled').repeat(r)}<span class="e">${icon('star').repeat(max-r)}</span></span>`}
+function starsHTML(n,max=5){const r=Math.round(n);return`<span class="stars-display" role="img" aria-label="${Math.round(n*10)/10} de ${max} estrelas">${icon('star-filled').repeat(r)}<span class="e">${icon('star').repeat(max-r)}</span></span>`}
 
 function abrirAvModal(pedidoId,revId,revNome){
   avPedidoId=pedidoId;avRevId=revId;avRevNome=revNome;avStars=0
