@@ -656,8 +656,10 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 /* Match bar */
 .match-bar-wrap{margin-bottom:16px}
 .match-bar-label{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);margin-bottom:5px;font-weight:600}
-.match-bar{background:#f3f4f6;border-radius:10px;height:9px;overflow:hidden}
+.match-bar{background:var(--border);border-radius:10px;height:9px;overflow:hidden}
 .match-bar-fill{height:100%;border-radius:10px;transition:width .7s cubic-bezier(.34,1.56,.64,1)}
+.badge-fechada{font-size:.68rem;background:var(--rose-l);color:#c62828;border-radius:7px;padding:2px 8px;font-weight:700;vertical-align:middle;margin-left:6px;white-space:nowrap}
+.txt-aberta{color:#2e9e4f;font-weight:700}
 .fill-great{background:linear-gradient(90deg,#059669,#34d399)}
 .fill-good{background:linear-gradient(90deg,#d97706,#fbbf24)}
 .fill-ok{background:linear-gradient(90deg,#dc2626,#f87171)}
@@ -1697,10 +1699,10 @@ function buildCard({rev,prods,dist,score,breakdown},isFront){
         <div class="card-avatar">${revFoto(rev)}</div>
         <div class="card-name">
           <h2>${rev.nome}
-            ${!lojaAberta?`<span style="font-size:.7rem;background:#fce4ec;color:#b71c1c;border-radius:8px;padding:2px 8px;font-weight:700;vertical-align:middle;margin-left:6px">${icon('lock-closed')} Fechada</span>`:''}
+            ${!lojaAberta?`<span class="badge-fechada">${icon('lock-closed')} Fechada</span>`:''}
           </h2>
           <p>${icon('map-pin')} ${rev.cidade}, ${rev.estado}${dist!==null?' · '+fmtDist(dist)+' de você':''}
-            ${lojaAberta?`<span style="color:#43a047;font-weight:700;font-size:.78rem"> · ${icon('dot')} Aberta</span>`:''}
+            ${lojaAberta?`<span class="txt-aberta" style="font-size:.78rem"> · ${icon('dot')} Aberta</span>`:''}
           </p>
           ${avs.length?`<p style="font-size:.78rem">${starsHTML(avgStar)} ${avgStar.toFixed(1)} (${avs.length})</p>`:''}
         </div>
@@ -2056,10 +2058,10 @@ function lojaCardHTML({rev,prods,match,dist}){
     <div class="loja-avatar">${revFoto(rev)}</div>
     <div class="loja-info">
       <h3>${rev.nome}
-        ${!lojaAberta?`<span style="font-size:.68rem;background:#fce4ec;color:#b71c1c;border-radius:6px;padding:2px 7px;font-weight:700;margin-left:6px;vertical-align:middle">${icon('lock-closed')} Fechada</span>`:''}
+        ${!lojaAberta?`<span class="badge-fechada">${icon('lock-closed')} Fechada</span>`:''}
       </h3>
       <div class="loja-meta">${icon('map-pin')} ${rev.cidade}, ${rev.estado}
-        ${lojaAberta?`<span style="color:#43a047;font-weight:700"> · ${icon('dot')} Aberta</span>`:''}
+        ${lojaAberta?`<span class="txt-aberta"> · ${icon('dot')} Aberta</span>`:''}
       </div>
       ${avs.length?`<div style="font-size:.76rem;margin-bottom:3px">${starsHTML(avgStar)} <span style="color:var(--muted)">${avgStar.toFixed(1)} (${avs.length})</span></div>`:`<div style="font-size:.74rem;color:var(--muted-l);margin-bottom:3px">Sem avaliações ainda</div>`}
       ${rev.bio?`<div class="loja-bio">${rev.bio}</div>`:''}
@@ -2401,10 +2403,10 @@ function renderMinhasLojas(){
       <div class="loja-avatar">${revFoto(rev)}</div>
       <div class="loja-info">
         <h3>${rev.nome}
-          ${!lojaAberta?`<span style="font-size:.68rem;background:#fce4ec;color:#b71c1c;border-radius:6px;padding:2px 7px;font-weight:700;margin-left:6px;vertical-align:middle">${icon('lock-closed')} Fechada</span>`:''}
+          ${!lojaAberta?`<span class="badge-fechada">${icon('lock-closed')} Fechada</span>`:''}
         </h3>
         <div class="loja-meta">${icon('map-pin')} ${rev.cidade}, ${rev.estado} · ${qtd} pedido(s) · Último: ${fmtData(ultimo.dataCriacao)}
-          ${lojaAberta?`<span style="color:#43a047;font-weight:700"> · ${icon('dot')} Aberta</span>`:''}
+          ${lojaAberta?`<span class="txt-aberta"> · ${icon('dot')} Aberta</span>`:''}
         </div>
       </div>
       <div class="loja-right">

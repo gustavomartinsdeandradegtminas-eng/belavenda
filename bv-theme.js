@@ -71,6 +71,18 @@
     '[data-theme=dark] .boleto-box{background:var(--surface-2);border-color:var(--border)}' +
     '[data-theme=dark] .delivery-opt{background:var(--surface-2)!important;border-color:var(--border)!important}' +
     '[data-theme=dark] .pix-key-wrap{background:var(--surface)}' +
+    // loja: notas de status e cartao PIX harmonizados ao dark (mantem identidade verde/laranja)
+    '[data-theme=dark] .tx-badge{background:rgba(16,185,129,.16);color:#6ee7b7}' +
+    '[data-theme=dark] .bv-note.ok{background:rgba(16,185,129,.14);border-color:rgba(16,185,129,.32);color:#6ee7b7}' +
+    '[data-theme=dark] .bv-note.warn{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.34);color:#fcd34d}' +
+    '[data-theme=dark] .pix-box{background:linear-gradient(135deg,#11271c,#0f2417);border-color:#2f6f43}' +
+    '[data-theme=dark] .pix-title,[data-theme=dark] .pix-amount,[data-theme=dark] .pix-key-text,[data-theme=dark] .pix-timer,[data-theme=dark] .pix-tip{color:#6ee7b7}' +
+    // preco do produto: gradiente clipado perde contraste no dark -> rosa claro solido
+    '[data-theme=dark] .prod-price{background:none!important;-webkit-text-fill-color:#f9a8d4;color:#f9a8d4}' +
+    // cliente: badges de status legiveis no dark
+    '[data-theme=dark] .badge-fechada{background:rgba(239,68,68,.16);color:#fca5a5}' +
+    '[data-theme=dark] .txt-aberta{color:#6ee7a8}' +
+    '[data-theme=dark] .cep-resultado.loading{background:rgba(233,30,140,.14);color:#f9a8d4}' +
     // landing: contraste no dark
     '[data-theme=dark] .vit-btn{background:rgba(233,30,140,.18);color:#f9a8d4}' +
     '[data-theme=dark] .vit-btn:hover{background:rgba(233,30,140,.3)}' +

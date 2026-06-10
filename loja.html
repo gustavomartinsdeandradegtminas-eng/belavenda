@@ -276,6 +276,9 @@ input[id="card-num"]{letter-spacing:3px;font-family:'Courier New',monospace;font
 .success-screen p{color:var(--muted);font-size:.9rem;margin-bottom:24px;line-height:1.6}
 .wa-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none}
 .tx-badge{background:#e8f5e9;color:var(--success);border-radius:8px;padding:8px 14px;font-size:.82rem;font-weight:600;margin-bottom:16px;display:inline-block}
+.bv-note{border-radius:9px;padding:10px 14px;font-size:.85rem;line-height:1.45;display:block}
+.bv-note.ok{background:#e8f5e9;border:1px solid #c8e6c9;color:#2e7d32}
+.bv-note.warn{background:#fff3e0;border:1px solid #ffcc80;color:#bf360c}
 
 /* BTNS */
 .btn{padding:10px 22px;border-radius:9px;font-size:.92rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .2s}
@@ -715,7 +718,7 @@ async function renderStep1(){
       ${items.map(it=>`<div class="resumo-row"><span>${it.qty}× ${it.nome}</span><span>${fmtM(it.precoVenda*it.qty)}</span></div>`).join('')}
       <div class="resumo-total"><span>Total dos itens</span><span style="color:var(--primary)">${fmtM(cartTotal())}</span></div>
     </div>
-    ${cli?`<div style="background:#e8f5e9;border:1px solid #c8e6c9;border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:.85rem;color:#2e7d32">`+icon('check')+` Identificado como <strong>${cli.nome}</strong></div>`:''}
+    ${cli?`<div class="bv-note ok" style="margin-bottom:14px">`+icon('check')+` Identificado como <strong>${cli.nome}</strong></div>`:''}
     <div class="form-group"><label>Seu nome *</label><input id="ch-nome" value="${cli?.nome||''}" placeholder="Nome completo"></div>
     <div class="form-group"><label>WhatsApp *</label><input id="ch-wa" type="tel" value="${cli?.whatsapp||''}" placeholder="+55 41 99999-0000"></div>
     <div class="form-group">
@@ -794,7 +797,7 @@ async function carregarOpcoesEntrega(toCEP){
       document.head.appendChild(s)
     }
   }catch(e){
-    wrap.innerHTML=`<div style="padding:12px;background:#fff3e0;border-radius:9px;font-size:.82rem;color:#bf360c">
+    wrap.innerHTML=`<div class="bv-note warn">
       ${icon('alert-triangle')} Não foi possível calcular o frete. Combine diretamente com a revendedora.</div>`
   }
 }
@@ -871,7 +874,7 @@ function renderPayForm(m){
   const area=document.getElementById('pay-form-area')
   if(!area)return
   if(m==='PIX'){
-    area.innerHTML=`<div style="background:#e8f5e9;border-radius:9px;padding:12px 14px;font-size:.85rem;color:#2e7d32;margin-top:4px">
+    area.innerHTML=`<div class="bv-note ok" style="margin-top:4px">
       ${icon('check-circle')} Você receberá o QR Code e a chave PIX para pagar. Aprovação em segundos!</div>`
   } else if(m==='CREDITO'){
     area.innerHTML=`
@@ -910,7 +913,7 @@ function renderPayForm(m){
       </div>`
   } else if(m==='BOLETO'){
     const due=new Date();due.setDate(due.getDate()+3)
-    area.innerHTML=`<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:9px;padding:12px 14px;font-size:.85rem;color:#e65100;margin-top:4px">
+    area.innerHTML=`<div class="bv-note warn" style="margin-top:4px">
       ${icon('document')} Boleto gerado ao confirmar. Vencimento em <strong>${due.toLocaleDateString('pt-BR')}</strong>. Pague em qualquer banco ou lotérica.</div>`
   }
 }
