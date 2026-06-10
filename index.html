@@ -124,6 +124,31 @@ nav.scrolled{
 .sec-head h2 em{font-style:italic;color:var(--rose);font-weight:700}
 .sec-head p{font-size:17px;color:var(--muted);line-height:1.65}
 section{padding:clamp(64px,8vw,92px) 0;position:relative}
+/* ===== SIMULADOR DE LUCRO ===== */
+.sim-card{
+  display:grid;grid-template-columns:1fr 1.1fr;gap:48px;align-items:center;
+  background:linear-gradient(135deg,#4a1033 0%,#880e4f 55%,#c2185b 100%);
+  border-radius:26px;padding:clamp(28px,5vw,56px);color:#fff;position:relative;overflow:hidden;
+  box-shadow:0 24px 60px -18px rgba(136,14,79,.45);
+}
+.sim-card::before{content:"";position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 65%);pointer-events:none}
+.sim-copy .eyebrow{background:rgba(255,255,255,.12);color:#fbcfe8;border-color:rgba(255,255,255,.2)}
+.sim-copy h3{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(26px,3.6vw,40px);line-height:1.12;letter-spacing:-.015em;margin:16px 0 12px}
+.sim-copy h3 em{font-style:italic;color:#f4d9b0}
+.sim-copy p{font-size:15px;color:rgba(255,255,255,.82);line-height:1.6;max-width:380px}
+.sim-controls{display:flex;flex-direction:column;gap:18px}
+.sim-field{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px 18px}
+.sim-label{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;font-weight:600;color:rgba(255,255,255,.85);margin-bottom:10px}
+.sim-label b{font-size:17px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.sim-field input[type=range]{width:100%;height:6px;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.22);border-radius:6px;outline:none;cursor:pointer;accent-color:#f4d9b0}
+.sim-field input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#f4d9b0 75%);box-shadow:0 2px 10px rgba(0,0,0,.35),0 0 0 4px rgba(244,217,176,.25);border:none}
+.sim-field input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#f4d9b0;border:none;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.sim-result{display:flex;flex-direction:column;gap:2px;padding:6px 4px 2px}
+.sim-result-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.65)}
+.sim-result-value{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(34px,4.6vw,52px);line-height:1;color:#f4d9b0;font-variant-numeric:tabular-nums}
+.sim-result-value small{font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:rgba(255,255,255,.7);margin-left:6px}
+.sim-cta{align-self:flex-start;margin-top:4px}
+@media(max-width:760px){.sim-card{grid-template-columns:1fr;gap:26px}}
 /* Marca-d'água editorial: monograma B impresso "no papel" */
 .wm{overflow:hidden}
 .wm::before{content:"B";position:absolute;z-index:0;top:-.08em;right:-4%;
@@ -849,6 +874,34 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
   </div>
 </section>
 
+<!-- ===== SIMULADOR DE LUCRO ===== -->
+<section id="simulador" style="padding-top:0">
+  <div class="wrap">
+    <div class="sim-card reveal">
+      <div class="sim-copy">
+        <span class="eyebrow"><svg class="ic"><use href="#ic-calculator"/></svg>Faça as contas</span>
+        <h3>Quanto você pode<br><em>lucrar por mês?</em></h3>
+        <p>Arraste os controles e veja uma estimativa com margem típica de 40% sobre o preço de revenda.</p>
+      </div>
+      <div class="sim-controls">
+        <div class="sim-field">
+          <div class="sim-label"><span>Pedidos por semana</span><b id="sim-ped-val">10</b></div>
+          <input type="range" id="sim-ped" min="1" max="50" value="10" aria-label="Pedidos por semana">
+        </div>
+        <div class="sim-field">
+          <div class="sim-label"><span>Ticket médio</span><b id="sim-ticket-val">R$ 80</b></div>
+          <input type="range" id="sim-ticket" min="30" max="300" step="5" value="80" aria-label="Ticket médio em reais">
+        </div>
+        <div class="sim-result">
+          <span class="sim-result-label">Lucro estimado</span>
+          <span class="sim-result-value" id="sim-result">R$ 1.386<small>/mês</small></span>
+        </div>
+        <a href="login.html" class="btn btn-primary sim-cta">Quero começar a vender</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ===== TESTIMONIALS ===== -->
 <section id="depoimentos" class="wm wm-left">
   <div class="wrap">
@@ -1091,6 +1144,25 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
     hero.addEventListener('pointerleave', function(){
       hero.style.setProperty('--prx','0'); hero.style.setProperty('--pry','0');
     }, {passive:true});
+  })();
+
+  /* ===== Simulador de lucro ===== */
+  (function(){
+    var ped = document.getElementById('sim-ped');
+    var tic = document.getElementById('sim-ticket');
+    if(!ped || !tic) return;
+    var MARGEM = 0.40, SEMANAS = 4.33;
+    function calc(){
+      var p = +ped.value, t = +tic.value;
+      document.getElementById('sim-ped-val').textContent = p;
+      document.getElementById('sim-ticket-val').textContent = 'R$ ' + t;
+      var lucro = Math.round(p * t * MARGEM * SEMANAS);
+      document.getElementById('sim-result').innerHTML =
+        'R$ ' + lucro.toLocaleString('pt-BR') + '<small>/mês</small>';
+    }
+    ped.addEventListener('input', calc, {passive:true});
+    tic.addEventListener('input', calc, {passive:true});
+    calc();
   })();
 
   /* ===== Scroll reveal ===== */
