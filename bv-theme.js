@@ -75,6 +75,7 @@
     '[data-theme=dark] .tx-badge{background:rgba(16,185,129,.16);color:#6ee7b7}' +
     '[data-theme=dark] .bv-note.ok{background:rgba(16,185,129,.14);border-color:rgba(16,185,129,.32);color:#6ee7b7}' +
     '[data-theme=dark] .bv-note.warn{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.34);color:#fcd34d}' +
+    '[data-theme=dark] .cupom-applied{background:rgba(16,185,129,.14);border-color:rgba(16,185,129,.32);color:#6ee7b7}' +
     '[data-theme=dark] .pix-box{background:linear-gradient(135deg,#11271c,#0f2417);border-color:#2f6f43}' +
     '[data-theme=dark] .pix-title,[data-theme=dark] .pix-amount,[data-theme=dark] .pix-key-text,[data-theme=dark] .pix-timer,[data-theme=dark] .pix-tip{color:#6ee7b7}' +
     // preco do produto: gradiente clipado perde contraste no dark -> rosa claro solido

@@ -175,3 +175,24 @@
     localStorage.setItem('bv_demo_seeded', SEED_VERSION);
   } catch (e) { /* nunca quebra a página */ }
 })();
+
+// ─── Cupons de demonstração (idempotente, fora do versionamento do seed) ───
+// Cada revendedora demo ganha dois cupons de exemplo para o cliente testar no checkout.
+// Roda uma única vez (flag bv_cupons_seeded) e nunca sobrescreve cupons existentes.
+;(function () {
+  'use strict';
+  try {
+    if (localStorage.getItem('bv_cupons_seeded') === '1') return;
+    var demoIds = ['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11'];
+    var now = new Date().toISOString();
+    demoIds.forEach(function (id) {
+      if (localStorage.getItem('bv_cupons_' + id)) return;
+      var cps = [
+        { id: id + '-c1', codigo: 'BEMVINDA10', tipo: 'percent', valor: 10, minimo: 0,   validade: '', ativo: true, usos: 0, criadoEm: now },
+        { id: id + '-c2', codigo: 'BELA20',     tipo: 'fixo',    valor: 20, minimo: 120, validade: '', ativo: true, usos: 0, criadoEm: now }
+      ];
+      localStorage.setItem('bv_cupons_' + id, JSON.stringify(cps));
+    });
+    localStorage.setItem('bv_cupons_seeded', '1');
+  } catch (e) { /* nunca quebra a página */ }
+})();

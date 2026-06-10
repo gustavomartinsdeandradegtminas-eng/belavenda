@@ -227,6 +227,17 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .pay-method-icon{font-size:1.6rem;margin-bottom:6px;display:block}
 .pay-method-name{font-size:.82rem;font-weight:700;color:var(--text)}
 .pay-method-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+.cupom-box{margin-bottom:18px}
+.cupom-input-row{display:flex;gap:8px}
+.cupom-input-row input{flex:1;border:1.5px dashed var(--border);border-radius:10px;padding:11px 12px;font-size:.88rem;font-family:inherit;text-transform:uppercase;letter-spacing:.5px;background:var(--cream)}
+.cupom-input-row input:focus{border-color:var(--primary);border-style:solid;outline:none}
+.cupom-apply-btn{border:none;background:var(--primary);color:#fff;font-weight:700;border-radius:10px;padding:0 18px;cursor:pointer;font-family:inherit;font-size:.85rem;transition:filter .2s;min-height:44px}
+.cupom-apply-btn:hover{filter:brightness(1.08)}
+.cupom-applied{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--success-l,#e8f5e9);border:1px solid #c8e6c9;border-radius:10px;padding:10px 14px;font-size:.85rem;color:#2e7d32;font-weight:600}
+.cupom-rm{border:none;background:transparent;color:var(--danger,#ef4444);font-weight:700;cursor:pointer;font-family:inherit;font-size:.82rem;text-decoration:underline}
+.cupom-msg{font-size:.78rem;margin-top:6px;min-height:1em;font-weight:600}
+.cupom-msg.err{color:var(--danger,#ef4444)}
+.cupom-msg.ok{color:var(--success,#10b981)}
 .trust-strip{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);font-size:.74rem;color:var(--muted);font-weight:600}
 .trust-strip span{display:inline-flex;align-items:center;gap:5px}
 .trust-strip .ic{width:15px;height:15px;color:var(--success)}
@@ -834,17 +845,54 @@ function nextStep1(){
 }
 
 // ─── STEP 2: PAGAMENTO ────────────────────────────────────
+// ─── CUPONS ───────────────────────────────────────────────
+function getCupons(revId){try{return JSON.parse(localStorage.getItem('bv_cupons_'+revId)||'[]')}catch(e){return[]}}
+function chDesconto(){return chInfo.cupom?chInfo.cupom.desconto:0}
+function chTotal(){return Math.max(0,cartTotal()-chDesconto())+(chInfo.entrega?.price||0)}
+function aplicarCupom(){
+  const inp=document.getElementById('cupom-code'); if(!inp)return
+  const code=(inp.value||'').trim().toUpperCase()
+  const msg=document.getElementById('cupom-msg')
+  const setMsg=(t,cls)=>{if(msg){msg.textContent=t;msg.className='cupom-msg '+cls}}
+  if(!code){setMsg('Digite um código de cupom.','err');return}
+  const c=getCupons(revendedora.id).find(x=>(x.codigo||'').toUpperCase()===code)
+  if(!c||!c.ativo){setMsg('Cupom inválido ou inativo.','err');return}
+  if(c.validade){const exp=new Date(c.validade+'T23:59:59');if(!isNaN(exp)&&exp<new Date()){setMsg('Este cupom expirou.','err');return}}
+  const subtotal=cartTotal()
+  if(c.minimo&&subtotal<c.minimo){setMsg('Pedido mínimo de '+fmtM(c.minimo)+' para este cupom.','err');return}
+  let desconto=c.tipo==='percent'?subtotal*(c.valor/100):Math.min(c.valor,subtotal)
+  desconto=Math.round(desconto*100)/100
+  chInfo.cupom={codigo:c.codigo,tipo:c.tipo,valor:c.valor,desconto:desconto}
+  bvToast('Cupom '+c.codigo+' aplicado! Você economizou '+fmtM(desconto)+'.','success')
+  renderStep2()
+}
+function removerCupom(){delete chInfo.cupom;renderStep2()}
+
 function renderStep2(){
   document.getElementById('modal-hd-title').textContent='Forma de Pagamento'
   const subtotal=cartTotal()
   const frete=chInfo.entrega?.price||0
-  const total=subtotal+frete
+  const desconto=chDesconto()
+  const total=chTotal()
   document.getElementById('modal-body').innerHTML=`
     ${stepBar(2)}
     <div class="resumo-box">
       <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:4px"><span>Subtotal</span><span>${fmtM(subtotal)}</span></div>
       ${chInfo.entrega?`<div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px"><span>${icon('truck')} ${chInfo.entrega.name}</span><span>${chInfo.entrega.price===0?'Grátis':fmtM(chInfo.entrega.price)}</span></div>`:''}
+      ${desconto>0?`<div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--success);font-weight:700;margin-bottom:6px"><span>${icon('tag')} Cupom ${chInfo.cupom.codigo}</span><span>− ${fmtM(desconto)}</span></div>`:''}
       <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;color:var(--primary);border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span>Total</span><span>${fmtM(total)}</span></div>
+    </div>
+    <div class="cupom-box">
+      ${chInfo.cupom?`
+        <div class="cupom-applied">
+          <span>${icon('tag')} Cupom <strong>${chInfo.cupom.codigo}</strong> aplicado</span>
+          <button class="cupom-rm" onclick="removerCupom()">Remover</button>
+        </div>`:`
+        <div class="cupom-input-row">
+          <input id="cupom-code" placeholder="Tem um cupom de desconto?" maxlength="24" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();aplicarCupom()}">
+          <button class="cupom-apply-btn" onclick="aplicarCupom()">Aplicar</button>
+        </div>`}
+      <div id="cupom-msg" class="cupom-msg"></div>
     </div>
     <div style="font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Escolha o método:</div>
     <div class="pay-methods">
@@ -959,7 +1007,7 @@ function processarPagamento(){
 }
 
 function showPixScreen(){
-  const total=cartTotal()+(chInfo.entrega?.price||0)
+  const total=chTotal()
   const pixKey=`belavenda+${revendedora.id.slice(0,8).toUpperCase()}@belavenda.app`
   pixSec=900
   document.getElementById('modal-hd-title').textContent='Pagamento PIX'
@@ -1004,7 +1052,7 @@ function processPagarCartao(){
     bvToast('Preencha todos os dados do cartão corretamente.','error');return
   }
   const parc=parseInt(document.getElementById('card-parc')?.value||1)
-  const total=cartTotal()+(chInfo.entrega?.price||0)
+  const total=chTotal()
   document.getElementById('modal-hd-title').textContent='Processando...'
   document.getElementById('modal-body').innerHTML=`
     <div class="processing-screen">
@@ -1027,7 +1075,7 @@ function processPagarCartao(){
 }
 
 function showBoletoScreen(){
-  const total=cartTotal()+(chInfo.entrega?.price||0)
+  const total=chTotal()
   const due=new Date();due.setDate(due.getDate()+3)
   const barcodeNum=`3399${Math.random().toString().slice(2,14)} 00010 ${Math.random().toString().slice(2,12)} 0000 ${Math.random().toString().slice(2,8)} 00000000 ${Math.round(total*100).toString().padStart(10,'0')}`
   document.getElementById('modal-hd-title').textContent='Boleto Bancário'
@@ -1068,7 +1116,16 @@ function criarPedido(pagamento){
   const items=cartItems()
   const subtotal=cartTotal()
   const frete=chInfo.entrega?.price||0
-  const total=subtotal+frete
+  const desconto=chDesconto()
+  const total=Math.max(0,subtotal-desconto)+frete
+  // Cupom: registra uso
+  if(chInfo.cupom){
+    try{
+      const ck='bv_cupons_'+revendedora.id, cps=getCupons(revendedora.id)
+      const cc=cps.find(x=>(x.codigo||'').toUpperCase()===chInfo.cupom.codigo.toUpperCase())
+      if(cc){cc.usos=(cc.usos||0)+1;localStorage.setItem(ck,JSON.stringify(cps))}
+    }catch(e){}
+  }
   // Cliente
   const cliKey='bv_clientes_'+revendedora.id
   const clientes=JSON.parse(localStorage.getItem(cliKey)||'[]')
@@ -1079,7 +1136,8 @@ function criarPedido(pagamento){
     id:uid(),revendedoraId:revendedora.id,clienteFinalId:cli.id,
     clienteNome:chInfo.nome,clienteTelefone:chInfo.wa,clienteEndereco:chInfo.endereco,
     cepDestino:chInfo.cepDest||'',
-    valorSubtotal:subtotal,valorFrete:frete,valorTotal:total,
+    valorSubtotal:subtotal,valorFrete:frete,valorDesconto:desconto,valorTotal:total,
+    cupom:chInfo.cupom||null,
     formaPagamento:pagamento.metodo,status:'NOVO',
     dataCriacao:now(),avaliado:false,
     entrega:chInfo.entrega||null,
@@ -1112,6 +1170,7 @@ function showSuccess(pedido,pagamento){
     items.map(it=>`• ${it.quantidade}x ${it.nome}`).join('\n')+
     `\n\nSubtotal: ${fmtM(pedido.valorSubtotal)}`+
     (pedido.entrega?`\nFrete: ${pedido.entrega.name} — ${pedido.entrega.price===0?'Grátis':fmtM(pedido.entrega.price)}`:'') +
+    (pedido.valorDesconto>0?`\nCupom ${pedido.cupom?pedido.cupom.codigo:''}: -${fmtM(pedido.valorDesconto)}`:'') +
     `\nTotal: ${fmtM(pedido.valorTotal)}\nPagamento: ${pagamento.metodo}${pagamento.status==='PAGO'?' (PAGO)':''}\nID: #${pedido.id.slice(0,8).toUpperCase()}`
   document.getElementById('modal-hd-title').textContent=''
   document.getElementById('modal-body').innerHTML=`
