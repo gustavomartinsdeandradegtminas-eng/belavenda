@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<script>document.documentElement.classList.add('js')</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BelaVenda — Beleza perto de você</title>
 <meta name="description" content="Marketplace que conecta revendedoras de cosméticos a clientes próximos. Descubra lojas perto de você, compre de quem você confia e receba por motoboy no mesmo dia.">
@@ -122,7 +123,7 @@ nav.scrolled{
 .sec-head h2{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(30px,4.4vw,46px);line-height:1.1;letter-spacing:-.02em;margin:18px 0 16px;color:var(--text)}
 .sec-head h2 em{font-style:italic;color:var(--rose);font-weight:700}
 .sec-head p{font-size:17px;color:var(--muted);line-height:1.65}
-section{padding:100px 0;position:relative}
+section{padding:clamp(64px,8vw,92px) 0;position:relative}
 
 /* ===== HERO ===== */
 .hero{
@@ -402,7 +403,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
 .foot-bottom .made .ic{color:#f9a8d4}
 
 /* ===== SCROLL REVEAL ===== */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1)}
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1)}
 .reveal.in{opacity:1;transform:none}
 .reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}.reveal.d4{transition-delay:.32s}
 
@@ -811,7 +812,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
           <p>Acompanhe vendas, margens e comissões em tempo real, sem planilha.</p>
         </div>
         <div class="feat-card reveal d2">
-          <div class="fc-icon rose"><svg class="ic"><use href="#ic-storefront"/></svg></div>
+          <div class="fc-icon rose"><svg class="ic"><use href="#ic-clock"/></svg></div>
           <h4>Abrir / fechar loja</h4>
           <p>Controle quando está disponível com um clique — descanse sem perder cliente.</p>
         </div>
@@ -1072,6 +1073,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
       var num = decimals > 0 ? v.toFixed(decimals).replace('.', ',') : Math.round(v).toLocaleString('pt-BR');
       return prefix + num + suffix;
     }
+    if(window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches){ el.textContent = fmt(target); return; }
     function frame(ts){
       if(!start) start = ts;
       var p = Math.min((ts - start)/dur, 1);
