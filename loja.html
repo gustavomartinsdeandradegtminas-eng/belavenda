@@ -417,6 +417,7 @@ window.onload=function(){
   revendedora=findRev(slug)
   if(!revendedora){showNotFound(`Loja "${slug}" não encontrada.`);return}
   produtos=getProds(revendedora.id)
+  cart=loadCart()
   renderPage()
   aplicarRecompra()
 }
@@ -632,7 +633,10 @@ function removeFromCart(id){delete cart[id];reRenderGrid();updateCartBadge();ren
 function cartItems(){return Object.keys(cart).map(id=>({...produtos.find(p=>p.id===id),qty:cart[id]})).filter(x=>x&&x.id)}
 function cartTotal(){return cartItems().reduce((s,it)=>s+(it.precoVenda||0)*it.qty,0)}
 function cartCount(){return Object.values(cart).reduce((s,n)=>s+n,0)}
-function updateCartBadge(){const b=document.getElementById('cart-badge'),n=cartCount();if(b)b.textContent=n+' ite'+(n===1?'m':'ns')}
+function cartKey(){return 'bv_cart_'+(revendedora?revendedora.slugLoja:'x')}
+function persistCart(){try{localStorage.setItem(cartKey(),JSON.stringify(cart))}catch(e){}}
+function loadCart(){try{return JSON.parse(localStorage.getItem(cartKey())||'{}')||{}}catch(e){return {}}}
+function updateCartBadge(){const b=document.getElementById('cart-badge'),n=cartCount();if(b)b.textContent=n+' ite'+(n===1?'m':'ns');persistCart()}
 function openCart(){renderCartItems();document.getElementById('cart-overlay').classList.add('open')}
 function closeCart(){document.getElementById('cart-overlay').classList.remove('open')}
 function closeCartIfOut(e){if(e.target===document.getElementById('cart-overlay'))closeCart()}

@@ -95,7 +95,7 @@
     ':focus-visible{outline:2.5px solid var(--primary,#c2185b);outline-offset:2px;border-radius:6px}' +
     'button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}' +
     // respeita preferência de menos movimento
-    '@media(prefers-reduced-motion:reduce){.bv-anim,.prod-photo,.skel::after,.dot-aberta{animation:none!important}*{scroll-behavior:auto!important}}';
+    '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}.marquee-track{animation:none!important}}';
 
   var st = d.createElement('style');
   st.id = 'bv-theme-css';
