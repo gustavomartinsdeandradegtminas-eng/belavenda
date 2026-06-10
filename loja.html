@@ -88,7 +88,7 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px}
 .prod-card{background:var(--surface);border-radius:18px;border:1px solid var(--border);overflow:hidden;transition:transform .25s cubic-bezier(.4,0,.2,1),box-shadow .25s,border-color .25s;box-shadow:0 2px 5px rgba(136,14,79,.04),0 10px 28px rgba(136,14,79,.06)}
 .prod-card:hover{transform:translateY(-6px);box-shadow:0 8px 16px rgba(136,14,79,.1),0 24px 50px rgba(136,14,79,.16);border-color:var(--primary-l)}
-.prod-img{height:160px;background:linear-gradient(135deg,var(--primary-l),#fff);display:flex;align-items:center;justify-content:center;font-size:3.5rem;overflow:hidden;position:relative}
+.prod-img{aspect-ratio:1/1;background:linear-gradient(135deg,var(--primary-l),#fff);display:flex;align-items:center;justify-content:center;font-size:3.5rem;overflow:hidden;position:relative;cursor:zoom-in}
 .prod-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 62%,rgba(136,14,79,.10));pointer-events:none}
 .stock-badge{position:absolute;top:10px;left:10px;z-index:2;background:rgba(239,68,68,.95);color:#fff;font-size:.68rem;font-weight:800;padding:4px 10px;border-radius:20px;box-shadow:0 3px 8px rgba(239,68,68,.4);letter-spacing:.2px}
 .prod-tag{position:absolute;top:10px;right:10px;z-index:2;font-size:.66rem;font-weight:800;padding:4px 10px;border-radius:20px;color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.18);letter-spacing:.2px;display:inline-flex;align-items:center;gap:4px}
@@ -165,7 +165,9 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .cart-header h2{font-size:1.1rem;font-weight:700}
 .cart-close{background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--muted);padding:4px}
 .cart-items{flex:1;overflow-y:auto;padding:16px 24px}
-.cart-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f5f5f5}
+.cart-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.cart-item-thumb{width:54px;height:54px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--primary-l);display:flex;align-items:center;justify-content:center}
+.cart-item-thumb .prod-art{height:100%;width:100%}
 .cart-item-info{flex:1}
 .cart-item-name{font-size:.9rem;font-weight:600;margin-bottom:2px}
 .cart-item-brand{font-size:.78rem;color:var(--muted)}
@@ -291,7 +293,7 @@ input[id="card-num"]{letter-spacing:3px;font-family:'Courier New',monospace;font
   .cart-drawer{width:100%}
   .prod-grid{grid-template-columns:repeat(2,1fr);gap:12px}
   .prod-body{padding:12px}
-  .prod-img{height:110px;font-size:2.5rem}
+  .prod-img{font-size:2.5rem}
   .store-header-inner{flex-direction:column}
   .pay-methods{grid-template-columns:1fr 1fr}
   .modal{border-radius:14px}
@@ -600,7 +602,7 @@ function renderProdCards(){
     const wished=cli&&isWished(p.id)
     const wishBtn=cli?`<button class="wish-btn${wished?' on':''}" onclick="toggleWish('${p.id}')" title="${wished?'Remover dos desejos':'Adicionar à lista de desejos'}">${icon('heart')}</button>`:''
     return`<div class="prod-card">
-      <div class="prod-img" style="overflow:hidden">${getProdImg(p)}${lowBadge}${prodTag}${wishBtn}</div>
+      <div class="prod-img" style="overflow:hidden" onclick="const im=this.querySelector('img.prod-photo');if(im)bvLightbox(im.src)">${getProdImg(p)}${lowBadge}${prodTag}${wishBtn}</div>
       <div class="prod-body">
         <div class="prod-brand">${p.marca}</div>
         <div class="prod-name">${p.nome}</div>
@@ -623,7 +625,7 @@ function setBusca(q){buscaQ=q.toLowerCase();reRenderGrid()}
 
 // ─── CART ─────────────────────────────────────────────────
 function stockOf(id){const p=produtos.find(x=>x.id===id);return (p&&p.estoque!=null)?p.estoque:Infinity}
-function addToCart(id){if((cart[id]||0)>=stockOf(id))return;cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge()}
+function addToCart(id){if((cart[id]||0)>=stockOf(id)){bvToast('Estoque máximo atingido.','info');return}cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge();const p=produtos.find(x=>x.id===id);if(window.bvToast)bvToast((p?p.nome:'Item')+' adicionado ao carrinho','success')}
 function incQty(id){if((cart[id]||0)>=stockOf(id))return;cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge();renderCartItems()}
 function decQty(id){cart[id]=(cart[id]||1)-1;if(cart[id]<=0)delete cart[id];reRenderGrid();updateCartBadge();renderCartItems()}
 function removeFromCart(id){delete cart[id];reRenderGrid();updateCartBadge();renderCartItems()}
@@ -638,6 +640,7 @@ function renderCartItems(){
   const items=cartItems(),el=document.getElementById('cart-items'),ft=document.getElementById('cart-footer')
   if(!items.length){el.innerHTML='<p style="color:var(--muted);text-align:center;padding:30px">Nenhum item</p>';ft.style.display='none';return}
   el.innerHTML=items.map(it=>`<div class="cart-item">
+    <div class="cart-item-thumb">${getProdImg(it)}</div>
     <div class="cart-item-info">
       <div class="cart-item-name">${it.nome}</div>
       <div class="cart-item-brand">${it.marca}</div>
