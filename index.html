@@ -143,8 +143,10 @@ section{padding:100px 0;position:relative}
 .hero-avatars span{
   width:38px;height:38px;border-radius:50%;border:2.5px solid #fff;margin-left:-12px;
   display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;box-shadow:var(--shadow-sm);
+  overflow:hidden;background:var(--grad);
 }
 .hero-avatars span:first-child{margin-left:0}
+.hero-avatars span img{width:100%;height:100%;object-fit:cover}
 .hero-meta-text{font-size:13.5px;color:var(--muted)}
 .hero-meta-text b{color:var(--text);font-weight:700}
 .hero-stars{color:var(--gold);display:inline-flex;gap:1px}
@@ -299,7 +301,8 @@ section{padding:100px 0;position:relative}
 .testi-stars{color:var(--gold);display:flex;gap:2px;margin:8px 0 16px}
 .testi p{font-size:15.5px;color:var(--text2);line-height:1.68;font-style:italic;flex:1}
 .testi-author{display:flex;align-items:center;gap:13px;margin-top:24px;padding-top:22px;border-top:1px solid var(--border)}
-.testi-av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-family:'Playfair Display',serif;font-size:18px;box-shadow:0 6px 16px rgba(136,14,79,.2)}
+.testi-av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-family:'Playfair Display',serif;font-size:18px;box-shadow:0 6px 16px rgba(136,14,79,.2);overflow:hidden;background:var(--grad)}
+.testi-av img{width:100%;height:100%;object-fit:cover}
 .testi-name{font-weight:700;font-size:15px}
 .testi-role{font-size:13px;color:var(--muted)}
 
@@ -481,14 +484,14 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
       </span></h1>
       <p class="hero-sub reveal d2">Conectamos revendedoras de cosméticos às clientes do bairro. Descubra suas marcas favoritas, peça pelo WhatsApp e receba por motoboy no mesmo dia — ou abra sua própria loja e venda mais.</p>
       <div class="hero-cta reveal d3">
-        <a href="login.html" class="btn btn-primary btn-lg"><svg class="ic"><use href="#ic-businesswoman"/></svg>Sou Revendedora</a>
-        <a href="cliente.html" class="btn btn-ghost btn-lg"><svg class="ic"><use href="#ic-shopping-bag"/></svg>Sou Cliente</a>
+        <a href="cliente.html" class="btn btn-primary btn-lg"><svg class="ic"><use href="#ic-map-pin"/></svg>Descobrir lojas perto de mim</a>
+        <a href="login.html" class="btn btn-ghost btn-lg"><svg class="ic"><use href="#ic-businesswoman"/></svg>Sou Revendedora</a>
       </div>
       <div class="hero-meta reveal d4">
         <div class="hero-avatars">
-          <span style="background:linear-gradient(135deg,#c2185b,#e91e8c)">JS</span>
-          <span style="background:linear-gradient(135deg,#7c3aed,#a855f7)">MA</span>
-          <span style="background:linear-gradient(135deg,#c9a86a,#e0c088)">RC</span>
+          <span><img src="https://images.pexels.com/photos/3769136/pexels-photo-3769136.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=80&h=80" alt="" aria-hidden="true"></span>
+          <span><img src="https://images.pexels.com/photos/1104758/pexels-photo-1104758.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=80&h=80" alt="" aria-hidden="true"></span>
+          <span><img src="https://images.pexels.com/photos/5905902/pexels-photo-5905902.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=80&h=80" alt="" aria-hidden="true"></span>
           <span style="background:linear-gradient(135deg,#880e4f,#c2185b)">+</span>
         </div>
         <div class="hero-meta-text">
@@ -596,7 +599,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
     </div>
     <div class="vitrines-grid">
       <div class="vit-card reveal">
-        <div class="vit-top"><span class="vit-match">94% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/3769136/pexels-photo-3769136.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
+        <div class="vit-top"><span class="vit-match">96% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/3769136/pexels-photo-3769136.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
         <div class="vit-body">
           <div class="vit-name">Camila Beauty</div>
           <div class="vit-meta"><svg class="ic"><use href="#ic-map-pin"/></svg> Vila Mariana, SP · 1,2 km</div>
@@ -606,7 +609,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
         </div>
       </div>
       <div class="vit-card reveal">
-        <div class="vit-top"><span class="vit-match">91% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/1104758/pexels-photo-1104758.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
+        <div class="vit-top"><span class="vit-match">89% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/1104758/pexels-photo-1104758.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
         <div class="vit-body">
           <div class="vit-name">Glamour by Paula</div>
           <div class="vit-meta"><svg class="ic"><use href="#ic-map-pin"/></svg> Moema, SP · 2,3 km</div>
@@ -616,7 +619,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
         </div>
       </div>
       <div class="vit-card reveal">
-        <div class="vit-top"><span class="vit-match">88% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/5905902/pexels-photo-5905902.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
+        <div class="vit-top"><span class="vit-match">92% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/5905902/pexels-photo-5905902.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
         <div class="vit-body">
           <div class="vit-name">Pele Viva by Aline</div>
           <div class="vit-meta"><svg class="ic"><use href="#ic-map-pin"/></svg> Santana, SP · 3,1 km</div>
@@ -626,7 +629,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
         </div>
       </div>
       <div class="vit-card reveal">
-        <div class="vit-top"><span class="vit-match">85% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/8727399/pexels-photo-8727399.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
+        <div class="vit-top"><span class="vit-match">84% match</span><img class="vit-photo" loading="lazy" alt="" src="https://images.pexels.com/photos/8727399/pexels-photo-8727399.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=140&h=140"></div>
         <div class="vit-body">
           <div class="vit-name">Studio Make Bruna</div>
           <div class="vit-meta"><svg class="ic"><use href="#ic-map-pin"/></svg> Itaim Bibi, SP · 4,4 km</div>
@@ -795,7 +798,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
         </div>
         <p>Em três meses dobrei minhas vendas. O painel de lucro me mostrou onde eu estava perdendo dinheiro e hoje atendo o bairro inteiro pelo celular.</p>
         <div class="testi-author">
-          <div class="testi-av" style="background:linear-gradient(135deg,#c2185b,#e91e8c)">AC</div>
+          <div class="testi-av"><img src="https://images.pexels.com/photos/6634221/pexels-photo-6634221.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=96&h=96" alt=""></div>
           <div><div class="testi-name">Aline Carvalho</div><div class="testi-role">Revendedora · São Paulo, SP</div></div>
         </div>
       </div>
@@ -806,7 +809,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
         </div>
         <p>Pedi meu perfume favorito às 14h e chegou antes das 16h, de motoboy. Comprar com quem é do bairro e ainda receber rapidinho não tem preço.</p>
         <div class="testi-author">
-          <div class="testi-av" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">MR</div>
+          <div class="testi-av"><img src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=96&h=96" alt=""></div>
           <div><div class="testi-name">Mariana Rocha</div><div class="testi-role">Cliente · Belo Horizonte, MG</div></div>
         </div>
       </div>
@@ -817,7 +820,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
         </div>
         <p>Comecei sem entender nada de tecnologia e em uma tarde minha loja estava no ar. Hoje minha renda extra virou meu principal trabalho.</p>
         <div class="testi-author">
-          <div class="testi-av" style="background:linear-gradient(135deg,#c9a86a,#e0c088)">RS</div>
+          <div class="testi-av"><img src="https://images.pexels.com/photos/8727399/pexels-photo-8727399.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=96&h=96" alt=""></div>
           <div><div class="testi-name">Renata Souza</div><div class="testi-role">Revendedora · Curitiba, PR</div></div>
         </div>
       </div>
