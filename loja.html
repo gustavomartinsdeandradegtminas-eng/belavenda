@@ -118,7 +118,19 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 /* ═══ LOJA FECHADA ═══ */
 .loja-fechada-banner{background:linear-gradient(135deg,#b71c1c,#c62828);color:#fff;text-align:center;padding:14px 24px;font-weight:700;font-size:.95rem;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:10px;position:sticky;top:0;z-index:200}
 .loja-fechada-banner span{font-size:1.4rem}
-.loja-fechada-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+/* Dock do carrinho — fixo no rodapé do mobile quando há itens */
+.cart-dock{display:none;position:fixed;left:12px;right:12px;bottom:12px;z-index:150;
+  align-items:center;justify-content:space-between;gap:12px;
+  background:var(--grad);color:#fff;border:none;border-radius:16px;padding:14px 18px;
+  font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;
+  box-shadow:0 14px 38px -8px rgba(136,14,79,.5);
+  padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.cart-dock .cd-left{display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:.86rem}
+.cart-dock .cd-count{background:rgba(255,255,255,.28);border-radius:20px;padding:2px 9px;font-size:.74rem}
+.cart-dock .cd-go{display:flex;align-items:center;gap:5px;font-size:.86rem;white-space:nowrap}
+body.has-dock #bv-theme-btn{bottom:86px}
+@media(max-width:600px){body.has-dock .cart-dock{display:flex;animation:bv-dock-in .3s cubic-bezier(.2,.9,.3,1) both}}
+@keyframes bv-dock-in{from{transform:translateY(80px);opacity:0}to{transform:none;opacity:1}}
 .loja-fechada-card{background:#fff;border-radius:20px;padding:44px 36px;text-align:center;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.25)}
 .loja-fechada-card h2{font-size:1.5rem;font-weight:800;color:#b71c1c;margin:16px 0 8px}
 .loja-fechada-card p{color:#757575;font-size:.95rem;line-height:1.6;margin-bottom:24px}
@@ -191,7 +203,7 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .modal-close{background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{background:var(--bg)}
 .modal-body{padding:22px 24px}
-.modal-foot{padding:12px 24px 20px;display:flex;gap:10px}
+.modal-foot{padding:12px 24px 20px;display:flex;gap:10px;position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);z-index:1}
 
 /* ═══ CHECKOUT STEPS ═══ */
 .csteps{display:flex;margin-bottom:24px}
@@ -207,6 +219,8 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 /* FORM */
 .form-group{margin-bottom:15px}
 .form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:5px}
+.field-err{display:block;font-size:.74rem;color:var(--danger);font-weight:600;margin-top:4px}
+.qty-max-badge{font-size:.64rem;color:var(--danger);font-weight:800;margin-left:6px;background:rgba(239,68,68,.12);border-radius:6px;padding:2px 7px;align-self:center;letter-spacing:.3px}
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 13px;border:2px solid var(--border);border-radius:9px;font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit;background:#fff;color:var(--text)}
 .form-group input:focus,.form-group select:focus{border-color:var(--primary)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -255,7 +269,10 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 .pix-tip{font-size:.78rem;color:#388e3c;margin-top:10px;line-height:1.5}
 
 /* ═══ CARTÃO ═══ */
-.virtual-card{background:linear-gradient(135deg,#1a237e 0%,#283593 50%,#3949ab 100%);border-radius:16px;padding:22px;color:#fff;margin-bottom:18px;box-shadow:0 8px 24px rgba(26,35,126,.3);position:relative;overflow:hidden}
+.virtual-card{background:linear-gradient(135deg,#4a1033 0%,#880e4f 55%,#c2185b 100%);border-radius:16px;padding:22px;color:#fff;margin-bottom:18px;box-shadow:0 8px 24px rgba(136,14,79,.35);position:relative;overflow:hidden;transition:background .5s ease,box-shadow .5s ease}
+.virtual-card.vc-visa{background:linear-gradient(135deg,#10204e 0%,#1a237e 55%,#3949ab 100%);box-shadow:0 8px 24px rgba(26,35,126,.35)}
+.virtual-card.vc-mc{background:linear-gradient(135deg,#1f1c1a 0%,#3c2f23 55%,#b45309 100%);box-shadow:0 8px 24px rgba(60,47,35,.4)}
+.virtual-card.vc-amex{background:linear-gradient(135deg,#0c3b35 0%,#0f5249 55%,#1f8a73 100%);box-shadow:0 8px 24px rgba(15,82,73,.35)}
 .virtual-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05)}
 .vc-chip{width:36px;height:26px;background:linear-gradient(135deg,#ffd54f,#ffca28);border-radius:4px;margin-bottom:16px}
 .vc-number{font-size:1rem;letter-spacing:4px;font-family:'Courier New',monospace;margin-bottom:14px;text-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -341,6 +358,12 @@ input[id="card-num"]{letter-spacing:3px;font-family:'Courier New',monospace;font
   <div class="empty" style="padding:80px"><div class="empty-icon"><svg class="ic ic-xl"><use href="#ic-hourglass"/></svg></div><p>Carregando...</p></div>
 </div>
 <div id="reviews-root"></div>
+
+<!-- DOCK DO CARRINHO (mobile) -->
+<button class="cart-dock" id="cart-dock" onclick="openCart()" aria-label="Ver meu pedido">
+  <span class="cd-left"><svg class="ic"><use href="#ic-shopping-cart"/></svg> Meu pedido <span class="cd-count" id="cd-count">0</span></span>
+  <span class="cd-go"><span id="cd-total">R$ 0,00</span> · Ver pedido →</span>
+</button>
 
 <!-- CART DRAWER -->
 <div class="cart-overlay" id="cart-overlay" onclick="closeCartIfOut(event)">
@@ -644,7 +667,7 @@ function renderProdCards(){
           ${!aberta
             ?`<button class="add-btn" disabled style="opacity:.4;cursor:not-allowed;width:100%">Loja fechada</button>`
             :qty>0
-              ?`<div class="qty-ctrl"><button onclick="decQty('${p.id}')">−</button><span>${qty}</span><button onclick="incQty('${p.id}')" ${noMax?'disabled style="opacity:.35;cursor:not-allowed"':''}>+</button></div>${noMax?`<span style="font-size:.68rem;color:var(--danger);font-weight:700;margin-left:6px">máx</span>`:''}`
+              ?`<div class="qty-ctrl"><button onclick="decQty('${p.id}')">−</button><span>${qty}</span><button onclick="incQty('${p.id}')" ${noMax?'disabled style="opacity:.35;cursor:not-allowed"':''}>+</button></div>${noMax?`<span class="qty-max-badge">máx</span>`:''}`
               :`<button class="add-btn" onclick="addToCart('${p.id}')">Adicionar</button>`
           }
         </div>
@@ -667,7 +690,15 @@ function cartCount(){return Object.values(cart).reduce((s,n)=>s+n,0)}
 function cartKey(){return 'bv_cart_'+(revendedora?revendedora.slugLoja:'x')}
 function persistCart(){try{localStorage.setItem(cartKey(),JSON.stringify(cart))}catch(e){}}
 function loadCart(){try{return JSON.parse(localStorage.getItem(cartKey())||'{}')||{}}catch(e){return {}}}
-function updateCartBadge(){const b=document.getElementById('cart-badge'),n=cartCount();if(b)b.textContent=n+' ite'+(n===1?'m':'ns');persistCart()}
+function updateCartBadge(){
+  const b=document.getElementById('cart-badge'),n=cartCount()
+  if(b)b.textContent=n+' ite'+(n===1?'m':'ns')
+  const cc=document.getElementById('cd-count'),ct=document.getElementById('cd-total')
+  if(cc)cc.textContent=n
+  if(ct)ct.textContent=fmtM(cartTotal())
+  document.body.classList.toggle('has-dock',n>0&&typeof isLojaAberta==='function'&&isLojaAberta())
+  persistCart()
+}
 function openCart(){renderCartItems();document.getElementById('cart-overlay').classList.add('open')}
 function closeCart(){document.getElementById('cart-overlay').classList.remove('open')}
 function closeCartIfOut(e){if(e.target===document.getElementById('cart-overlay'))closeCart()}
@@ -831,12 +862,22 @@ function selecionarEntrega(opt,ev){
   ;(ev&&ev.currentTarget||window.event&&window.event.currentTarget).classList.add('selected')
 }
 
+function fieldErr(id,msg){
+  const el=document.getElementById(id); if(!el)return
+  el.style.borderColor='var(--danger)'
+  let m=el.parentElement.querySelector('.field-err')
+  if(!m){m=document.createElement('span');m.className='field-err';el.parentElement.appendChild(m)}
+  m.textContent=msg
+  el.oninput=()=>{el.style.borderColor='';const x=el.parentElement.querySelector('.field-err');if(x)x.remove();el.oninput=null}
+}
 function nextStep1(){
   const nome=document.getElementById('ch-nome').value.trim()
   const wa=document.getElementById('ch-wa').value.trim()
   if(!nome||!wa){
-    if(!nome)document.getElementById('ch-nome').style.borderColor='var(--danger)'
-    if(!wa)document.getElementById('ch-wa').style.borderColor='var(--danger)'
+    if(!nome)fieldErr('ch-nome','Informe seu nome completo.')
+    if(!wa)fieldErr('ch-wa','Informe seu WhatsApp para a revendedora confirmar.')
+    const first=document.getElementById(!nome?'ch-nome':'ch-wa')
+    if(first){first.focus();first.scrollIntoView({behavior:'smooth',block:'center'})}
     return
   }
   const cepEl=document.getElementById('ch-cep')
@@ -992,6 +1033,13 @@ function fmtCardNum(el){
   const vn=document.getElementById('vc-num');if(vn)vn.textContent=disp
   const brand=document.getElementById('vc-brand');if(brand){
     brand.textContent=v.startsWith('4')?'VISA':v.startsWith('5')||v.startsWith('2')?'MC':v.startsWith('3')?'AMEX':'CARTÃO'
+  }
+  const vc=document.getElementById('vc')
+  if(vc&&!vc.style.background){
+    vc.classList.remove('vc-visa','vc-mc','vc-amex')
+    if(v.startsWith('4'))vc.classList.add('vc-visa')
+    else if(v.startsWith('5')||v.startsWith('2'))vc.classList.add('vc-mc')
+    else if(v.startsWith('3'))vc.classList.add('vc-amex')
   }
 }
 function fmtExpiry(el){
