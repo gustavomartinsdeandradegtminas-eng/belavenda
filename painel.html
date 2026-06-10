@@ -356,7 +356,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <script src="belavenda-api.js"></script>
 <script>
 // ─── UTILS ───────────────────────────────────────────────
-const uid=()=>crypto.randomUUID()
+const uid=()=>(crypto&&crypto.randomUUID?crypto.randomUUID():'id-'+Date.now().toString(36)+Math.random().toString(36).slice(2,10))
 const fmtMoeda=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')
 const fmtData=d=>d?new Date(d).toLocaleDateString('pt-BR'):'—'
 const fmtDataHora=d=>d?new Date(d).toLocaleString('pt-BR'):'—'
@@ -480,7 +480,7 @@ function navigate(section){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'))
   const el=document.getElementById('nav-'+section)
   if(el)el.classList.add('active')
-  const titles={dashboard:'Dashboard',pedidos:'Pedidos',clientes:'Clientes',produtos:'Produtos',entregas:'Entregas',relatorios:'Relatórios',calculadora:'Calculadora de Margem',perfilLoja:'Perfil da Loja'}
+  const titles={dashboard:'Dashboard',pedidos:'Pedidos',clientes:'Clientes',produtos:'Produtos',entregas:'Entregas',relatorios:'Relatórios',calculadora:'Calculadora de Margem',perfilLoja:'Perfil da Loja',avaliacoes:'Avaliações'}
   document.getElementById('topbar-title').textContent=titles[section]||section
   document.getElementById('topbar-actions').innerHTML=''
   const renderers={dashboard:renderDashboard,pedidos:renderPedidos,clientes:renderClientes,produtos:renderProdutos,entregas:renderEntregas,relatorios:renderRelatorios,calculadora:renderCalculadora,avaliacoes:renderAvaliacoes,perfilLoja:renderPerfilLoja}
@@ -726,7 +726,7 @@ function onboardingHTML(){
   </div></div>`
 }
 function copiarLink(){
-  navigator.clipboard.writeText(catalogUrl())
+  try{(navigator.clipboard&&navigator.clipboard.writeText(catalogUrl()))||0}catch(e){}
   bvToast('Link copiado!','success')
 }
 function calcDashboard(pedidos,clientes,periodo){
@@ -1404,9 +1404,10 @@ function renderRelatorios(){
   // Vendas por mês (últimos 6 meses)
   const meses={}
   for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;meses[k]={vendas:0,lucro:0,label:d.toLocaleString('pt-BR',{month:'short',year:'2-digit'})}}
-  pedidos.filter(p=>p.status==='ENTREGUE').forEach(p=>{const k=p.dataCriacao.slice(0,7);if(meses[k]){meses[k].vendas+=p.valorTotal||0;meses[k].lucro+=p.lucroEstimado||0}})
+  pedidos.filter(p=>p.status==='ENTREGUE').forEach(p=>{const k=(p.dataCriacao||'').slice(0,7);if(meses[k]){meses[k].vendas+=p.valorTotal||0;meses[k].lucro+=p.lucroEstimado||0}})
   const mList=Object.values(meses)
   const maxV=Math.max(...mList.map(m=>m.vendas),1)
+  const maxL=Math.max(...mList.map(m=>m.lucro),1)
   // Top produtos
   const prodCount={}
   pedidos.forEach(p=>(p.itens||[]).forEach(it=>{prodCount[it.produtoId]=(prodCount[it.produtoId]||{nome:it.nome,qtd:0,receita:0});prodCount[it.produtoId].qtd+=it.quantidade;prodCount[it.produtoId].receita+=it.precoUnitario*it.quantidade}))
@@ -1434,7 +1435,7 @@ function renderRelatorios(){
         <div class="card-body">
           <div class="bar-chart">${mList.map(m=>`
             <div class="bar-wrap">
-              <div class="bar" style="height:${Math.round(m.lucro/maxV*120)}px;background:var(--success)" title="${m.label}: ${fmtMoeda(m.lucro)}"></div>
+              <div class="bar" style="height:${Math.round(m.lucro/maxL*120)}px;background:var(--success)" title="${m.label}: ${fmtMoeda(m.lucro)}"></div>
               <div class="bar-label">${m.label}</div>
             </div>`).join('')}
           </div>

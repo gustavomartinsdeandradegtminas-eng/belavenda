@@ -25,6 +25,8 @@
      Mesmos tokens do index.html e login.html          */
   --rose:#c2185b;--rose-d:#880e4f;--rose-dd:#620839;
   --rose-l:#fce4ec;--rose-xl:#fff0f8;--rose-mid:#e91e8c;
+  /* aliases p/ coerência com index/loja/painel (e dark via bv-theme) */
+  --primary:var(--rose);--primary-d:var(--rose-d);--primary-l:var(--rose-l);
   --violet:#7c3aed;--violet-l:#ede9fe;--violet-d:#5b21b6;
   --blue:#2563eb;--blue-l:#eff6ff;--blue-d:#1d4ed8;
   --gold:#f59e0b;--gold-l:#fef3c7;
@@ -1232,14 +1234,14 @@ window.onload=function(){
     if(s.whatsapp)document.getElementById('f-wa').value=s.whatsapp
     showPainel()
   }
-  // Teclado para swipe
+  // Teclado para swipe — só na aba Match e sem modal aberto
   document.addEventListener('keydown',e=>{
-    if(document.getElementById('prefs-modal').classList.contains('open'))return
-    if(document.getElementById('cep-modal').classList.contains('open'))return
-    if(document.getElementById('track-modal').classList.contains('open'))return
-    if(document.getElementById('av-modal').classList.contains('open'))return
-    if(e.key==='ArrowLeft')swipe('left')
-    if(e.key==='ArrowRight')swipe('right')
+    if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return
+    const mt=document.getElementById('tab-match')
+    if(!mt||mt.style.display==='none')return
+    if(['perfil-modal','prefs-modal','cep-modal','track-modal','av-modal'].some(id=>{const m=document.getElementById(id);return m&&m.classList.contains('open')}))return
+    if(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))return
+    swipe(e.key==='ArrowLeft'?'left':'right')
   })
 }
 
@@ -1744,10 +1746,10 @@ function swipe(dir){
     if(dir==='right'){
       const item=matchDeck[matchIndex]
       if(item){
-        curtidas.push({id:item.rev.id,nome:item.rev.nome,score:item.score,slug:item.rev.slugLoja,cidade:item.rev.cidade,estado:item.rev.estado})
+        curtidas.push({id:item.rev.id,nome:item.rev.nome,score:item.score,slug:item.rev.slugLoja,cidade:item.rev.cidade,estado:item.rev.estado,foto:item.rev.foto||''})
         saveCurtidas(curtidas)
       }
-      showNotif('like','Curtiu! '+matchDeck[matchIndex]?.rev.nome.split(' ')[0])
+      showNotif('like','Curtiu! '+(item?item.rev.nome.split(' ')[0]:''))
     }else{
       passes.push(revId)
       savePasses(passes)
@@ -1770,6 +1772,7 @@ function addSwipeGestures(card){
     const pt=e.touches?e.touches[0]:e
     startX=pt.clientX;startY=pt.clientY;isDragging=true;curX=0
     card.classList.add('dragging')
+    if(!e.touches){document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp)}
   }
   const onMove=e=>{
     if(!isDragging)return
@@ -1793,14 +1796,13 @@ function addSwipeGestures(card){
     const likeEl=card.querySelector('[id^="overlay-like"]')
     const nopeEl=card.querySelector('[id^="overlay-nope"]')
     if(likeEl)likeEl.style.opacity=0;if(nopeEl)nopeEl.style.opacity=0
+    document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)
     if(curX>80)swipe('right')
     else if(curX<-80)swipe('left')
   }
   card.addEventListener('mousedown',onDown)
   card.addEventListener('touchstart',onDown,{passive:true})
-  document.addEventListener('mousemove',onMove)
   card.addEventListener('touchmove',onMove,{passive:false})
-  document.addEventListener('mouseup',onUp)
   card.addEventListener('touchend',onUp)
 }
 
@@ -1838,9 +1840,8 @@ function renderCurtidasList(){
     <div class="curtidas-section">
       <div class="curtidas-title">${icon('heart-red')} Lojas que você curtiu <span style="background:var(--primary-l);color:var(--primary);border-radius:20px;padding:1px 8px;font-size:.76rem;font-weight:700">${curtidas.length}</span></div>
       ${curtidas.map(c=>{
-        const ini=c.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
         return`<div class="curtida-card">
-          <div class="curtida-avatar">${ini}</div>
+          <div class="curtida-avatar">${revFoto(c)}</div>
           <div class="curtida-info">
             <h4>${c.nome}</h4>
             <p>${icon('map-pin')} ${c.cidade}, ${c.estado}</p>
@@ -2235,7 +2236,7 @@ function submitAvaliacao(){
   const s=getSession()
   const avs=getAvaliacoes(avRevId)
   if(avs.find(a=>a.pedidoId===avPedidoId)){bvToast('Você já avaliou este pedido.','info');return}
-  avs.push({id:crypto.randomUUID(),pedidoId:avPedidoId,clienteNome:s.nome,clienteWa:s.whatsapp,estrelas:avStars,comentario:document.getElementById('av-comentario').value.trim(),foto:avFoto||'',data:new Date().toISOString()})
+  avs.push({id:(crypto&&crypto.randomUUID?crypto.randomUUID():'av-'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)),pedidoId:avPedidoId,clienteNome:s.nome,clienteWa:s.whatsapp,estrelas:avStars,comentario:document.getElementById('av-comentario').value.trim(),foto:avFoto||'',data:new Date().toISOString()})
   localStorage.setItem('bv_avaliacoes_'+avRevId,JSON.stringify(avs))
   // Marcar pedido como avaliado
   const key='bv_pedidos_'+avRevId
@@ -2316,9 +2317,9 @@ async function abrirRastreamento(pedidoId,revId){
   const box=document.getElementById('track-modal-box')
   const idShort='#'+p.id.slice(0,8).toUpperCase()
   const ent=p.entrega
-  const entLabel=ent?((ent.carrier?ent.carrier+' ':'')+(ent.service||'')).trim():'A combinar'
-  const isRetirada=ent&&/retir/i.test((ent.service||'')+' '+(ent.carrier||''))
-  const isRevEntrega=ent&&/revendedora/i.test((ent.service||'')+' '+(ent.carrier||''))
+  const entLabel=ent&&ent.name?ent.name:'A combinar'
+  const isRetirada=!!(ent&&ent.id==='retirada')
+  const isRevEntrega=!!(ent&&ent.id==='revendedora')
 
   if(p.status==='CANCELADO'){
     box.innerHTML=`<h3>${icon('route')} Rastrear pedido</h3>

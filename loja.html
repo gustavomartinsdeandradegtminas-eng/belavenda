@@ -342,7 +342,7 @@ input[id="card-num"]{letter-spacing:3px;font-family:'Courier New',monospace;font
 <script>
 // ─── UTILS ────────────────────────────────────────────────
 const fmtM=v=>'R$ '+Number(v||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')
-const uid=()=>crypto.randomUUID()
+const uid=()=>(crypto&&crypto.randomUUID?crypto.randomUUID():'id-'+Date.now().toString(36)+Math.random().toString(36).slice(2,10))
 const now=()=>new Date().toISOString()
 const fmtData=d=>d?new Date(d).toLocaleDateString('pt-BR'):'—'
 
@@ -495,7 +495,7 @@ function renderPage(){
       <div class="filter-section">
         <span>Marca:</span>
         <button class="filter-chip${marcaFiltro==='Todas'?' active':''}" onclick="setMarca('Todas')">Todas</button>
-        ${marcas.map(m=>`<button class="filter-chip${marcaFiltro===m?' active':''}" onclick="setMarca('${m}')">${m}</button>`).join('')}
+        ${marcas.map(m=>`<button class="filter-chip${marcaFiltro===m?' active':''}" onclick="setMarca('${m.replace(/'/g,"\\'")}')">${m}</button>`).join('')}
       </div>
       <div class="prod-grid" id="prod-grid">${skeletonProds(Math.min(produtos.length||6,8))}</div>
     </div>`
@@ -759,7 +759,7 @@ async function carregarOpcoesEntrega(toCEP){
         <div id="delivery-opts-list">
           ${opts.map(opt=>`
             <div class="delivery-opt${opt.unavailable?' delivery-opt-unavail':''}" style="${opt.unavailable?'opacity:.5;cursor:default':''}"
-              onclick="${opt.unavailable?'':'selecionarEntrega('+JSON.stringify(opt).replace(/"/g,'&quot;')+')'}">
+              onclick="${opt.unavailable?'':'selecionarEntrega('+JSON.stringify(opt).replace(/"/g,'&quot;')+',event)'}">
               <div style="flex-shrink:0;width:40px;text-align:center;line-height:1">${icon(opt.logo,'ic-lg')}</div>
               <div style="flex:1;min-width:0">
                 <div style="font-size:.9rem;font-weight:700;color:var(--text)">${opt.name}</div>
@@ -787,10 +787,10 @@ async function carregarOpcoesEntrega(toCEP){
   }
 }
 
-function selecionarEntrega(opt){
+function selecionarEntrega(opt,ev){
   chInfo.entrega=opt
   document.querySelectorAll('.delivery-opt').forEach(el=>el.classList.remove('selected'))
-  event.currentTarget.classList.add('selected')
+  ;(ev&&ev.currentTarget||window.event&&window.event.currentTarget).classList.add('selected')
 }
 
 function nextStep1(){
@@ -824,7 +824,7 @@ function renderStep2(){
     ${stepBar(2)}
     <div class="resumo-box">
       <div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:4px"><span>Subtotal</span><span>${fmtM(subtotal)}</span></div>
-      ${chInfo.entrega?`<div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px"><span>${icon('truck')} ${chInfo.entrega.carrier} ${chInfo.entrega.service}</span><span>${chInfo.entrega.price===0?'Grátis':fmtM(chInfo.entrega.price)}</span></div>`:''}
+      ${chInfo.entrega?`<div style="display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px"><span>${icon('truck')} ${chInfo.entrega.name}</span><span>${chInfo.entrega.price===0?'Grátis':fmtM(chInfo.entrega.price)}</span></div>`:''}
       <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:900;color:var(--primary);border-top:1px solid var(--border);padding-top:8px;margin-top:4px"><span>Total</span><span>${fmtM(total)}</span></div>
     </div>
     <div style="font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Escolha o método:</div>
@@ -835,7 +835,7 @@ function renderStep2(){
         {id:'DEBITO',icon:'credit-card',name:'Cartão de Débito',sub:'À vista'},
         {id:'BOLETO',icon:'barcode',name:'Boleto',sub:'Venc. em 3 dias'},
       ].map(m=>`
-        <button class="pay-method${chMetodo===m.id?' sel':''}" onclick="selectMetodo('${m.id}')">
+        <button class="pay-method${chMetodo===m.id?' sel':''}" onclick="selectMetodo('${m.id}',event)">
           <span class="pay-method-icon">${icon(m.icon,'ic-lg')}</span>
           <div class="pay-method-name">${m.name}</div>
           <div class="pay-method-sub">${m.sub}</div>
@@ -843,15 +843,15 @@ function renderStep2(){
     </div>
     <div id="pay-form-area"></div>`
   document.getElementById('modal-foot').innerHTML=`
-    <button class="btn btn-secondary" onclick="()=>{chStep=1;renderStep()}">← Voltar</button>
+    <button class="btn btn-secondary" onclick="chStep=1;renderStep()">← Voltar</button>
     <button id="pay-action-btn" class="btn btn-primary" style="flex:1" onclick="processarPagamento()">Pagar ${fmtM(total)} →</button>`
   renderPayForm(chMetodo)
 }
 
-function selectMetodo(m){
+function selectMetodo(m,ev){
   chMetodo=m
   document.querySelectorAll('.pay-method').forEach(el=>el.classList.remove('sel'))
-  event.currentTarget.classList.add('sel')
+  ;(ev&&ev.currentTarget||window.event&&window.event.currentTarget).classList.add('sel')
   renderPayForm(m)
 }
 
@@ -953,7 +953,7 @@ function showPixScreen(){
       <div class="pix-tip">Abra o app do seu banco → PIX → Pagar com QR ou chave → cole a chave acima</div>
     </div>`
   document.getElementById('modal-foot').innerHTML=`
-    <button class="btn btn-secondary" onclick="()=>{chStep=2;renderStep()}">← Mudar método</button>
+    <button class="btn btn-secondary" onclick="chStep=2;renderStep()">← Mudar método</button>
     <button class="btn btn-success btn-full" onclick="confirmarPix()" style="flex:1">${icon('check-circle')} Já Paguei</button>`
   // timer
   clearInterval(pixTimerInt)
@@ -966,6 +966,7 @@ function showPixScreen(){
 }
 
 function confirmarPix(){
+  if(pixSec<=0){bvToast('O QR Code do PIX expirou. Gere um novo.','error');showPixScreen();return}
   clearInterval(pixTimerInt)
   criarPedido({metodo:'PIX',status:'PAGO',txId:'PIX'+uid().replace(/-/g,'').slice(0,12).toUpperCase(),dataPagamento:now()})
 }
@@ -1027,7 +1028,7 @@ function showBoletoScreen(){
     </div>
     <p style="font-size:.78rem;color:var(--muted);text-align:center">Pague em qualquer banco, lotérica ou Internet Banking até ${due.toLocaleDateString('pt-BR')}.</p>`
   document.getElementById('modal-foot').innerHTML=`
-    <button class="btn btn-secondary" onclick="()=>{chStep=2;renderStep()}">← Mudar</button>
+    <button class="btn btn-secondary" onclick="chStep=2;renderStep()">← Mudar</button>
     <button class="btn btn-primary" style="flex:1;background:#bf360c" onclick="confirmarBoleto()">${icon('document')} Confirmar Pedido</button>`
 }
 
@@ -1086,7 +1087,7 @@ function showSuccess(pedido,pagamento){
   const msg=`Oi ${revendedora.nome.split(' ')[0]}! Fiz meu pedido na BelaVenda:\n`+
     items.map(it=>`• ${it.quantidade}x ${it.nome}`).join('\n')+
     `\n\nSubtotal: ${fmtM(pedido.valorSubtotal)}`+
-    (pedido.entrega?`\nFrete: ${pedido.entrega.carrier} ${pedido.entrega.service} — ${pedido.entrega.price===0?'Grátis':fmtM(pedido.entrega.price)}`:'') +
+    (pedido.entrega?`\nFrete: ${pedido.entrega.name} — ${pedido.entrega.price===0?'Grátis':fmtM(pedido.entrega.price)}`:'') +
     `\nTotal: ${fmtM(pedido.valorTotal)}\nPagamento: ${pagamento.metodo}${pagamento.status==='PAGO'?' (PAGO)':''}\nID: #${pedido.id.slice(0,8).toUpperCase()}`
   document.getElementById('modal-hd-title').textContent=''
   document.getElementById('modal-body').innerHTML=`
@@ -1098,7 +1099,7 @@ function showSuccess(pedido,pagamento){
       ${pagamento.ultimos4?`Cartão final <strong>${pagamento.ultimos4}</strong><br>`:''}
       ${pagamento.parcelas>1?`<strong>${pagamento.parcelas}× de ${fmtM(pedido.valorTotal/pagamento.parcelas)}</strong><br>`:''}
       Envie a confirmação para <strong>${revendedora.nome}</strong> pelo WhatsApp.</p>
-      <a class="wa-btn" href="https://wa.me/${revendedora.telefone.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}" target="_blank">
+      <a class="wa-btn" href="https://wa.me/${(revendedora.telefone||'').replace(/\D/g,'')}?text=${encodeURIComponent(msg)}" target="_blank">
         ${icon('chat-bubble')} Confirmar pelo WhatsApp
       </a>
     </div>`
