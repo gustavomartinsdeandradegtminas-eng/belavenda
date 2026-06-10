@@ -162,7 +162,14 @@ section{padding:100px 0;position:relative}
 [data-theme=dark] .hero::after{opacity:.10;mix-blend-mode:screen}
 .hero-grid{display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center;position:relative;z-index:1}
 .hero h1{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(40px,5.6vw,68px);line-height:1.04;letter-spacing:-.025em;color:var(--text)}
-.hero h1 .accent{color:var(--rose);font-style:italic;font-weight:700;position:relative}
+.hero h1 .accent{
+  font-style:italic;font-weight:700;position:relative;
+  background:linear-gradient(100deg,var(--rose) 0%,#e0a96b 30%,var(--rose-mid) 55%,var(--rose) 100%);
+  background-size:220% auto;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  animation:bv-shimmer-text 6.5s linear infinite;
+}
+@keyframes bv-shimmer-text{to{background-position:220% center}}
 .hero h1 .accent svg{position:absolute;left:0;bottom:-10px;width:100%;height:14px;color:var(--champagne)}
 .hero-sub{font-size:18.5px;color:var(--text2);margin:24px 0 34px;max-width:520px;line-height:1.6}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
