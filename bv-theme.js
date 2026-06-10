@@ -167,4 +167,50 @@
   }
   if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', mount);
   else mount();
+
+  // ── Micro-tilt premium em cards de vitrine (segue o cursor em 3D) ──
+  // Seguro: só altera transform inline; sem injeção de DOM, sem mudar layout.
+  // Funciona com conteúdo dinâmico (delegação por seletor) e respeita preferências.
+  (function () {
+    var SEL = '.feat-card, .vit-card, .loja-card, .prod-card';
+    var fine, calm;
+    try {
+      fine = w.matchMedia('(hover:hover) and (pointer:fine)').matches;
+      calm = w.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    } catch (e) { fine = false; calm = true; }
+    if (!fine || calm) return;
+
+    var active = null, raf = 0, lastX = 0, lastY = 0;
+    function frame() {
+      raf = 0;
+      if (!active) return;
+      var r = active.getBoundingClientRect();
+      var px = (lastX - r.left) / r.width;  // 0..1
+      var py = (lastY - r.top) / r.height;
+      var ry = (px - 0.5) * 9;              // rotação Y (graus) — máx ±4.5
+      var rx = (0.5 - py) * 9;              // rotação X
+      active.style.transform = 'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-5px)';
+    }
+    d.addEventListener('pointermove', function (e) {
+      var card = e.target && e.target.closest ? e.target.closest(SEL) : null;
+      if (card !== active) {
+        if (active) reset(active);
+        active = card;
+        if (active) { active.style.transition = 'transform .14s cubic-bezier(.2,.7,.3,1)'; active.style.transformStyle = 'preserve-3d'; }
+      }
+      if (!active) return;
+      lastX = e.clientX; lastY = e.clientY;
+      if (!raf) raf = w.requestAnimationFrame(frame);
+    }, { passive: true });
+    function reset(el) {
+      el.style.transition = 'transform .45s cubic-bezier(.2,.7,.3,1)';
+      el.style.transform = '';
+      w.setTimeout(function () { if (el !== active) { el.style.transition = ''; el.style.transformStyle = ''; } }, 460);
+    }
+    d.addEventListener('pointerout', function (e) {
+      if (active && (!e.relatedTarget || !active.contains(e.relatedTarget))) {
+        var was = active; active = null; reset(was);
+      }
+    }, { passive: true });
+  })();
 })(window, document);
