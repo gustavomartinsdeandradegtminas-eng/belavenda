@@ -23,6 +23,12 @@
     s.textContent=
       '#bv-toasts{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:99998;display:flex;flex-direction:column;gap:9px;align-items:center;pointer-events:none}'+
       '.bv-toast{display:flex;align-items:center;gap:10px;background:var(--surface,#fff);color:var(--text,#111);border:1px solid var(--border,#eee);border-left:4px solid var(--primary,#c2185b);border-radius:12px;padding:12px 16px;box-shadow:0 12px 34px rgba(0,0,0,.2);font-size:.88rem;font-weight:600;max-width:92vw;opacity:0;transform:translateY(14px) scale(.98);transition:opacity .25s,transform .25s;pointer-events:auto}'+
+      '@supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){'+
+        '.bv-toast{background:rgba(255,255,255,.8);backdrop-filter:blur(12px) saturate(1.35);-webkit-backdrop-filter:blur(12px) saturate(1.35);border-color:rgba(255,255,255,.6)}'+
+        '[data-theme=dark] .bv-toast{background:rgba(32,16,27,.82);border-color:rgba(244,143,177,.14)}'+
+        '.bv-dlg{background:rgba(255,255,255,.88);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);border-color:rgba(255,255,255,.65)}'+
+        '[data-theme=dark] .bv-dlg{background:rgba(32,16,27,.86);border-color:rgba(244,143,177,.15)}'+
+      '}'+
       '.bv-toast.show{opacity:1;transform:none}'+
       '.bv-toast.success{border-left-color:#10b981}.bv-toast.success .ti{color:#10b981}'+
       '.bv-toast.error{border-left-color:#ef4444}.bv-toast.error .ti{color:#ef4444}'+
@@ -92,16 +98,36 @@
     }});
   };
 
+  // Confete assinatura "Couture Rosé": pétalas de rosa + faíscas champagne
   w.bvConfetti=function(){
-    var cores=['#c2185b','#e91e8c','#f59e0b','#7c3aed','#10b981','#f48fb1'];
+    try{if(w.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;}catch(e){}
+    var PETALAS=['#c2185b','#e91e8c','#f48fb1','#ad1457','#f9a8d4'];
+    var FAISCAS=['#c9a86a','#e6b878','#f4d9b0'];
     var layer=d.getElementById('bv-confetti');
     if(!layer){layer=d.createElement('div');layer.id='bv-confetti';layer.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:99997;overflow:hidden';d.body.appendChild(layer);}
-    for(var i=0;i<90;i++){(function(idx){
+    var H=w.innerHeight;
+    for(var i=0;i<70;i++){(function(idx){
+      var ehFaisca=idx%4===3; // 1 em 4 é faísca dourada
       var c=d.createElement('i');
-      var size=6+Math.floor(Math.random()*8);
-      c.style.cssText='position:fixed;top:-20px;left:'+(Math.random()*100)+'vw;width:'+size+'px;height:'+(size*0.6)+'px;background:'+cores[idx%cores.length]+';opacity:'+(0.8+Math.random()*0.2)+';border-radius:2px;transform:rotate('+(Math.random()*360)+'deg)';
-      var dur=2.2+Math.random()*1.6, delay=Math.random()*0.4, drift=(Math.random()*2-1)*160;
-      try{c.animate([{transform:c.style.transform+' translate(0,0)',opacity:1},{transform:'translate('+drift+'px,'+(window.innerHeight+60)+'px) rotate('+(720+Math.random()*360)+'deg)',opacity:1}],{duration:dur*1000,delay:delay*1000,easing:'cubic-bezier(.2,.6,.4,1)',fill:'forwards'});}catch(e){}
+      var x=Math.random()*100, dur=2.6+Math.random()*1.8, delay=Math.random()*0.5;
+      var drift=(Math.random()*2-1)*140, rotz=540+Math.random()*540;
+      if(ehFaisca){
+        var s=4+Math.random()*4;
+        c.style.cssText='position:fixed;top:-16px;left:'+x+'vw;width:'+s+'px;height:'+s+'px;border-radius:50%;'+
+          'background:'+FAISCAS[idx%FAISCAS.length]+';box-shadow:0 0 '+(s*2)+'px '+FAISCAS[(idx+1)%FAISCAS.length]+';opacity:.95';
+      }else{
+        var pw=8+Math.random()*7;
+        c.style.cssText='position:fixed;top:-22px;left:'+x+'vw;width:'+pw+'px;height:'+(pw*1.35)+'px;'+
+          'background:linear-gradient(135deg,'+PETALAS[idx%PETALAS.length]+','+PETALAS[(idx+2)%PETALAS.length]+');'+
+          'border-radius:80% 4px 80% 4px;opacity:'+(0.82+Math.random()*0.18)+';box-shadow:inset 0 0 3px rgba(255,255,255,.35)';
+      }
+      // flutter: queda com balanço lateral e rotação 3D (pétala girando no ar)
+      try{c.animate([
+        {transform:'translate(0,0) rotateZ(0deg) rotateY(0deg)',opacity:1},
+        {transform:'translate('+(drift*0.45)+'px,'+(H*0.36)+'px) rotateZ('+(rotz*0.4)+'deg) rotateY(200deg)',opacity:1,offset:0.38},
+        {transform:'translate('+(drift*0.15)+'px,'+(H*0.68)+'px) rotateZ('+(rotz*0.72)+'deg) rotateY(380deg)',opacity:.96,offset:0.68},
+        {transform:'translate('+drift+'px,'+(H+70)+'px) rotateZ('+rotz+'deg) rotateY(560deg)',opacity:.85}
+      ],{duration:dur*1000,delay:delay*1000,easing:'cubic-bezier(.25,.5,.45,.95)',fill:'forwards'});}catch(e){}
       layer.appendChild(c);
       setTimeout(function(){c.remove();},(dur+delay)*1000+250);
     })(i);}

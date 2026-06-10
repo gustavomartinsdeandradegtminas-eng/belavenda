@@ -434,8 +434,17 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .fid-level{font-size:1.05rem;font-weight:800;font-family:'Playfair Display',Georgia,serif}
 .fid-pts{font-size:.78rem;opacity:.82}
 .fid-tag{font-size:.66rem;font-weight:800;background:rgba(255,255,255,.18);padding:4px 9px;border-radius:20px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
-.fid-track{height:9px;background:rgba(255,255,255,.18);border-radius:10px;overflow:hidden;position:relative}
-.fid-fill{height:100%;background:linear-gradient(90deg,#f9a8d4,#fff);border-radius:10px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+/* Bracelete de fidelidade — metal champagne→rosa com bisel, brilho periódico e pedra na ponta */
+.fid-track{height:11px;background:rgba(0,0,0,.22);border-radius:10px;position:relative;box-shadow:inset 0 1px 3px rgba(0,0,0,.35),inset 0 -1px 0 rgba(255,255,255,.12)}
+.fid-fill{height:100%;border-radius:10px;transition:width .7s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+  background:linear-gradient(90deg,#c9a86a,#f6e3c0 18%,#c9a86a 38%,#f48fb1 72%,#fff);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 1px rgba(0,0,0,.25)}
+.fid-fill::after{content:'';position:absolute;inset:0;width:46px;
+  background:linear-gradient(105deg,transparent,rgba(255,255,255,.85),transparent);
+  transform:translateX(-60px);animation:fidGleam 4.5s ease-in-out infinite}
+@keyframes fidGleam{0%,55%{transform:translateX(-60px)}75%,100%{transform:translateX(110%)}}
+.fid-gem{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);z-index:1;
+  background:radial-gradient(circle at 35% 30%,#fff,#c9a86a 72%);box-shadow:0 0 9px 2px rgba(201,168,106,.75)}
 .fid-foot{font-size:.8rem;margin-top:9px;opacity:.92;position:relative}
 .inicio-sec{margin-bottom:22px}
 .inicio-sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -614,24 +623,28 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .match-card.anim-right{animation:swipeRight .38s cubic-bezier(.55,.06,.68,.19) forwards}
 
 /* Overlays LIKE/NOPE */
-.card-overlay-like{
-  position:absolute;top:20px;left:18px;
-  background:linear-gradient(135deg,var(--success),#34d399);
-  color:#fff;font-size:1.1rem;font-weight:900;
-  padding:7px 18px;border-radius:12px;border:2.5px solid rgba(255,255,255,.6);
-  transform:rotate(-15deg);opacity:0;transition:opacity .1s;
-  z-index:20;pointer-events:none;letter-spacing:1.5px;
-  box-shadow:0 4px 16px rgba(16,185,129,.4);
+/* Selos de cera "couture" — prensados fisicamente pelo arrasto (--drag/data-dir) */
+.card-overlay-like,.card-overlay-nope{
+  position:absolute;top:20px;z-index:20;pointer-events:none;opacity:0;
+  font-family:'Playfair Display',Georgia,serif;font-size:1.05rem;font-weight:900;letter-spacing:4px;
+  padding:8px 16px 8px 20px;border-radius:8px;border:3px double currentColor;
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
 }
-.card-overlay-nope{
-  position:absolute;top:20px;right:18px;
-  background:linear-gradient(135deg,var(--danger),#f87171);
-  color:#fff;font-size:1.1rem;font-weight:900;
-  padding:7px 18px;border-radius:12px;border:2.5px solid rgba(255,255,255,.6);
-  transform:rotate(15deg);opacity:0;transition:opacity .1s;
-  z-index:20;pointer-events:none;letter-spacing:1.5px;
-  box-shadow:0 4px 16px rgba(239,68,68,.4);
-}
+.card-overlay-like{left:18px;color:#047857;background:rgba(209,250,229,.55);transform:rotate(-15deg)}
+.card-overlay-nope{right:18px;color:#b91c1c;background:rgba(254,226,226,.55);transform:rotate(15deg)}
+[data-theme=dark] .card-overlay-like{color:#6ee7b7;background:rgba(32,16,27,.55)}
+[data-theme=dark] .card-overlay-nope{color:#fca5a5;background:rgba(32,16,27,.55)}
+.match-card[data-dir=right] .card-overlay-like{opacity:var(--drag,0);transform:rotate(calc(-15deg + var(--drag,0)*9deg)) scale(calc(1.4 - var(--drag,0)*.4))}
+.match-card[data-dir=left] .card-overlay-nope{opacity:var(--drag,0);transform:rotate(calc(15deg - var(--drag,0)*9deg)) scale(calc(1.4 - var(--drag,0)*.4))}
+/* Véu de veredito: o card é lavado pela cor da decisão na direção do gesto */
+.match-card::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;opacity:0}
+.match-card[data-dir=right]::after{background:linear-gradient(100deg,transparent 40%,rgba(16,185,129,.20));opacity:var(--drag,0)}
+.match-card[data-dir=left]::after{background:linear-gradient(260deg,transparent 40%,rgba(239,68,68,.20));opacity:var(--drag,0)}
+[data-theme=dark] .match-card[data-dir=right]::after{background:linear-gradient(100deg,transparent 40%,rgba(16,185,129,.30))}
+[data-theme=dark] .match-card[data-dir=left]::after{background:linear-gradient(260deg,transparent 40%,rgba(239,68,68,.30))}
+/* Engate no limiar: o selo "prensa" com um clique */
+.match-card.bv-armed .card-overlay-like,.match-card.bv-armed .card-overlay-nope{animation:bvStampLock .22s ease}
+@keyframes bvStampLock{45%{scale:1.14}}
 
 /* Card content */
 .card-top{padding:24px 22px 16px}
@@ -1375,7 +1388,7 @@ function fidelidadeCardHTML(){
       <div style="flex:1"><div class="fid-level">Nível ${f.cur.n}</div><div class="fid-pts">${f.pts} pontos acumulados</div></div>
       <span class="fid-tag">${icon('sparkles')} Programa Bela</span>
     </div>
-    <div class="fid-track"><div class="fid-fill" style="width:${f.pct}%"></div></div>
+    <div class="fid-track"><div class="fid-fill" style="width:${f.pct}%"></div><i class="fid-gem" style="left:${f.pct}%"></i></div>
     <div class="fid-foot">${f.nxt?`Faltam <b>${f.falta} pts</b> para o nível <b>${f.nxt.n}</b>`:`${icon('trophy')} Você alcançou o nível máximo. Parabéns!`}</div>
   </div>`
 }
@@ -1705,8 +1718,8 @@ function buildCard({rev,prods,dist,score,breakdown},isFront){
 
   const lojaAberta=rev.lojaAberta!==false
   card.innerHTML=`
-    <div class="card-overlay-like" id="overlay-like-${rev.id}">CURTIR ${icon('heart')}</div>
-    <div class="card-overlay-nope" id="overlay-nope-${rev.id}">PASSAR ${icon('x-mark')}</div>
+    <div class="card-overlay-like" id="overlay-like-${rev.id}">ADORE ${icon('heart')}</div>
+    <div class="card-overlay-nope" id="overlay-nope-${rev.id}">PASSO ${icon('x-mark')}</div>
     <div class="card-top">
       <div class="card-avatar-row">
         <div class="card-avatar">${revFoto(rev)}</div>
@@ -1785,10 +1798,11 @@ function swipe(dir){
 
 // ─── GESTOS DE TOUCH/MOUSE ────────────────────────────────
 function addSwipeGestures(card){
-  let startX=0,startY=0,isDragging=false,curX=0
+  let startX=0,startY=0,isDragging=false,curX=0,lastX=0,lastT=0,vx=0
   const onDown=e=>{
     const pt=e.touches?e.touches[0]:e
     startX=pt.clientX;startY=pt.clientY;isDragging=true;curX=0
+    lastX=pt.clientX;lastT=performance.now();vx=0
     card.classList.add('dragging')
     if(!e.touches){document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp)}
   }
@@ -1799,24 +1813,48 @@ function addSwipeGestures(card){
     const curY=pt.clientY-startY
     if(Math.abs(curX)<Math.abs(curY)&&Math.abs(curX)<10)return
     e.preventDefault()
-    const rotate=curX*0.08
-    card.style.transform=`translateX(${curX}px) rotate(${rotate}deg)`
+    // velocidade (px/ms) para o flick
+    const now=performance.now()
+    if(now>lastT)vx=(pt.clientX-lastX)/(now-lastT)
+    lastX=pt.clientX;lastT=now
+    // arco com peso: o card levanta levemente conforme se afasta do centro
+    card.style.transform=`translateX(${curX}px) translateY(${(-Math.abs(curX)*0.07).toFixed(1)}px) rotate(${(curX*0.08).toFixed(2)}deg)`
+    // fonte única de verdade: --drag + data-dir dirigem selos e véu via CSS
     const pct=Math.min(1,Math.abs(curX)/120)
-    const likeEl=card.querySelector('[id^="overlay-like"]')
-    const nopeEl=card.querySelector('[id^="overlay-nope"]')
-    if(curX>0){if(likeEl)likeEl.style.opacity=pct;if(nopeEl)nopeEl.style.opacity=0}
-    else{if(nopeEl)nopeEl.style.opacity=pct;if(likeEl)likeEl.style.opacity=0}
+    card.style.setProperty('--drag',pct.toFixed(3))
+    card.dataset.dir=curX>0?'right':'left'
+    // a próxima carta é promovida conforme a da frente sai
+    const next=card.parentElement&&card.parentElement.children[1]
+    if(next&&next!==card)next.style.transform=`scale(${(.96+pct*.04).toFixed(3)}) translateY(${(12-pct*12).toFixed(1)}px) rotate(${(-1.5+pct*1.5).toFixed(2)}deg)`
+    // engate no limiar (80px): clique tátil + prensa do selo
+    if(Math.abs(curX)>=80){
+      if(!card.classList.contains('bv-armed')){
+        card.classList.add('bv-armed')
+        try{navigator.vibrate&&navigator.vibrate(8)}catch(err){}
+      }
+    }else card.classList.remove('bv-armed')
   }
   const onUp=e=>{
     if(!isDragging)return
     isDragging=false;card.classList.remove('dragging')
-    card.style.transform=''
-    const likeEl=card.querySelector('[id^="overlay-like"]')
-    const nopeEl=card.querySelector('[id^="overlay-nope"]')
-    if(likeEl)likeEl.style.opacity=0;if(nopeEl)nopeEl.style.opacity=0
     document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)
-    if(curX>80)swipe('right')
-    else if(curX<-80)swipe('left')
+    const next=card.parentElement&&card.parentElement.children[1]
+    // decisão: distância OU flick (arrasto curto e rápido na mesma direção)
+    const flick=Math.abs(vx)>0.55&&Math.abs(curX)>24&&Math.sign(vx)===Math.sign(curX)
+    const decided=curX>80||(flick&&curX>0)?'right':(curX<-80||(flick&&curX<0)?'left':null)
+    if(decided){
+      card.classList.remove('bv-armed')
+      if(next&&next!==card)next.style.transform=''
+      swipe(decided)
+      return
+    }
+    // volta com mola
+    card.classList.remove('bv-armed')
+    card.style.transition='transform .5s cubic-bezier(.34,1.56,.64,1)'
+    card.style.transform=''
+    card.style.removeProperty('--drag');delete card.dataset.dir
+    if(next&&next!==card)next.style.transform=''
+    setTimeout(()=>{card.style.transition=''},520)
   }
   card.addEventListener('mousedown',onDown)
   card.addEventListener('touchstart',onDown,{passive:true})

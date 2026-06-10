@@ -124,6 +124,16 @@ nav.scrolled{
 .sec-head h2 em{font-style:italic;color:var(--rose);font-weight:700}
 .sec-head p{font-size:17px;color:var(--muted);line-height:1.65}
 section{padding:clamp(64px,8vw,92px) 0;position:relative}
+/* Marca-d'água editorial: monograma B impresso "no papel" */
+.wm{overflow:hidden}
+.wm::before{content:"B";position:absolute;z-index:0;top:-.08em;right:-4%;
+  font-family:'Playfair Display',serif;font-weight:900;font-style:italic;
+  font-size:clamp(300px,40vw,560px);line-height:.8;color:transparent;
+  -webkit-text-stroke:1.5px rgba(194,24,91,.09);pointer-events:none;user-select:none}
+.wm.wm-left::before{right:auto;left:-3%}
+.wm .wrap{position:relative;z-index:1}
+@supports not (-webkit-text-stroke:1px #000){.wm::before{color:rgba(194,24,91,.05)}}
+[data-theme=dark] .wm::before{-webkit-text-stroke-color:rgba(249,168,212,.08)}
 
 /* ===== HERO ===== */
 .hero{
@@ -161,6 +171,14 @@ section{padding:clamp(64px,8vw,92px) 0;position:relative}
     radial-gradient(46% 56% at 66% 82%, rgba(136,14,79,.34), transparent 62%);
 }
 [data-theme=dark] .hero::after{opacity:.10;mix-blend-mode:screen}
+/* Parallax de profundidade: cada camada reage ao cursor com inércia própria.
+   Usa a propriedade `translate` (independente) — compõe com as animações de
+   transform (bv-aurora, floaty) sem sobrescrevê-las. */
+.hero{--prx:0;--pry:0}
+.hero::before{translate:calc(var(--prx)*-26px) calc(var(--pry)*-18px);transition:translate 1s cubic-bezier(.2,.7,.3,1)}
+.hc-main{translate:calc(var(--prx)*10px) calc(var(--pry)*8px);transition:translate .55s cubic-bezier(.2,.7,.3,1)}
+.hc-float-pin,.hc-float-money{translate:calc(var(--prx)*22px) calc(var(--pry)*15px);transition:translate .35s cubic-bezier(.2,.7,.3,1)}
+.float-shape{translate:calc(var(--prx)*-14px) calc(var(--pry)*-10px);transition:translate .8s ease}
 .hero-grid{display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center;position:relative;z-index:1}
 .hero h1{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(40px,5.6vw,68px);line-height:1.04;letter-spacing:-.025em;color:var(--text)}
 .hero h1 .accent{
@@ -751,7 +769,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
 </section>
 
 <!-- ===== FEATURES ===== -->
-<section class="features" id="features">
+<section class="features wm" id="features">
   <div class="wrap">
     <div class="sec-head reveal">
       <span class="eyebrow"><svg class="ic"><use href="#ic-sparkle"/></svg>Recursos</span>
@@ -832,7 +850,7 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
 </section>
 
 <!-- ===== TESTIMONIALS ===== -->
-<section id="depoimentos">
+<section id="depoimentos" class="wm wm-left">
   <div class="wrap">
     <div class="sec-head reveal">
       <span class="eyebrow"><svg class="ic"><use href="#ic-heart-filled"/></svg>Depoimentos</span>
@@ -1048,6 +1066,32 @@ footer{background:#120710;color:rgba(255,255,255,.62);padding:72px 0 32px}
       }
     });
   });
+
+  /* ===== Parallax do hero (cursor) ===== */
+  (function(){
+    var hero = document.querySelector('.hero');
+    if(!hero) return;
+    var fine, calm;
+    try{
+      fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+      calm = matchMedia('(prefers-reduced-motion:reduce)').matches;
+    }catch(e){ return; }
+    if(!fine || calm) return;
+    var raf = 0, px = 0, py = 0;
+    hero.addEventListener('pointermove', function(e){
+      var r = hero.getBoundingClientRect();
+      px = (e.clientX - r.left)/r.width - 0.5;
+      py = (e.clientY - r.top)/r.height - 0.5;
+      if(!raf) raf = requestAnimationFrame(function(){
+        raf = 0;
+        hero.style.setProperty('--prx', px.toFixed(3));
+        hero.style.setProperty('--pry', py.toFixed(3));
+      });
+    }, {passive:true});
+    hero.addEventListener('pointerleave', function(){
+      hero.style.setProperty('--prx','0'); hero.style.setProperty('--pry','0');
+    }, {passive:true});
+  })();
 
   /* ===== Scroll reveal ===== */
   var revealEls = document.querySelectorAll('.reveal');

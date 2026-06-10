@@ -89,7 +89,7 @@
     '[data-theme=dark] .vit-btn:hover{background:rgba(233,30,140,.3)}' +
     '[data-theme=dark] .eyebrow{color:#f9a8d4}' +
     // botão de tema
-    '#bv-theme-btn{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(0,0,0,.06);cursor:pointer;z-index:150;background:#fff;color:#c2185b;box-shadow:0 6px 22px rgba(136,14,79,.28);display:grid;place-items:center;transition:transform .2s,background .3s,color .3s;padding:0}' +
+    '#bv-theme-btn{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(0,0,0,.06);cursor:pointer;z-index:150;background:#fff;color:#c2185b;box-shadow:0 6px 22px rgba(136,14,79,.28);display:grid;place-items:center;transition:transform .2s,background .3s,color .3s;padding:0;view-transition-name:bv-fab}' +
     '#bv-theme-btn:hover{transform:scale(1.1) rotate(-8deg)}' +
     '#bv-theme-btn:focus-visible{outline:3px solid rgba(194,24,91,.5);outline-offset:2px}' +
     '[data-theme=dark] #bv-theme-btn{background:#2a1524;color:#fbcfe8;border-color:var(--border);box-shadow:0 6px 22px rgba(0,0,0,.55)}' +
@@ -107,6 +107,13 @@
     // acessibilidade: foco visível por teclado
     ':focus-visible{outline:2.5px solid var(--primary,#c2185b);outline-offset:2px;border-radius:6px}' +
     'button:focus:not(:focus-visible),a:focus:not(:focus-visible){outline:none}' +
+    // ── Travessia de Seda: transição suave entre páginas (View Transitions) ──
+    // Navegadores sem suporte ignoram o at-rule (fallback = navegação normal).
+    '@view-transition{navigation:auto}' +
+    '::view-transition-old(root){animation:bv-vt-out .25s ease both}' +
+    '::view-transition-new(root){animation:bv-vt-in .42s cubic-bezier(.2,.7,.3,1) both}' +
+    '@keyframes bv-vt-out{to{opacity:0;transform:translateY(-10px)}}' +
+    '@keyframes bv-vt-in{from{opacity:0;transform:translateY(12px)}}' +
     // ── Couture Rosé · acabamento fino global ──
     // seleção de texto na cor da marca
     '::selection{background:rgba(233,30,140,.22);color:inherit;text-shadow:none}' +
@@ -127,11 +134,21 @@
     '.btn-primary:hover::after{opacity:1;animation:bv-sheen .85s cubic-bezier(.4,0,.2,1)}' +
     '@keyframes bv-sheen{from{left:-70%}to{left:140%}}' +
     // elevação tingida na marca + halo ao passar o mouse nos cards de vitrine
-    '.feat-card,.vit-card,.loja-card,.prod-card{transition:box-shadow .38s ease,transform .35s cubic-bezier(.2,.7,.3,1),border-color .3s ease}' +
+    '.feat-card,.vit-card,.loja-card,.prod-card{position:relative;transition:box-shadow .38s ease,transform .35s cubic-bezier(.2,.7,.3,1),border-color .3s ease}' +
+    // Lustre Líquido: verniz radial que segue o cursor dentro do card (compõe com o tilt)
+    '.feat-card::after,.vit-card::after,.loja-card::after,.prod-card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;opacity:0;transition:opacity .4s ease;mix-blend-mode:soft-light;background:radial-gradient(340px circle at var(--bv-mx,50%) var(--bv-my,38%),rgba(255,255,255,.85),rgba(201,168,106,.35) 42%,transparent 65%)}' +
+    '.feat-card:hover::after,.vit-card:hover::after,.loja-card:hover::after,.prod-card:hover::after{opacity:1}' +
+    '[data-theme=dark] .feat-card::after,[data-theme=dark] .vit-card::after,[data-theme=dark] .loja-card::after,[data-theme=dark] .prod-card::after{mix-blend-mode:screen;background:radial-gradient(340px circle at var(--bv-mx,50%) var(--bv-my,38%),rgba(255,236,246,.14),rgba(201,168,106,.06) 42%,transparent 65%)}' +
     '.feat-card:hover,.vit-card:hover,.loja-card:hover,.prod-card:hover{box-shadow:0 24px 52px -18px rgba(136,14,79,.32),0 8px 22px -12px rgba(194,24,91,.22)}' +
     '[data-theme=dark] .feat-card:hover,[data-theme=dark] .vit-card:hover,[data-theme=dark] .loja-card:hover,[data-theme=dark] .prod-card:hover{box-shadow:0 26px 60px -16px rgba(0,0,0,.62),0 0 0 1px rgba(233,30,140,.20),0 12px 36px -10px rgba(233,30,140,.20)}' +
+    // ── Vidro de Boudoir: modais em cristal fumê rosado (fallback = sólido atual) ──
+    '@supports ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){' +
+      '.modal-overlay{backdrop-filter:blur(10px) saturate(1.25);-webkit-backdrop-filter:blur(10px) saturate(1.25)}' +
+      '.modal-overlay .modal{background:rgba(255,255,255,.88);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);border:1px solid rgba(255,255,255,.65);box-shadow:0 24px 70px rgba(136,14,79,.26),inset 0 1px 0 rgba(255,255,255,.8)}' +
+      '[data-theme=dark] .modal-overlay .modal{background:rgba(32,16,27,.86);border-color:rgba(244,143,177,.15);box-shadow:0 24px 70px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06)}' +
+    '}' +
     // respeita preferência de menos movimento
-    '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}.marquee-track{animation:none!important}}';
+    '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}.marquee-track{animation:none!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}';
 
   var st = d.createElement('style');
   st.id = 'bv-theme-css';
@@ -194,6 +211,8 @@
       var ry = (px - 0.5) * 9;              // rotação Y (graus) — máx ±4.5
       var rx = (0.5 - py) * 9;              // rotação X
       active.style.transform = 'perspective(900px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) translateY(-5px)';
+      active.style.setProperty('--bv-mx', (px * 100).toFixed(1) + '%');
+      active.style.setProperty('--bv-my', (py * 100).toFixed(1) + '%');
     }
     d.addEventListener('pointermove', function (e) {
       var card = e.target && e.target.closest ? e.target.closest(SEL) : null;
