@@ -284,10 +284,18 @@ input[id="card-num"]{letter-spacing:3px;font-family:'Courier New',monospace;font
 @keyframes dots{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
 /* SUCCESS */
-.success-screen{text-align:center;padding:36px 20px}
-@keyframes popIn{0%{transform:scale(0);opacity:0}80%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.success-screen{text-align:center;padding:40px 20px}
+@keyframes popIn{0%{transform:scale(0);opacity:0}80%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+.success-halo{position:relative;width:96px;height:96px;margin:0 auto 22px;display:grid;place-items:center}
+.success-halo::before,.success-halo::after{content:"";position:absolute;inset:4px;border-radius:50%;border:2px solid var(--primary);opacity:0;animation:bv-ring 2.6s ease-out infinite}
+.success-halo::after{animation-delay:1.3s}
+@keyframes bv-ring{0%{transform:scale(.65);opacity:.55}100%{transform:scale(1.7);opacity:0}}
+.success-disc{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;position:relative;z-index:1;
+  background:var(--grad);box-shadow:0 16px 42px -10px rgba(194,24,91,.5),inset 0 1px 0 rgba(255,255,255,.45);
+  animation:popIn .6s cubic-bezier(.2,1.5,.4,1) both}
+.success-disc .ic{width:44px;height:44px;color:#fff;filter:drop-shadow(0 3px 6px rgba(0,0,0,.18))}
 .success-icon{font-size:4rem;display:block;margin:0 auto 16px;animation:popIn .5s ease forwards}
-.success-screen h2{font-size:1.4rem;font-weight:800;margin-bottom:8px;color:var(--text)}
+.success-screen h2{font-family:'Playfair Display',Georgia,serif;font-size:1.7rem;font-weight:800;letter-spacing:-.01em;margin-bottom:8px;color:var(--text)}
 .success-screen p{color:var(--muted);font-size:.9rem;margin-bottom:24px;line-height:1.6}
 .wa-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;background:#25D366;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;text-decoration:none}
 .tx-badge{background:#e8f5e9;color:var(--success);border-radius:8px;padding:8px 14px;font-size:.82rem;font-weight:600;margin-bottom:16px;display:inline-block}
@@ -1175,7 +1183,7 @@ function showSuccess(pedido,pagamento){
   document.getElementById('modal-hd-title').textContent=''
   document.getElementById('modal-body').innerHTML=`
     <div class="success-screen">
-      <span class="success-icon">${pagamento.status==='PAGO'?icon('party-popper','ic-xl'):icon('mailbox','ic-xl')}</span>
+      <div class="success-halo"><div class="success-disc">${icon(pagamento.status==='PAGO'?'party-popper':'mailbox','ic-lg')}</div></div>
       <h2>Pedido registrado!</h2>
       <div class="tx-badge">${statusMsg[pagamento.status]||'Pedido enviado!'}</div>
       <p>Pedido <strong>#${pedido.id.slice(0,8).toUpperCase()}</strong><br>
