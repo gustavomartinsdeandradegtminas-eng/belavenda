@@ -220,12 +220,16 @@ body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;heig
 
 /* ═══ MÉTODO DE PAGAMENTO ═══ */
 .pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
-.pay-method{border:2px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;font-family:inherit}
+.pay-method{position:relative;border:2px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;background:#fff;font-family:inherit}
 .pay-method:hover{border-color:var(--primary);background:var(--primary-l)}
-.pay-method.sel{border-color:var(--primary);background:var(--primary-l);box-shadow:0 0 0 3px rgba(194,24,91,.1)}
+.pay-method.sel{border-color:var(--primary);background:var(--primary-l);box-shadow:0 0 0 3px rgba(194,24,91,.22);transform:translateY(-1px)}
+.pay-method.sel::after{content:'✓';position:absolute;top:6px;right:7px;width:18px;height:18px;background:var(--primary);color:#fff;border-radius:50%;font-size:.66rem;font-weight:800;display:grid;place-items:center;line-height:1}
 .pay-method-icon{font-size:1.6rem;margin-bottom:6px;display:block}
 .pay-method-name{font-size:.82rem;font-weight:700;color:var(--text)}
 .pay-method-sub{font-size:.7rem;color:var(--muted);margin-top:2px}
+.trust-strip{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);font-size:.74rem;color:var(--muted);font-weight:600}
+.trust-strip span{display:inline-flex;align-items:center;gap:5px}
+.trust-strip .ic{width:15px;height:15px;color:var(--success)}
 
 /* ═══ PIX ═══ */
 .pix-box{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:2px solid #81c784;border-radius:14px;padding:24px;text-align:center}
@@ -856,7 +860,12 @@ function renderStep2(){
           <div class="pay-method-sub">${m.sub}</div>
         </button>`).join('')}
     </div>
-    <div id="pay-form-area"></div>`
+    <div id="pay-form-area"></div>
+    <div class="trust-strip">
+      <span>${icon('shield-check')} Pagamento seguro</span>
+      <span>${icon('lock-closed')} Seus dados protegidos</span>
+      <span>${icon('info')} Ambiente de demonstração</span>
+    </div>`
   document.getElementById('modal-foot').innerHTML=`
     <button class="btn btn-secondary" onclick="chStep=1;renderStep()">← Voltar</button>
     <button id="pay-action-btn" class="btn btn-primary" style="flex:1" onclick="processarPagamento()">Pagar ${fmtM(total)} →</button>`
