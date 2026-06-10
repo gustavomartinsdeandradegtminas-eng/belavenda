@@ -255,6 +255,22 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 /* ─── PROD TABLE IMAGE ────────────────────────────────── */
 .prod-img-cell{width:34px;height:34px;border-radius:8px;background:var(--primary-l);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;overflow:hidden}
 .prod-img-cell img{width:100%;height:100%;object-fit:cover}
+
+/* ─── CUPONS / PROMOÇÕES ──────────────────────────────── */
+.cupons-list{display:flex;flex-direction:column;gap:10px}
+.cupom-card{display:flex;align-items:center;gap:14px;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;transition:opacity .2s,border-color .2s}
+.cupom-card.off{opacity:.55}
+.cupom-card-tag{font-family:'Playfair Display',Georgia,serif;font-weight:800;letter-spacing:.5px;background:var(--primary-l);color:var(--primary-d);border:1px dashed var(--primary);border-radius:8px;padding:8px 12px;font-size:.92rem;white-space:nowrap}
+.cupom-card-info{flex:1;min-width:0}
+.cupom-card-val{font-weight:800;font-size:.95rem;color:var(--text)}
+.cupom-card-cond{font-size:.76rem;color:var(--muted);margin-top:2px}
+.cupom-card-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.cupom-toggle{border:1.5px solid var(--border);background:var(--bg);border-radius:20px;padding:6px 14px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;min-height:36px}
+.cupom-toggle.on{background:rgba(16,185,129,.12);border-color:#10b981;color:#059669}
+.cupom-toggle.off{color:var(--muted)}
+.cupom-del{border:none;background:transparent;color:var(--muted);cursor:pointer;width:36px;height:36px;border-radius:9px;display:grid;place-items:center;transition:all .2s}
+.cupom-del:hover{background:rgba(239,68,68,.12);color:#ef4444}
+.cupom-del .ic{width:17px;height:17px}
 </style>
 </head>
 <body>
@@ -306,6 +322,9 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
     </a>
     <a class="nav-item" onclick="navigate('avaliacoes')" id="nav-avaliacoes">
       <span class="nav-item-icon"><svg class="ic"><use href="#ic-star"/></svg></span> Avaliações
+    </a>
+    <a class="nav-item" onclick="navigate('promocoes')" id="nav-promocoes">
+      <span class="nav-item-icon"><svg class="ic"><use href="#ic-tag"/></svg></span> Promoções
     </a>
     <a class="nav-item" onclick="openLoja()" id="nav-loja">
       <span class="nav-item-icon"><svg class="ic"><use href="#ic-link"/></svg></span> Ver Catálogo
@@ -471,6 +490,82 @@ function salvarPerfilLoja(){
   document.getElementById('user-name').textContent=nome
   bvToast('Perfil da loja atualizado!','success')
 }
+
+// ─── PROMOÇÕES / CUPONS ───────────────────────────────────
+function getCuponsP(){try{return JSON.parse(localStorage.getItem('bv_cupons_'+REV_ID)||'[]')}catch(e){return[]}}
+function saveCuponsP(a){localStorage.setItem('bv_cupons_'+REV_ID,JSON.stringify(a))}
+function renderPromocoes(){
+  const cps=getCuponsP()
+  const ativos=cps.filter(c=>c.ativo).length, usos=cps.reduce((s,c)=>s+(c.usos||0),0)
+  document.getElementById('content').innerHTML=`
+    <div style="display:grid;gap:18px;max-width:780px">
+      <div class="card">
+        <div class="card-header"><span class="card-title">${icon('tag')} Criar cupom de desconto</span></div>
+        <div class="card-body">
+          <p style="font-size:.86rem;color:var(--muted);margin-bottom:16px">Crie cupons para suas clientes aplicarem no checkout — ótimo para atrair novas clientes e premiar as fiéis.</p>
+          <div class="form-group"><label>Código do cupom</label><input id="cp-codigo" maxlength="24" placeholder="Ex: BEMVINDA10" style="text-transform:uppercase;letter-spacing:.5px"></div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div class="form-group" style="flex:1;min-width:140px"><label>Tipo de desconto</label><select id="cp-tipo" onchange="cpTipoChange()"><option value="percent">Percentual (%)</option><option value="fixo">Valor fixo (R$)</option></select></div>
+            <div class="form-group" style="flex:1;min-width:140px"><label id="cp-valor-label">Desconto (%)</label><input id="cp-valor" type="number" min="1" step="1" placeholder="10"></div>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div class="form-group" style="flex:1;min-width:140px"><label>Pedido mínimo (R$) <span style="color:var(--muted);font-weight:400">· opcional</span></label><input id="cp-minimo" type="number" min="0" step="1" placeholder="0"></div>
+            <div class="form-group" style="flex:1;min-width:140px"><label>Validade <span style="color:var(--muted);font-weight:400">· opcional</span></label><input id="cp-validade" type="date"></div>
+          </div>
+          <button class="btn btn-primary" onclick="criarCupom()">${icon('plus')} Criar cupom</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Meus cupons</span>${cps.length?`<span style="font-size:.8rem;color:var(--muted)">${ativos} ativo(s) · ${usos} uso(s)</span>`:''}</div>
+        <div class="card-body">
+          ${cps.length?`<div class="cupons-list">${cps.map(cupomRowHTML).join('')}</div>`:`<div style="text-align:center;padding:30px 10px;color:var(--muted)"><div style="font-size:2rem;margin-bottom:8px">${icon('tag','ic-lg')}</div><p style="font-size:.9rem">Nenhum cupom ainda. Crie o primeiro acima!</p></div>`}
+        </div>
+      </div>
+    </div>`
+}
+function cpTipoChange(){
+  const t=document.getElementById('cp-tipo').value
+  document.getElementById('cp-valor-label').textContent=t==='percent'?'Desconto (%)':'Desconto (R$)'
+}
+function cupomRowHTML(c){
+  const valorTxt=c.tipo==='percent'?c.valor+'% OFF':fmtMoeda(c.valor)+' OFF'
+  const cond=[]
+  if(c.minimo)cond.push('mín. '+fmtMoeda(c.minimo))
+  if(c.validade)cond.push('até '+new Date(c.validade+'T00:00:00').toLocaleDateString('pt-BR'))
+  cond.push((c.usos||0)+' uso(s)')
+  return `<div class="cupom-card${c.ativo?'':' off'}">
+    <div class="cupom-card-tag">${c.codigo}</div>
+    <div class="cupom-card-info">
+      <div class="cupom-card-val">${valorTxt}</div>
+      <div class="cupom-card-cond">${cond.join(' · ')}</div>
+    </div>
+    <div class="cupom-card-actions">
+      <button class="cupom-toggle ${c.ativo?'on':'off'}" onclick="toggleCupom('${c.id}')">${c.ativo?'Ativo':'Inativo'}</button>
+      <button class="cupom-del" onclick="excluirCupom('${c.id}')" title="Excluir cupom">${icon('trash')}</button>
+    </div>
+  </div>`
+}
+function criarCupom(){
+  const codigo=(document.getElementById('cp-codigo').value||'').trim().toUpperCase().replace(/\s+/g,'')
+  const tipo=document.getElementById('cp-tipo').value
+  const valor=parseFloat(document.getElementById('cp-valor').value)
+  const minimo=parseFloat(document.getElementById('cp-minimo').value)||0
+  const validade=document.getElementById('cp-validade').value||''
+  if(!codigo){bvToast('Informe um código para o cupom.','error');return}
+  if(!(valor>0)){bvToast('Informe um valor de desconto válido.','error');return}
+  if(tipo==='percent'&&valor>90){bvToast('O desconto percentual máximo é 90%.','error');return}
+  const cps=getCuponsP()
+  if(cps.some(c=>(c.codigo||'').toUpperCase()===codigo)){bvToast('Já existe um cupom com esse código.','error');return}
+  cps.unshift({id:'cp'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),codigo,tipo,valor,minimo,validade,ativo:true,usos:0,criadoEm:new Date().toISOString()})
+  saveCuponsP(cps)
+  bvToast('Cupom '+codigo+' criado!','success')
+  renderPromocoes()
+}
+function toggleCupom(id){const cps=getCuponsP();const c=cps.find(x=>x.id===id);if(c){c.ativo=!c.ativo;saveCuponsP(cps);renderPromocoes()}}
+async function excluirCupom(id){
+  if(!await bvConfirm('Este cupom será removido permanentemente.',{title:'Excluir cupom?',okText:'Excluir',danger:true}))return
+  saveCuponsP(getCuponsP().filter(x=>x.id!==id));renderPromocoes();bvToast('Cupom excluído.','info')
+}
 updateLojaStatusUI()
 
 let currentSection='dashboard'
@@ -480,10 +575,10 @@ function navigate(section){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'))
   const el=document.getElementById('nav-'+section)
   if(el)el.classList.add('active')
-  const titles={dashboard:'Dashboard',pedidos:'Pedidos',clientes:'Clientes',produtos:'Produtos',entregas:'Entregas',relatorios:'Relatórios',calculadora:'Calculadora de Margem',perfilLoja:'Perfil da Loja',avaliacoes:'Avaliações'}
+  const titles={dashboard:'Dashboard',pedidos:'Pedidos',clientes:'Clientes',produtos:'Produtos',entregas:'Entregas',relatorios:'Relatórios',calculadora:'Calculadora de Margem',perfilLoja:'Perfil da Loja',avaliacoes:'Avaliações',promocoes:'Promoções'}
   document.getElementById('topbar-title').textContent=titles[section]||section
   document.getElementById('topbar-actions').innerHTML=''
-  const renderers={dashboard:renderDashboard,pedidos:renderPedidos,clientes:renderClientes,produtos:renderProdutos,entregas:renderEntregas,relatorios:renderRelatorios,calculadora:renderCalculadora,avaliacoes:renderAvaliacoes,perfilLoja:renderPerfilLoja}
+  const renderers={dashboard:renderDashboard,pedidos:renderPedidos,clientes:renderClientes,produtos:renderProdutos,entregas:renderEntregas,relatorios:renderRelatorios,calculadora:renderCalculadora,avaliacoes:renderAvaliacoes,perfilLoja:renderPerfilLoja,promocoes:renderPromocoes}
   if(renderers[section])renderers[section]()
   atualizarBadgesSidebar()
   if(window.bvAnimate)bvAnimate(document.getElementById('content'))
