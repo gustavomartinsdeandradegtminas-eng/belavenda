@@ -61,6 +61,20 @@
     '[data-theme=dark] .btn-ghost,[data-theme=dark] .back-btn{background:var(--surface-2);color:var(--text);border-color:var(--border)}' +
     '[data-theme=dark] .calc-result,[data-theme=dark] .order-info-item,[data-theme=dark] .hc-item{background:var(--surface-2)}' +
     '[data-theme=dark] nav.scrolled{background:rgba(20,8,17,.85)!important}' +
+    // loja: checkout/modal/avaliações que tinham cores claras fixas
+    '[data-theme=dark] .modal-hd{background:var(--surface);border-color:var(--border)}' +
+    '[data-theme=dark] .review-card,[data-theme=dark] .loja-fechada-card{background:var(--surface);border-color:var(--border)}' +
+    '[data-theme=dark] .bar-track{background:var(--surface-2)}' +
+    '[data-theme=dark] .cart-item{border-color:var(--border)}' +
+    '[data-theme=dark] .pay-method{background:var(--surface-2);border-color:var(--border)}' +
+    '[data-theme=dark] .cstep-circle{background:var(--surface-2)}' +
+    '[data-theme=dark] .boleto-box{background:var(--surface-2);border-color:var(--border)}' +
+    '[data-theme=dark] .delivery-opt{background:var(--surface-2)!important;border-color:var(--border)!important}' +
+    '[data-theme=dark] .pix-key-wrap{background:var(--surface)}' +
+    // landing: contraste no dark
+    '[data-theme=dark] .vit-btn{background:rgba(233,30,140,.18);color:#f9a8d4}' +
+    '[data-theme=dark] .vit-btn:hover{background:rgba(233,30,140,.3)}' +
+    '[data-theme=dark] .eyebrow{color:#f9a8d4}' +
     // botão de tema
     '#bv-theme-btn{position:fixed;right:18px;bottom:18px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(0,0,0,.06);cursor:pointer;z-index:150;background:#fff;color:#c2185b;box-shadow:0 6px 22px rgba(136,14,79,.28);display:grid;place-items:center;transition:transform .2s,background .3s,color .3s;padding:0}' +
     '#bv-theme-btn:hover{transform:scale(1.1) rotate(-8deg)}' +
