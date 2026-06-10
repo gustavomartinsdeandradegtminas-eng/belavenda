@@ -126,6 +126,10 @@
     '.btn-primary::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;z-index:-1;background:linear-gradient(100deg,transparent,rgba(255,255,255,.38),transparent);transform:skewX(-18deg);opacity:0}' +
     '.btn-primary:hover::after{opacity:1;animation:bv-sheen .85s cubic-bezier(.4,0,.2,1)}' +
     '@keyframes bv-sheen{from{left:-70%}to{left:140%}}' +
+    // elevação tingida na marca + halo ao passar o mouse nos cards de vitrine
+    '.feat-card,.vit-card,.loja-card,.prod-card{transition:box-shadow .38s ease,transform .35s cubic-bezier(.2,.7,.3,1),border-color .3s ease}' +
+    '.feat-card:hover,.vit-card:hover,.loja-card:hover,.prod-card:hover{box-shadow:0 24px 52px -18px rgba(136,14,79,.32),0 8px 22px -12px rgba(194,24,91,.22)}' +
+    '[data-theme=dark] .feat-card:hover,[data-theme=dark] .vit-card:hover,[data-theme=dark] .loja-card:hover,[data-theme=dark] .prod-card:hover{box-shadow:0 26px 60px -16px rgba(0,0,0,.62),0 0 0 1px rgba(233,30,140,.20),0 12px 36px -10px rgba(233,30,140,.20)}' +
     // respeita preferência de menos movimento
     '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}.marquee-track{animation:none!important}}';
 

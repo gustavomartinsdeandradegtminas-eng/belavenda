@@ -307,7 +307,17 @@ section{padding:100px 0;position:relative}
 
 /* ===== VITRINES ===== */
 .vitrines-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:46px}
-.vit-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .3s,box-shadow .3s}
+.vit-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .3s,box-shadow .3s;position:relative}
+/* Moldura de luz que circula — destaque "couture" nas vitrines */
+@property --bv-a{syntax:'<angle>';inherits:false;initial-value:0deg}
+.vit-card::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:1.7px;pointer-events:none;z-index:4;
+  background:conic-gradient(from var(--bv-a,0deg),var(--rose-mid),#e6b878,var(--rose),#f4d9b0,var(--rose-mid));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  opacity:.85;animation:bv-rotate 8s linear infinite;
+}
+@keyframes bv-rotate{to{--bv-a:360deg}}
 .vit-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
 .vit-top{position:relative;height:66px;background:var(--grad)}
 .vit-top::after{content:"";position:absolute;inset:0;background:radial-gradient(130% 120% at 90% 0%,rgba(255,255,255,.25),transparent 55%)}
