@@ -17,7 +17,7 @@
 <script src="bv-toast.js"></script>
 <script src="bv-icons.js"></script>
 <script src="bv-seed.js"></script>
-<script src="bv-art.js?v=6"></script>
+<script src="bv-art.js?v=7"></script>
 <script src="bv-notify.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -701,6 +701,7 @@ function renderDashboard(){
         </div>
       </div>`
     })()}
+    ${aniversariantesCardHTML(clientes)}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
       <div class="card">
         <div class="card-header"><span class="card-title">Últimos Pedidos</span><button class="btn btn-sm btn-secondary" onclick="navigate('pedidos')">Ver todos</button></div>
@@ -772,6 +773,46 @@ function vendasMesAnterior(pedidos){
   const ini=new Date();ini.setDate(1);ini.setHours(0,0,0,0)
   const iniPrev=new Date(ini);iniPrev.setMonth(iniPrev.getMonth()-1)
   return pedidos.filter(p=>{if(p.status!=='ENTREGUE')return false;const d=new Date(p.dataCriacao);return d>=iniPrev&&d<ini}).reduce((s,p)=>s+(p.valorTotal||0),0)
+}
+// ─── ANIVERSARIANTES DA SEMANA ────────────────────────────
+// Parse por string (new Date('YYYY-MM-DD') cai no dia anterior em UTC-3)
+function aniversariantesSemana(clientes){
+  const hoje=new Date();hoje.setHours(0,0,0,0)
+  const out=[]
+  ;(clientes||[]).forEach(c=>{
+    if(!c.aniversario||!/^\d{4}-\d{2}-\d{2}/.test(c.aniversario))return
+    const [,m,dia]=c.aniversario.split('-').map(Number)
+    let cand=new Date(hoje.getFullYear(),m-1,dia)
+    if(cand<hoje)cand=new Date(hoje.getFullYear()+1,m-1,dia)
+    const diff=Math.round((cand-hoje)/86400000)
+    if(diff<=6)out.push({c,dia,mes:m,diff})
+  })
+  return out.sort((a,b)=>a.diff-b.diff)
+}
+function waParabens(clienteId){
+  const c=DB.getClients().find(x=>x.id===clienteId); if(!c)return
+  const tel=(c.telefone||'').replace(/\D/g,''); if(!tel){bvToast('Esta cliente não tem WhatsApp cadastrado.','info');return}
+  const msg='Parabéns, '+c.nome.split(' ')[0]+'! 🎉 Aqui é da '+(DB.getRev().nome||'sua loja de beleza')+' — te desejo um dia maravilhoso! Como presente de aniversário, tenho um mimo especial te esperando. Me chama aqui! 💝'
+  window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(msg),'_blank')
+}
+function aniversariantesCardHTML(clientes){
+  const nivers=aniversariantesSemana(clientes)
+  if(!nivers.length)return''
+  const pad=n=>String(n).padStart(2,'0')
+  return`<div class="card" style="margin-bottom:24px">
+    <div class="card-header"><span class="card-title">${icon('party-popper')} Aniversariantes da semana</span><span style="font-size:.8rem;color:var(--muted)">${nivers.length} cliente(s)</span></div>
+    <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+      ${nivers.map(n=>`
+        <div style="display:flex;align-items:center;gap:12px;border:1.5px solid var(--border);border-radius:12px;padding:10px 14px">
+          <span style="width:38px;height:38px;border-radius:11px;background:var(--primary-l);color:var(--primary);display:grid;place-items:center;flex-shrink:0">${icon('gift')}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:.92rem">${n.c.nome}</div>
+            <div style="font-size:.78rem;color:var(--muted)">${pad(n.dia)}/${pad(n.mes)} · ${n.diff===0?'🎂 é hoje!':n.diff===1?'amanhã':'em '+n.diff+' dias'}</div>
+          </div>
+          ${(n.c.telefone||'').replace(/\D/g,'')?`<button class="wa-btn" style="padding:9px 14px;font-size:.8rem" onclick="waParabens('${n.c.id}')">${icon('chat-bubble','ic-sm')} Parabenizar</button>`:''}
+        </div>`).join('')}
+    </div>
+  </div>`
 }
 function insightsDashboard(pedidos){
   const entregues=pedidos.filter(p=>p.status==='ENTREGUE')
@@ -953,6 +994,13 @@ function renderDetalhePedido(id){
             <a class="wa-btn" style="width:100%;justify-content:center" href="https://wa.me/${(p.clienteTelefone||'').replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+p.clienteNome+'! Atualização do seu pedido BelaVenda: '+p.status)}" target="_blank">Contatar Cliente</a>
           </div>
         </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recibo</span></div>
+          <div class="card-body">
+            <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px">Gere um recibo elegante em imagem para enviar à cliente.</p>
+            <button class="btn btn-secondary" style="width:100%;justify-content:center" onclick="gerarRecibo('${p.id}')">${icon('document')} Gerar recibo</button>
+          </div>
+        </div>
       </div>
     </div>
   `
@@ -966,6 +1014,87 @@ function atualizarStatus(id){
   if(status==='ENTREGUE')p.dataConclusao=now()
   DB.savePedidos(pedidos)
   renderDetalhePedido(id)
+}
+
+// ─── RECIBO ELEGANTE (canvas → PNG) ───────────────────────
+async function gerarRecibo(id){
+  const p=DB.getPedidos().find(x=>x.id===id); if(!p)return
+  const rev=DB.getRev()
+  try{await document.fonts.load('900 64px "Playfair Display"');await document.fonts.load('600 26px Inter');await document.fonts.load('800 30px Inter')}catch(e){}
+  // fallbacks: pedidos criados no painel não têm subtotal/frete/desconto/cupom
+  const itens=p.itens||[]
+  const subtotal=p.valorSubtotal!=null?p.valorSubtotal:itens.reduce((s,it)=>s+(it.precoUnitario||0)*(it.quantidade||1),0)
+  const frete=p.valorFrete||0, desconto=p.valorDesconto||0
+  const total=p.valorTotal!=null?p.valorTotal:Math.max(0,subtotal-desconto)+frete
+  const stLabel={NOVO:'Novo',SEPARANDO:'Separando',EM_TRANSITO:'Em Trânsito',ENTREGUE:'Entregue',CANCELADO:'Cancelado'}[p.status]||p.status
+  const W=840,linhasItens=Math.max(1,itens.length)
+  const H=560+linhasItens*52+(desconto>0?52:0)+(p.entrega?0:0)+300
+  const cv=document.createElement('canvas');cv.width=W*2;cv.height=H*2
+  const ctx=cv.getContext('2d');ctx.scale(2,2)
+  // fundo
+  ctx.fillStyle='#fdf4f9';ctx.fillRect(0,0,W,H)
+  // cartão branco com sombra
+  ctx.save();ctx.shadowColor='rgba(136,14,79,.18)';ctx.shadowBlur=40;ctx.shadowOffsetY=12
+  ctx.fillStyle='#fff';if(ctx.roundRect){ctx.beginPath();ctx.roundRect(36,36,W-72,H-72,22);ctx.fill()}else ctx.fillRect(36,36,W-72,H-72)
+  ctx.restore()
+  // faixa de cabeçalho na marca
+  ctx.save();if(ctx.roundRect){ctx.beginPath();ctx.roundRect(36,36,W-72,150,[22,22,0,0]);ctx.clip()}else{ctx.beginPath();ctx.rect(36,36,W-72,150);ctx.clip()}
+  ctx.fillStyle=gradMarca(ctx,W,200);ctx.fillRect(36,36,W-72,150)
+  ctx.globalAlpha=.12;ctx.font='italic 900 210px "Playfair Display", Georgia, serif';ctx.fillStyle='#fff';ctx.fillText('B',W-220,230)
+  ctx.restore()
+  ctx.textAlign='center'
+  ctx.fillStyle='#fff';ctx.font='900 44px "Playfair Display", Georgia, serif'
+  ctx.fillText(rev.nome||'BelaVenda',W/2,118)
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='600 20px Inter, sans-serif'
+  ctx.fillText('Recibo de pedido',W/2,152)
+  // meta do pedido
+  let y=240
+  ctx.fillStyle='#880e4f';ctx.font='800 30px "Playfair Display", Georgia, serif'
+  ctx.fillText('Pedido #'+p.id.slice(0,8).toUpperCase(),W/2,y)
+  ctx.fillStyle='#9b7286';ctx.font='600 19px Inter, sans-serif'
+  ctx.fillText(fmtDataHora(p.dataCriacao)+'  ·  '+stLabel+(p.clienteNome?'  ·  '+p.clienteNome:''),W/2,y+34)
+  y+=86
+  // linha divisória
+  ctx.strokeStyle='#f3dbe7';ctx.lineWidth=1.5
+  ctx.beginPath();ctx.moveTo(86,y);ctx.lineTo(W-86,y);ctx.stroke()
+  y+=44
+  // itens
+  ctx.textAlign='left';ctx.fillStyle='#1f2937';ctx.font='600 21px Inter, sans-serif'
+  itens.forEach(it=>{
+    const nome=(it.quantidade||1)+'× '+(it.nome||'Item')
+    const val=fmtMoeda((it.precoUnitario||0)*(it.quantidade||1))
+    ctx.fillStyle='#374151';ctx.fillText(nome.length>38?nome.slice(0,37)+'…':nome,96,y)
+    ctx.textAlign='right';ctx.fillStyle='#1f2937';ctx.fillText(val,W-96,y);ctx.textAlign='left'
+    y+=52
+  })
+  if(!itens.length){ctx.fillStyle='#9b7286';ctx.fillText('— sem itens detalhados —',96,y);y+=52}
+  y+=4
+  ctx.strokeStyle='#f3dbe7';ctx.beginPath();ctx.moveTo(86,y);ctx.lineTo(W-86,y);ctx.stroke()
+  y+=42
+  // totais
+  function linhaTotal(label,val,destaque,cor){
+    ctx.font=(destaque?'900 30px "Playfair Display", Georgia, serif':'600 21px Inter, sans-serif')
+    ctx.fillStyle=cor||(destaque?'#c2185b':'#6b7280')
+    ctx.fillText(label,96,y)
+    ctx.textAlign='right';ctx.fillText(val,W-96,y);ctx.textAlign='left'
+    y+=destaque?52:40
+  }
+  linhaTotal('Subtotal',fmtMoeda(subtotal))
+  if(p.entrega)linhaTotal('Entrega — '+(p.entrega.name||''),p.entrega.price===0?'Grátis':fmtMoeda(frete))
+  else if(frete>0)linhaTotal('Entrega',fmtMoeda(frete))
+  if(desconto>0)linhaTotal('Cupom'+(p.cupom&&p.cupom.codigo?' '+p.cupom.codigo:''),'− '+fmtMoeda(desconto),false,'#059669')
+  y+=8
+  linhaTotal('Total',fmtMoeda(total),true)
+  ctx.fillStyle='#9b7286';ctx.font='600 19px Inter, sans-serif'
+  ctx.fillText('Pagamento: '+(p.formaPagamento||'—'),96,y)
+  // rodapé
+  ctx.textAlign='center'
+  ctx.fillStyle='#c2185b';ctx.font='italic 700 24px "Playfair Display", Georgia, serif'
+  ctx.fillText('Obrigada pela preferência! ♥',W/2,H-104)
+  ctx.fillStyle='#b48ba0';ctx.font='600 16px Inter, sans-serif'
+  ctx.fillText('Emitido pela BelaVenda · belavenda',W/2,H-72)
+  baixarCanvas(cv,'recibo-'+p.id.slice(0,8).toUpperCase()+'.png')
+  bvToast('Recibo baixado!','success')
 }
 function abrirNovoPedido(){
   const clientes=DB.getClients()
@@ -1166,6 +1295,7 @@ function renderProdRows(produtos){
         </label>
       </td>
       <td style="display:flex;gap:4px">
+        <button class="btn-icon" title="Divulgar — gerar arte de oferta" onclick="divulgarProduto('${p.id}')">${icon('share')}</button>
         <button class="btn-icon" onclick="abrirFormProduto('${p.id}')">${icon('pencil')}</button>
         <button class="btn-icon" onclick="excluirProduto('${p.id}')">${icon('trash')}</button>
       </td>
@@ -1414,6 +1544,93 @@ function salvarProduto(id){
 async function excluirProduto(id){
   if(!await bvConfirm('Este produto será removido do seu catálogo permanentemente.',{title:'Excluir produto?',okText:'Excluir',danger:true}))return
   DB.saveProdos(DB.getProdos().filter(p=>p.id!==id));renderProdutos();bvToast('Produto excluído.','info')
+}
+
+// ─── DIVULGAÇÃO: ARTE DE OFERTA (canvas → PNG) ────────────
+function baixarCanvas(cv,nome){
+  const a=document.createElement('a')
+  a.href=cv.toDataURL('image/png')
+  a.download=nome
+  document.body.appendChild(a);a.click();a.remove()
+}
+function gradMarca(ctx,w,h){
+  const g=ctx.createLinearGradient(0,0,w,h)
+  g.addColorStop(0,'#880e4f');g.addColorStop(.55,'#c2185b');g.addColorStop(1,'#e91e8c')
+  return g
+}
+function carregarImg(url){
+  return new Promise(res=>{
+    if(!url)return res(null)
+    const img=new Image()
+    img.crossOrigin='anonymous'
+    img.onload=()=>res(img)
+    img.onerror=()=>res(null)
+    img.src=url
+  })
+}
+async function divulgarProduto(id){
+  const p=DB.getProdos().find(x=>x.id===id); if(!p)return
+  const rev=DB.getRev()
+  bvToast('Gerando arte de divulgação...','info')
+  try{await document.fonts.load('900 92px "Playfair Display"');await document.fonts.load('700 40px Inter');await document.fonts.load('800 110px "Playfair Display"')}catch(e){}
+  // foto do produto em alta (troca o crop de 500 por 1080 quando for Pexels)
+  let url=(window.prodImgUrl?prodImgUrl(p.imagem,p.categoria,p.id||p.nome):null)
+  if(url&&url.indexOf('images.pexels.com')>=0)url=url.replace('w=500&h=500','w=1080&h=1080')
+  let img=await carregarImg(url)
+  const S=1080,cv=document.createElement('canvas');cv.width=S;cv.height=S
+  const ctx=cv.getContext('2d')
+  function desenhar(comFoto){
+    // fundo: gradiente da marca + véu radial de luz
+    ctx.fillStyle=gradMarca(ctx,S,S);ctx.fillRect(0,0,S,S)
+    const rg=ctx.createRadialGradient(S*.78,S*.16,40,S*.78,S*.16,520)
+    rg.addColorStop(0,'rgba(255,255,255,.20)');rg.addColorStop(1,'rgba(255,255,255,0)')
+    ctx.fillStyle=rg;ctx.fillRect(0,0,S,S)
+    // monograma B gigante em outline (marca-d'água)
+    ctx.save();ctx.globalAlpha=.10;ctx.font='italic 900 760px "Playfair Display", Georgia, serif'
+    ctx.fillStyle='#fff';ctx.fillText('B',S-430,S-60);ctx.restore()
+    // foto do produto em medalhão circular
+    if(comFoto&&img){
+      const R=235,cx=S/2,cy=330
+      ctx.save();ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.closePath()
+      ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=60;ctx.shadowOffsetY=18
+      ctx.fillStyle='#fff';ctx.fill();ctx.restore()
+      ctx.save();ctx.beginPath();ctx.arc(cx,cy,R-10,0,Math.PI*2);ctx.clip()
+      const m=Math.min(img.width,img.height),sx=(img.width-m)/2,sy=(img.height-m)/2
+      ctx.drawImage(img,sx,sy,m,m,cx-(R-10),cy-(R-10),(R-10)*2,(R-10)*2)
+      ctx.restore()
+      // anel champagne
+      ctx.beginPath();ctx.arc(cx,cy,R-4,0,Math.PI*2);ctx.lineWidth=7;ctx.strokeStyle='#e6b878';ctx.stroke()
+    }
+    const baseY=comFoto&&img?625:330
+    // marca do produto (kicker)
+    ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.75)'
+    ctx.font='700 32px Inter, sans-serif'
+    ctx.fillText((p.marca||'').toUpperCase().split('').join(String.fromCharCode(8202)),S/2,baseY)
+    // nome do produto (quebra em até 2 linhas)
+    ctx.fillStyle='#fff';ctx.font='900 70px "Playfair Display", Georgia, serif'
+    const palavras=(p.nome||'').split(' ');let l1='',l2=''
+    palavras.forEach(w=>{if(ctx.measureText(l1+' '+w).width<S-160&&!l2)l1=(l1+' '+w).trim();else l2=(l2+' '+w).trim()})
+    if(l2&&ctx.measureText(l2).width>S-160)l2=l2.slice(0,28)+'…'
+    ctx.fillText(l1,S/2,baseY+80)
+    if(l2)ctx.fillText(l2,S/2,baseY+160)
+    // preço em destaque champagne
+    ctx.fillStyle='#f4d9b0';ctx.font='900 104px "Playfair Display", Georgia, serif'
+    ctx.fillText(fmtMoeda(p.precoVenda),S/2,baseY+(l2?312:215))
+    // rodapé: loja + chamada
+    ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='800 36px Inter, sans-serif'
+    ctx.fillText(rev.nome||'BelaVenda',S/2,S-88)
+    ctx.fillStyle='rgba(255,255,255,.65)';ctx.font='600 27px Inter, sans-serif'
+    ctx.fillText('Peça pelo WhatsApp · entrega no mesmo dia',S/2,S-42)
+  }
+  desenhar(true)
+  try{
+    baixarCanvas(cv,'oferta-'+(p.nome||'produto').toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)+'.png')
+  }catch(e){
+    // canvas contaminado (URL externa sem CORS) → redesenha sem foto
+    img=null;ctx.clearRect(0,0,S,S);desenhar(false)
+    baixarCanvas(cv,'oferta-'+(p.nome||'produto').toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)+'.png')
+  }
+  bvToast('Arte pronta! Compartilhe no status do WhatsApp. ✨','success')
 }
 
 // ══════════════════════════════════════════════════════════

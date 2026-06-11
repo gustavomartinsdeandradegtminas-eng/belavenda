@@ -135,6 +135,15 @@
     return w.prodArt(key);
   };
 
+  // URL crua da imagem do produto (para canvas/divulgação); null se só houver arte SVG
+  w.prodImgUrl = function (imagem, categoria, seed) {
+    if (imagem && /^(https?:|data:)/.test(imagem)) return imagem;
+    var key = resolveKey(imagem, categoria);
+    var arr = PHOTO[key];
+    if (arr && arr.length) return photoUrl(arr[hashStr(seed != null ? seed : (imagem || key)) % arr.length]);
+    return null;
+  };
+
   // Avatar da revendedora: foto (se houver) ou iniciais — para preencher
   // um container redondo já estilizado (.loja-avatar, .store-avatar, etc.)
   w.revFoto = function (rev) {
