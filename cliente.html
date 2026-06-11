@@ -803,6 +803,27 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 .radio-opt input{accent-color:var(--rose)}
 .radio-opt span{font-size:.88rem;font-weight:600;color:var(--text2)}
 
+/* QUIZ DE BELEZA */
+.quiz-head{text-align:center;margin-bottom:16px}
+.quiz-mark{width:54px;height:54px;margin:0 auto 10px;border-radius:16px;background:var(--grad-primary);color:#fff;font-family:'Playfair Display',Georgia,serif;font-weight:900;font-size:1.7rem;display:grid;place-items:center;box-shadow:0 8px 22px rgba(194,24,91,.35)}
+.quiz-head h3{font-family:'Playfair Display',Georgia,serif;font-size:1.35rem;font-weight:800}
+.quiz-head p{font-size:.82rem;color:var(--muted);margin-top:4px}
+.quiz-prog{display:flex;gap:6px;justify-content:center;margin-top:14px}
+.quiz-prog i{width:26px;height:5px;border-radius:3px;background:var(--rose-l);transition:background .25s}
+.quiz-prog i.on{background:var(--rose)}
+.quiz-q{font-size:1.02rem;font-weight:800;margin-bottom:4px;text-align:center}
+.quiz-hint{font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:14px}
+.quiz-opts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.quiz-opts.col{flex-direction:column;flex-wrap:nowrap}
+.quiz-chip{padding:10px 18px;border-radius:22px;border:1.5px solid var(--border2);background:var(--surface);font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;color:var(--text2);font-family:inherit}
+.quiz-chip:hover{border-color:var(--rose);background:var(--rose-xl)}
+.quiz-chip.sel{border-color:var(--rose);background:var(--rose-l);color:var(--rose-d);font-weight:700}
+.quiz-cta{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--rose-xl),var(--rose-l));border:1.5px dashed var(--rose);border-radius:16px;padding:14px 16px;margin-bottom:18px;cursor:pointer;transition:box-shadow .25s}
+.quiz-cta:hover{box-shadow:0 10px 26px -12px rgba(194,24,91,.35)}
+.quiz-cta-mark{width:44px;height:44px;border-radius:13px;background:var(--grad-primary);color:#fff;font-family:'Playfair Display',Georgia,serif;font-weight:900;font-size:1.4rem;display:grid;place-items:center;flex-shrink:0}
+.quiz-cta-t{font-weight:800;font-size:.92rem}
+.quiz-cta-s{font-size:.78rem;color:var(--muted);margin-top:2px}
+
 /* ══════════════════════════════════════════════════════
    MODAIS GENÉRICOS
 ══════════════════════════════════════════════════════ */
@@ -1146,6 +1167,23 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   </div>
 </div>
 
+<!-- QUIZ DE PERFIL DE BELEZA -->
+<div class="modal-overlay" id="quiz-modal" onclick="fecharQuiz(event)">
+  <div class="modal" id="quiz-modal-box" style="max-width:460px">
+    <div class="quiz-head">
+      <div class="quiz-mark">B</div>
+      <h3>Quiz de Beleza</h3>
+      <p id="quiz-sub"> 5 perguntas rápidas para o Match te conhecer de verdade ✨</p>
+      <div class="quiz-prog" id="quiz-prog"></div>
+    </div>
+    <div id="quiz-body"></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="modal-btn-sec" id="quiz-back" onclick="quizVoltar()">Voltar</button>
+      <button class="modal-btn-primary" id="quiz-next" onclick="quizAvancar()">Próxima <svg class="ic"><use href="#ic-check"/></svg></button>
+    </div>
+  </div>
+</div>
+
 <script src="belavenda-api.js"></script>
 <script src="bv-art.js?v=7"></script>
 <script src="bv-notify.js"></script>
@@ -1271,7 +1309,7 @@ window.onload=function(){
     if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return
     const mt=document.getElementById('tab-match')
     if(!mt||mt.style.display==='none')return
-    if(['perfil-modal','prefs-modal','cep-modal','track-modal','av-modal'].some(id=>{const m=document.getElementById(id);return m&&m.classList.contains('open')}))return
+    if(['perfil-modal','prefs-modal','cep-modal','track-modal','av-modal','quiz-modal'].some(id=>{const m=document.getElementById(id);return m&&m.classList.contains('open')}))return
     if(document.activeElement&&/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName))return
     swipe(e.key==='ArrowLeft'?'left':'right')
   })
@@ -1457,6 +1495,7 @@ function renderPerfilBody(){
       <h4>${icon('sparkles')} Meu perfil de beleza</h4>
       <p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">Tipo de pele (ajuda nas recomendações):</p>
       <div class="pele-chips">${PELE_TIPOS.map(t=>`<button class="pele-chip${pele===t?' sel':''}" onclick="setPele('${t}')">${t}</button>`).join('')}</div>
+      <button class="btn-ver" style="margin-top:12px" onclick="fecharPerfil();abrirQuiz()">${icon('sparkles')} ${getPrefs().quizFeito?'Refazer quiz de beleza':'Fazer quiz de beleza'}</button>
     </div>
   `
 }
@@ -1481,8 +1520,8 @@ function avgRating(revId){const avs=getAvaliacoes(revId);return avs.length?avs.r
 // ═══════════════════════════════════════════════════════════
 
 // Opções de preferências
-const CATEGORIAS=['Maquiagem','Skincare','Perfumaria','Cabelo','Unhas','Corpo']
-const MARCAS=['Ruby Rose','Natura','Avon','Boticário','Mary Kay','L\'Oreal','MAC','NYX','Eudora']
+const CATEGORIAS=['Maquiagem','Skincare','Perfumaria','Cabelos','Unhas','Corpo','Proteção Solar']
+const MARCAS=['Ruby Rose','Natura','Avon','Boticário','Mary Kay','Vult','Dailus','Payot','Eudora']
 const PRECOS=[
   {v:'economico', label:icon('heart-green')+' Econômico',sub:'Produtos até R$50 em média'},
   {v:'medio',     label:icon('heart-yellow')+' Médio',    sub:'Entre R$50 e R$100 em média'},
@@ -1969,6 +2008,89 @@ function salvarPrefs(){
   renderMatch()
 }
 
+// ─── QUIZ DE PERFIL DE BELEZA ─────────────────────────────
+let quizStep=0, quizResp={}
+const QUIZ_PERGUNTAS=[
+  {id:'pele',q:'Como é a sua pele?',hint:'Isso ajuda a indicar os produtos certos',tipo:'single',
+    opts:()=>PELE_TIPOS.map(t=>({v:t,label:t}))},
+  {id:'preocupacao',q:'Qual é a sua maior preocupação de beleza?',hint:'Escolha a principal',tipo:'single',
+    opts:()=>[{v:'acne',label:'Acne e oleosidade'},{v:'manchas',label:'Manchas e sinais'},{v:'hidratacao',label:'Hidratação'},{v:'sol',label:'Proteção solar'},{v:'cabelos',label:'Cabelos'},{v:'nenhuma',label:'Nenhuma específica'}]},
+  {id:'categorias',q:'O que você mais ama comprar?',hint:'Pode escolher várias',tipo:'multi',
+    opts:()=>todasCategorias().map(c=>({v:c,label:c}))},
+  {id:'preco',q:'Qual faixa de preço combina com você?',hint:'',tipo:'radio',
+    opts:()=>PRECOS.map(p=>({v:p.v,label:p.label,sub:p.sub}))},
+  {id:'raio',q:'Até onde você iria por um achadinho?',hint:'Distância máxima das lojas',tipo:'single',
+    opts:()=>[{v:10,label:'Pertinho · até 10 km'},{v:50,label:'Na minha cidade · até 50 km'},{v:5000,label:'Tanto faz, mostra tudo!'}]},
+]
+function abrirQuiz(){
+  quizStep=0
+  const prefs=getPrefs(), s=getSession()||{}
+  quizResp={pele:prefs.pele||s.peleTipo||null,preocupacao:prefs.preocupacao||null,categorias:[...(prefs.categorias||[])],preco:prefs.preco||null,raio:prefs.raio||null}
+  renderQuizStep()
+  document.getElementById('quiz-modal').classList.add('open')
+}
+function fecharQuiz(e){
+  if(!e||e.target===document.getElementById('quiz-modal'))
+    document.getElementById('quiz-modal').classList.remove('open')
+}
+function renderQuizStep(){
+  const P=QUIZ_PERGUNTAS[quizStep]
+  document.getElementById('quiz-prog').innerHTML=QUIZ_PERGUNTAS.map((_,i)=>`<i class="${i<=quizStep?'on':''}"></i>`).join('')
+  const body=document.getElementById('quiz-body')
+  const sel=quizResp[P.id]
+  if(P.tipo==='radio'){
+    body.innerHTML=`<div class="quiz-q">${P.q}</div>${P.hint?`<div class="quiz-hint">${P.hint}</div>`:''}
+      <div class="quiz-opts col">${P.opts().map(o=>`
+        <label class="radio-opt${sel===o.v?' sel':''}" onclick="quizSel('${o.v}',this)">
+          <input type="radio" name="quiz-${P.id}"${sel===o.v?' checked':''}>
+          <div><div style="font-weight:700;font-size:.88rem">${o.label}</div>${o.sub?`<div style="font-size:.76rem;color:var(--muted)">${o.sub}</div>`:''}</div>
+        </label>`).join('')}</div>`
+  }else{
+    body.innerHTML=`<div class="quiz-q">${P.q}</div>${P.hint?`<div class="quiz-hint">${P.hint}</div>`:''}
+      <div class="quiz-opts">${P.opts().map(o=>{
+        const isSel=P.tipo==='multi'?(quizResp.categorias||[]).includes(o.v):String(sel)===String(o.v)
+        return`<button class="quiz-chip${isSel?' sel':''}" onclick="quizSel(${typeof o.v==='number'?o.v:`'${String(o.v).replace(/'/g,"\\'")}'`},this)">${o.label}</button>`
+      }).join('')}</div>`
+  }
+  document.getElementById('quiz-back').style.visibility=quizStep===0?'hidden':'visible'
+  document.getElementById('quiz-next').innerHTML=quizStep===QUIZ_PERGUNTAS.length-1?'Ver meu perfil ✨':'Próxima →'
+}
+function quizSel(v,el){
+  const P=QUIZ_PERGUNTAS[quizStep]
+  if(P.tipo==='multi'){
+    const arr=quizResp.categorias||[]
+    const i=arr.indexOf(v)
+    if(i>=0){arr.splice(i,1);el.classList.remove('sel')}
+    else{arr.push(v);el.classList.add('sel')}
+    quizResp.categorias=arr
+  }else{
+    quizResp[P.id]=v
+    renderQuizStep()
+  }
+}
+function quizVoltar(){if(quizStep>0){quizStep--;renderQuizStep()}}
+function quizAvancar(){
+  const P=QUIZ_PERGUNTAS[quizStep]
+  if(P.tipo!=='multi'&&(quizResp[P.id]==null)){bvToast('Escolha uma opção para continuar.','info');return}
+  if(quizStep<QUIZ_PERGUNTAS.length-1){quizStep++;renderQuizStep();return}
+  finalizarQuiz()
+}
+function finalizarQuiz(){
+  // mapeia preocupação → categorias que o Match já pontua
+  const extra={acne:['Skincare'],manchas:['Skincare'],hidratacao:['Skincare'],sol:['Proteção Solar'],cabelos:['Cabelos']}[quizResp.preocupacao]||[]
+  const cats=[...new Set([...(quizResp.categorias||[]),...extra])]
+  const prefs={...getPrefs(),categorias:cats,preco:quizResp.preco||'qualquer',raio:quizResp.raio||5000,
+    pele:quizResp.pele,preocupacao:quizResp.preocupacao,quizFeito:true}
+  savePrefs(prefs)
+  // compat: perfil ainda lê peleTipo da sessão
+  const s=getSession();if(s){setSession({...s,peleTipo:quizResp.pele})}
+  document.getElementById('quiz-modal').classList.remove('open')
+  passes=[];savePasses([]);matchDeck=[];matchIndex=0
+  renderMatch();renderInicio();filtrarLojas&&filtrarLojas()
+  if(window.bvConfetti)bvConfetti()
+  bvToast('Perfil de beleza salvo! Seu Match ficou mais esperto. 💄','success')
+}
+
 // ─── EXPLORAR ─────────────────────────────────────────────
 let raio=5000, buscaProd='', catFiltro='', marcaFiltro='', ordenar='dist', soAbertas=false
 
@@ -2193,6 +2315,46 @@ function renderFavoritas(){
 
 // ─── INÍCIO (FEED) ────────────────────────────────────────
 function saudacao(){const h=new Date().getHours();return h<12?'Bom dia':h<18?'Boa tarde':'Boa noite'}
+// ─── HORA DE REPOR (lembrete de recompra) ─────────────────
+// duração típica por nome (mais específico) com fallback por categoria
+const DURACAO_NOME=[[/batom|lip\b|gloss/i,120],[/base\b|founda/i,60],[/perfume|col[ôo]nia|body splash/i,90],[/protetor|fps/i,45],[/s[ée]rum|hidratante|creme|t[ôo]nico|micelar|gel de limpeza|água termal/i,50],[/shampoo|condicionador|capilar/i,45],[/esmalte/i,150]]
+const DURACAO_CAT={'Skincare':45,'Proteção Solar':45,'Maquiagem':60,'Perfumaria':90,'Cabelos':45,'Corpo':50,'Corpo e Banho':50,'Unhas':120,'Masculino':75}
+function duracaoDias(nome,cat){for(const par of DURACAO_NOME){if(par[0].test(nome||''))return par[1]}return DURACAO_CAT[cat]||60}
+function itensParaRepor(todos){
+  const vistos=new Set(),out=[]
+  // todos já vem ordenado por data desc → a 1ª ocorrência de cada produto é a compra mais recente
+  todos.filter(p=>p.status==='ENTREGUE').forEach(p=>{
+    const base=new Date(p.dataConclusao||p.dataCriacao).getTime()
+    if(!base)return
+    const prods=JSON.parse(localStorage.getItem('bv_produtos_'+p._rId)||'[]')
+    ;(p.itens||[]).forEach(it=>{
+      if(!it.produtoId||vistos.has(it.produtoId))return
+      vistos.add(it.produtoId)
+      const prod=prods.find(x=>x.id===it.produtoId)
+      const dur=duracaoDias(it.nome,prod?prod.categoria:'')
+      const dias=Math.floor((Date.now()-base)/86400000)
+      if(dias>=dur)out.push({it,dias,_rId:p._rId,_rSlug:p._rSlug,_rNome:p._rNome})
+    })
+  })
+  return out.slice(0,3)
+}
+function reporItem(produtoId,qty,revId,slug){
+  localStorage.setItem('bv_recompra_'+revId,JSON.stringify([{id:produtoId,qty:qty||1}]))
+  location.href='loja.html?slug='+slug+'&recompra=1'
+}
+function reporCardHTML(todos){
+  const reps=itensParaRepor(todos)
+  if(!reps.length)return''
+  return`<div class="inicio-sec">
+    <div class="inicio-sec-h"><h3>${icon('hourglass')} Está acabando?</h3></div>
+    ${reps.map(r=>`<div class="inicio-order">
+      <div class="io-ic" style="color:var(--rose)">${icon('droplet')}</div>
+      <div style="flex:1;min-width:0"><div class="io-loja">${r.it.nome}</div><div class="io-st">comprado há ${r.dias} dias · ${r._rNome}</div></div>
+      <button class="btn-track" onclick="reporItem('${r.it.produtoId}',${r.it.quantidade||1},'${r._rId}','${r._rSlug}')">${icon('arrows-rotate')} Repor</button>
+    </div>`).join('')}
+  </div>`
+}
+
 function renderInicio(){
   const el=document.getElementById('tab-inicio'); if(!el)return
   const s=getSession()||{}, temLoc=s.lat&&s.lng
@@ -2217,6 +2379,14 @@ function renderInicio(){
       ${!temLoc?`<button class="inicio-cep-btn" onclick="abrirModalCep()">${icon('mailbox')} Informar CEP</button>`:''}
     </div>
     ${fidelidadeCardHTML()}
+    ${!getPrefs().quizFeito?`<div class="quiz-cta" onclick="abrirQuiz()">
+      <div class="quiz-cta-mark">B</div>
+      <div style="flex:1;min-width:0">
+        <div class="quiz-cta-t">Quiz de Beleza · 1 minuto</div>
+        <div class="quiz-cta-s">Responda 5 perguntas e o Match passa a entender o seu estilo.</div>
+      </div>
+      <button class="btn-track" onclick="event.stopPropagation();abrirQuiz()">${icon('sparkles')} Fazer quiz</button>
+    </div>`:''}
     ${ativos.length?`<div class="inicio-sec">
       <div class="inicio-sec-h"><h3>${icon('motorcycle')} Em andamento</h3><a onclick="showTab('pedidos')">Ver pedidos</a></div>
       ${ativos.slice(0,3).map(p=>{const st=STAT[p.status]||STAT.NOVO;return`<div class="inicio-order" onclick="abrirRastreamento('${p.id}','${p._rId}')">
@@ -2225,6 +2395,7 @@ function renderInicio(){
         <button class="btn-track" onclick="event.stopPropagation();abrirRastreamento('${p.id}','${p._rId}')">${icon('route')} Rastrear</button>
       </div>`}).join('')}
     </div>`:''}
+    ${reporCardHTML(todos)}
     ${favs.length?`<div class="inicio-sec">
       <div class="inicio-sec-h"><h3>${icon('heart-filled')} Suas favoritas</h3><a onclick="showTab('favoritas')">Ver todas</a></div>
       <div class="inicio-chips">${favs.slice(0,10).map(r=>`<div class="fav-chip" onclick="location.href='loja.html?slug=${r.slugLoja}'" title="${r.nome}"><div class="fav-chip-av">${revFoto(r)}</div><span>${r.nome.split(' ')[0]}</span></div>`).join('')}</div>
