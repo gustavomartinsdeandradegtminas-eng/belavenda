@@ -157,7 +157,7 @@
       '[data-theme=dark] .modal-overlay .modal{background:rgba(32,16,27,.86);border-color:rgba(244,143,177,.15);box-shadow:0 24px 70px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06)}' +
     '}' +
     // respeita preferência de menos movimento
-    '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}.marquee-track{animation:none!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}';
+    '@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.reveal{opacity:1!important;transform:none!important}.marquee-track{animation:none!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}';
 
   var st = d.createElement('style');
   st.id = 'bv-theme-css';
@@ -204,14 +204,19 @@
       var y = r ? r.top + r.height / 2 : w.innerHeight - 40;
       var endR = Math.hypot(Math.max(x, w.innerWidth - x), Math.max(y, w.innerHeight - y));
       d.documentElement.classList.add('bv-theming');
-      var vt = d.startViewTransition(done);
-      vt.ready.then(function () {
-        d.documentElement.animate(
-          { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + endR + 'px at ' + x + 'px ' + y + 'px)'] },
-          { duration: 520, easing: 'cubic-bezier(.2,.7,.3,1)', pseudoElement: '::view-transition-new(root)' }
-        );
-      }).catch(function () {});
-      vt.finished.finally(function () { d.documentElement.classList.remove('bv-theming'); });
+      try {
+        var vt = d.startViewTransition(done);
+        vt.ready.then(function () {
+          d.documentElement.animate(
+            { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + endR + 'px at ' + x + 'px ' + y + 'px)'] },
+            { duration: 520, easing: 'cubic-bezier(.2,.7,.3,1)', pseudoElement: '::view-transition-new(root)' }
+          );
+        }).catch(function () {});
+        vt.finished.finally(function () { d.documentElement.classList.remove('bv-theming'); });
+      } catch (e) {
+        d.documentElement.classList.remove('bv-theming');
+        done();
+      }
     } else done();
   };
   function mount() {
