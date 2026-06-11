@@ -54,6 +54,10 @@
 }
 
 body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);min-height:100vh;color:var(--text)}
+/* Fundo vivo: brilhos de luz da marca que respiram lentamente atrás do app */
+body::before{content:'';position:fixed;top:18%;right:-160px;width:540px;height:540px;border-radius:50%;background:radial-gradient(circle,rgba(233,30,140,.09),transparent 68%);pointer-events:none;z-index:-1;animation:bv-drift 28s ease-in-out infinite alternate}
+body::after{content:'';position:fixed;bottom:-200px;left:-140px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,106,.08),transparent 68%);pointer-events:none;z-index:-1;animation:bv-drift 34s ease-in-out infinite alternate-reverse}
+@keyframes bv-drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-42px,28px) scale(1.12)}}
 
 /* ── SCROLLBAR ──────────────────────────────────────── */
 ::-webkit-scrollbar{width:5px;height:5px}
@@ -1355,7 +1359,7 @@ function showTab(t){
   if(t==='inicio')renderInicio()
   if(t==='favoritas')renderFavoritas()
   if(t==='explorar')renderExplorar()
-  if(window.bvAnimate)bvAnimate(document.getElementById('tab-'+t))
+  if(window.bvAnimate)bvAnimate(document.getElementById('tab-'+t),t!=='match')
   window.scrollTo(0,0)
 }
 

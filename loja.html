@@ -36,8 +36,9 @@
   --grad:linear-gradient(135deg,#880e4f 0%,#c2185b 55%,#e91e8c 100%);
 }
 body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);min-height:100vh;position:relative}
-body::before{content:'';position:fixed;top:30%;right:-140px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(233,30,140,.10),transparent 68%);pointer-events:none;z-index:0}
-body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.07),transparent 68%);pointer-events:none;z-index:0}
+body::before{content:'';position:fixed;top:30%;right:-140px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(233,30,140,.10),transparent 68%);pointer-events:none;z-index:0;animation:bv-drift 26s ease-in-out infinite alternate}
+body::after{content:'';position:fixed;bottom:-180px;left:-120px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.07),transparent 68%);pointer-events:none;z-index:0;animation:bv-drift 32s ease-in-out infinite alternate-reverse}
+@keyframes bv-drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-40px,30px) scale(1.12)}}
 .store-header,.cart-bar,.main-inner,.reviews-section{position:relative;z-index:1}
 .bv-display,.logo,h1,h2,.store-info h1,.store-brand.bv-logo,.boleto-logo{font-family:'Playfair Display',Georgia,serif}
 
@@ -164,9 +165,11 @@ body.has-dock #bv-theme-btn{bottom:86px}
 .rf-grid{display:flex;gap:10px;flex-wrap:wrap}
 .rf-thumb{width:84px;height:84px;object-fit:cover;border-radius:12px;cursor:pointer;border:1px solid var(--border);transition:transform .2s,box-shadow .2s}
 .rf-thumb:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.18)}
-#bv-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
-#bv-lightbox.open{display:flex}
-#bv-lightbox img{max-width:92vw;max-height:88vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#bv-lightbox{position:fixed;inset:0;background:rgba(20,4,14,.82);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);z-index:9999;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+#bv-lightbox.open{display:flex;animation:lbFade .25s ease both}
+#bv-lightbox img{max-width:92vw;max-height:88vh;border-radius:16px;box-shadow:0 30px 90px rgba(0,0,0,.6);animation:lbPop .42s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes lbFade{from{opacity:0}}
+@keyframes lbPop{from{transform:scale(.82) translateY(14px);opacity:0}}
 
 /* CART DRAWER */
 .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;visibility:hidden;transition:all .3s}
@@ -668,7 +671,7 @@ function renderProdCards(){
             ?`<button class="add-btn" disabled style="opacity:.4;cursor:not-allowed;width:100%">Loja fechada</button>`
             :qty>0
               ?`<div class="qty-ctrl"><button onclick="decQty('${p.id}')">−</button><span>${qty}</span><button onclick="incQty('${p.id}')" ${noMax?'disabled style="opacity:.35;cursor:not-allowed"':''}>+</button></div>${noMax?`<span class="qty-max-badge">máx</span>`:''}`
-              :`<button class="add-btn" onclick="addToCart('${p.id}')">Adicionar</button>`
+              :`<button class="add-btn" onclick="addToCart('${p.id}',event)">Adicionar</button>`
           }
         </div>
       </div>
@@ -680,7 +683,44 @@ function setBusca(q){buscaQ=q.toLowerCase();reRenderGrid()}
 
 // ─── CART ─────────────────────────────────────────────────
 function stockOf(id){const p=produtos.find(x=>x.id===id);return (p&&p.estoque!=null)?p.estoque:Infinity}
-function addToCart(id){if((cart[id]||0)>=stockOf(id)){bvToast('Estoque máximo atingido.','info');return}cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge();const p=produtos.find(x=>x.id===id);if(window.bvToast)bvToast((p?p.nome:'Item')+' adicionado ao carrinho','success')}
+// Fly-to-cart: a foto do produto voa em arco até o carrinho
+function flyToCart(srcBtn){
+  try{
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return
+    const card=srcBtn&&srcBtn.closest?srcBtn.closest('.prod-card'):null
+    const img=card?card.querySelector('.prod-img img'):null
+    let alvo=document.getElementById('cart-dock')
+    if(!alvo||!alvo.offsetParent)alvo=document.querySelector('.cart-btn')
+    if(!img||!alvo)return
+    const a=img.getBoundingClientRect(), b=alvo.getBoundingClientRect()
+    if(!a.width||!b.width)return
+    const S=Math.min(84,a.width)
+    const ghost=document.createElement('img')
+    ghost.src=img.currentSrc||img.src
+    ghost.style.cssText='position:fixed;left:'+(a.left+a.width/2-S/2)+'px;top:'+(a.top+a.height/2-S/2)+'px;width:'+S+'px;height:'+S+'px;object-fit:cover;border-radius:14px;z-index:9998;pointer-events:none;box-shadow:0 10px 30px rgba(136,14,79,.45)'
+    document.body.appendChild(ghost)
+    const dx=(b.left+b.width/2)-(a.left+a.width/2), dy=(b.top+b.height/2)-(a.top+a.height/2)
+    const anim=ghost.animate([
+      {transform:'translate(0,0) scale(1)',opacity:1},
+      {transform:'translate('+(dx*.5)+'px,'+(dy*.5-90)+'px) scale(.55)',opacity:.95,offset:.55},
+      {transform:'translate('+dx+'px,'+dy+'px) scale(.12)',opacity:.25}
+    ],{duration:620,easing:'cubic-bezier(.3,.6,.35,1)'})
+    anim.onfinish=()=>{
+      ghost.remove()
+      // pulso no alvo ao "receber" o item
+      try{alvo.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:260,easing:'ease-out'})}catch(e){}
+    }
+    setTimeout(()=>ghost.remove(),900)
+  }catch(e){}
+}
+function addToCart(id,ev){
+  if((cart[id]||0)>=stockOf(id)){bvToast('Estoque máximo atingido.','info');return}
+  const srcBtn=ev&&(ev.currentTarget||ev.target)
+  flyToCart(srcBtn)
+  cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge()
+  const p=produtos.find(x=>x.id===id)
+  if(window.bvToast)bvToast((p?p.nome:'Item')+' adicionado ao carrinho','success')
+}
 function incQty(id){if((cart[id]||0)>=stockOf(id))return;cart[id]=(cart[id]||0)+1;reRenderGrid();updateCartBadge();renderCartItems()}
 function decQty(id){cart[id]=(cart[id]||1)-1;if(cart[id]<=0)delete cart[id];reRenderGrid();updateCartBadge();renderCartItems()}
 function removeFromCart(id){delete cart[id];reRenderGrid();updateCartBadge();renderCartItems()}
@@ -758,6 +798,7 @@ function renderStep(){
   if(chStep===1) renderStep1()
   else if(chStep===2) renderStep2()
   else if(chStep===3) renderStep3()
+  if(window.bvAnimate)bvAnimate(document.getElementById('modal-body'))
 }
 
 // ─── STEP 1: DADOS ────────────────────────────────────────

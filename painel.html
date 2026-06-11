@@ -585,7 +585,7 @@ function navigate(section){
   const renderers={dashboard:renderDashboard,pedidos:renderPedidos,clientes:renderClientes,produtos:renderProdutos,entregas:renderEntregas,relatorios:renderRelatorios,calculadora:renderCalculadora,avaliacoes:renderAvaliacoes,perfilLoja:renderPerfilLoja,promocoes:renderPromocoes}
   if(renderers[section])renderers[section]()
   atualizarBadgesSidebar()
-  if(window.bvAnimate)bvAnimate(document.getElementById('content'))
+  if(window.bvAnimate)bvAnimate(document.getElementById('content'),true)
   if(section==='dashboard')setTimeout(checkMetaCelebration,350)
   if(window.innerWidth<900)document.getElementById('sidebar').classList.remove('open')
 }
@@ -648,25 +648,25 @@ function renderDashboard(){
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-label">Vendas no período</div>
-        <div class="kpi-value">${fmtMoeda(filtro.vendas)}</div>
+        <div class="kpi-value" data-cnt="${filtro.vendas}" data-cfmt="moeda">${fmtMoeda(filtro.vendas)}</div>
         <div class="kpi-sub">${filtro.qtdPedidos} pedido(s) entregue(s)</div>
         <div class="kpi-icon">${icon('money-bag','ic-xl')}</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Lucro estimado</div>
-        <div class="kpi-value" style="color:var(--success)">${fmtMoeda(filtro.lucro)}</div>
+        <div class="kpi-value" style="color:var(--success)" data-cnt="${filtro.lucro}" data-cfmt="moeda">${fmtMoeda(filtro.lucro)}</div>
         <div class="kpi-sub">Margem média: ${filtro.margem}%</div>
         <div class="kpi-icon">${icon('trending-up','ic-xl')}</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Clientes ativas</div>
-        <div class="kpi-value">${filtro.clientesAtivas}</div>
+        <div class="kpi-value" data-cnt="${filtro.clientesAtivas}">${filtro.clientesAtivas}</div>
         <div class="kpi-sub">Nos últimos 90 dias</div>
         <div class="kpi-icon">${icon('users','ic-xl')}</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Produtos no catálogo</div>
-        <div class="kpi-value">${DB.getProdos().filter(p=>p.visivelCatalogo).length}</div>
+        <div class="kpi-value" data-cnt="${DB.getProdos().filter(p=>p.visivelCatalogo).length}">${DB.getProdos().filter(p=>p.visivelCatalogo).length}</div>
         <div class="kpi-sub">de ${DB.getProdos().length} produtos cadastrados</div>
         <div class="kpi-icon">${icon('shopping-bag','ic-xl')}</div>
       </div>
@@ -752,6 +752,24 @@ function renderDashboard(){
       })()}
     </div>
   `
+  animarKPIs(content)
+}
+// contagem animada dos KPIs (valor final direto com prefers-reduced-motion)
+function animarKPIs(root){
+  try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return}catch(e){return}
+  root.querySelectorAll('[data-cnt]').forEach(el=>{
+    const alvo=parseFloat(el.dataset.cnt)||0
+    if(alvo<=0)return
+    const fmt=el.dataset.cfmt==='moeda'?fmtMoeda:(v=>String(Math.round(v)))
+    const dur=850;let t0=null
+    function fr(ts){
+      if(!t0)t0=ts
+      const p=Math.min(1,(ts-t0)/dur), e=1-Math.pow(1-p,3)
+      el.textContent=fmt(alvo*e)
+      if(p<1)requestAnimationFrame(fr);else el.textContent=fmt(alvo)
+    }
+    requestAnimationFrame(fr)
+  })
 }
 function setDashPeriodo(v){dashPeriodo=v;renderDashboard()}
 // ─── META DE VENDAS + GRÁFICO ─────────────────────────────

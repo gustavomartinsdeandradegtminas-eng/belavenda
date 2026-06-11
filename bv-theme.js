@@ -114,6 +114,15 @@
     '::view-transition-new(root){animation:bv-vt-in .42s cubic-bezier(.2,.7,.3,1) both}' +
     '@keyframes bv-vt-out{to{opacity:0;transform:translateY(-10px)}}' +
     '@keyframes bv-vt-in{from{opacity:0;transform:translateY(12px)}}' +
+    // troca de tema: revelação circular (o JS anima o clip-path do snapshot novo)
+    'html.bv-theming::view-transition-old(root),html.bv-theming::view-transition-new(root){animation:none;mix-blend-mode:normal;display:block}' +
+    'html.bv-theming::view-transition-image-pair(root){isolation:auto}' +
+    // entradas escalonadas: filhos do container surgem em cascata (opt-in via bvAnimate(el,true))
+    '.bv-stagger>*{animation:bv-fade-up .4s cubic-bezier(.2,.7,.3,1) backwards}' +
+    '.bv-stagger>*:nth-child(2){animation-delay:.05s}.bv-stagger>*:nth-child(3){animation-delay:.1s}' +
+    '.bv-stagger>*:nth-child(4){animation-delay:.15s}.bv-stagger>*:nth-child(5){animation-delay:.2s}' +
+    '.bv-stagger>*:nth-child(6){animation-delay:.25s}.bv-stagger>*:nth-child(7){animation-delay:.3s}' +
+    '.bv-stagger>*:nth-child(n+8){animation-delay:.34s}' +
     // ── Couture Rosé · acabamento fino global ──
     // seleção de texto na cor da marca
     '::selection{background:rgba(233,30,140,.22);color:inherit;text-shadow:none}' +
@@ -155,8 +164,16 @@
   st.textContent = css;
   (d.head || d.documentElement).appendChild(st);
 
-  // re-dispara a animação de entrada num elemento (troca de aba/seção)
-  w.bvAnimate = function (el) { if (!el) return; el.classList.remove('bv-anim'); void el.offsetWidth; el.classList.add('bv-anim'); };
+  // re-dispara a animação de entrada num elemento (troca de aba/seção).
+  // stagger=true: filhos diretos surgem em cascata (não usar em containers
+  // cujos filhos dependem de transform posicional, ex. deck do Match).
+  w.bvAnimate = function (el, stagger) {
+    if (!el) return;
+    el.classList.remove('bv-anim'); el.classList.remove('bv-stagger');
+    void el.offsetWidth;
+    el.classList.add('bv-anim');
+    if (stagger) el.classList.add('bv-stagger');
+  };
 
   // 3) Botão flutuante
   var MOON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
@@ -172,9 +189,30 @@
   }
   w.bvToggleTheme = function () {
     var t = cur() === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem(KEY, t); } catch (e) {}
-    apply(t);
-    refresh();
+    var done = function () {
+      try { localStorage.setItem(KEY, t); } catch (e) {}
+      apply(t);
+      refresh();
+    };
+    var calm = false;
+    try { calm = w.matchMedia('(prefers-reduced-motion:reduce)').matches; } catch (e) {}
+    // Revelação circular: o novo tema "nasce" do botão e toma a tela (View Transition)
+    if (!calm && d.startViewTransition) {
+      var b = d.getElementById('bv-theme-btn');
+      var r = b ? b.getBoundingClientRect() : null;
+      var x = r ? r.left + r.width / 2 : w.innerWidth - 40;
+      var y = r ? r.top + r.height / 2 : w.innerHeight - 40;
+      var endR = Math.hypot(Math.max(x, w.innerWidth - x), Math.max(y, w.innerHeight - y));
+      d.documentElement.classList.add('bv-theming');
+      var vt = d.startViewTransition(done);
+      vt.ready.then(function () {
+        d.documentElement.animate(
+          { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + endR + 'px at ' + x + 'px ' + y + 'px)'] },
+          { duration: 520, easing: 'cubic-bezier(.2,.7,.3,1)', pseudoElement: '::view-transition-new(root)' }
+        );
+      }).catch(function () {});
+      vt.finished.finally(function () { d.documentElement.classList.remove('bv-theming'); });
+    } else done();
   };
   function mount() {
     if (d.getElementById('bv-theme-btn')) return;
