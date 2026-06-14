@@ -164,7 +164,7 @@
     // badges em gradiente: glint branco
     '.sidebar-logo-mark::after,.tb-mark::after,.quiz-mark::after,.quiz-cta-mark::after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent)}' +
     // badges brancos: glint dourado (champagne)
-    '.auth-mark::after,.brand-mark::after{background:linear-gradient(100deg,transparent,rgba(233,30,140,.45),transparent)}' +
+    '.auth-mark::after,.brand-mark::after{background:linear-gradient(100deg,transparent,rgba(230,184,120,.55),transparent)}' +
     '@keyframes bv-mono-sheen{0%,72%{left:-130%}100%{left:170%}}' +
     // elevação tingida na marca + halo ao passar o mouse nos cards de vitrine
     '.feat-card,.vit-card,.loja-card,.prod-card{position:relative;transition:box-shadow .38s ease,transform .35s cubic-bezier(.2,.7,.3,1),border-color .3s ease}' +
