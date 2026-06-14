@@ -166,6 +166,16 @@
     // badges brancos: glint dourado (champagne)
     '.auth-mark::after,.brand-mark::after{background:linear-gradient(100deg,transparent,rgba(230,184,120,.55),transparent)}' +
     '@keyframes bv-mono-sheen{0%,72%{left:-130%}100%{left:170%}}' +
+    // ── Nome "reVENDE.aí" com degradê fluido rosa→dourado→magenta (igual ao "pertinho de você") ──
+    // .bv-name = fundos claros · .bv-name-d = fundos escuros/plum (tons mais claros p/ contraste)
+    '.bv-name,.bv-name-d{background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:bv-name-shimmer 6.5s linear infinite}' +
+    '.bv-name{background-image:linear-gradient(100deg,#c2185b 0%,#e0a96b 30%,#e91e8c 55%,#c2185b 100%)}' +
+    '.bv-name-d{background-image:linear-gradient(100deg,#f9a8d4 0%,#f0cf94 30%,#ff8fcf 55%,#f9a8d4 100%)}' +
+    '[data-theme=dark] .bv-name{background-image:linear-gradient(100deg,#f9a8d4 0%,#f0cf94 30%,#ff8fcf 55%,#f9a8d4 100%)}' +
+    // filhos (reVENDE / .aí) ficam transparentes p/ o degradê do container fluir por cima de tudo
+    '.bv-name *,.bv-name-d *{-webkit-text-fill-color:transparent!important;color:transparent!important;background:none!important}' +
+    '.bv-name .ai,.bv-name-d .ai{animation:none}' +
+    '@keyframes bv-name-shimmer{to{background-position:200% center}}' +
     // elevação tingida na marca + halo ao passar o mouse nos cards de vitrine
     '.feat-card,.vit-card,.loja-card,.prod-card{position:relative;transition:box-shadow .38s ease,transform .35s cubic-bezier(.2,.7,.3,1),border-color .3s ease}' +
     // Lustre Líquido: verniz radial que segue o cursor dentro do card (compõe com o tilt)
