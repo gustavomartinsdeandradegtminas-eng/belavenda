@@ -168,14 +168,15 @@
     '@keyframes bv-mono-sheen{0%,72%{left:-130%}100%{left:170%}}' +
     // ── Nome "reVENDE.aí" com degradê fluido rosa→dourado→magenta (igual ao "pertinho de você") ──
     // .bv-name = fundos claros · .bv-name-d = fundos escuros/plum (tons mais claros p/ contraste)
-    '.bv-name,.bv-name-d{background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:bv-name-shimmer 6.5s linear infinite}' +
-    '.bv-name{background-image:linear-gradient(100deg,#c2185b 0%,#e0a96b 30%,#e91e8c 55%,#c2185b 100%)}' +
-    '.bv-name-d{background-image:linear-gradient(100deg,#f9a8d4 0%,#f0cf94 30%,#ff8fcf 55%,#f9a8d4 100%)}' +
-    '[data-theme=dark] .bv-name{background-image:linear-gradient(100deg,#f9a8d4 0%,#f0cf94 30%,#ff8fcf 55%,#f9a8d4 100%)}' +
+    // gradiente simétrico que desliza continuamente da esquerda p/ direita (sem pulso)
+    '.bv-name,.bv-name-d{background-size:200% 100%;background-repeat:repeat;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:bv-name-slide 7s linear infinite}' +
+    '.bv-name{background-image:linear-gradient(90deg,#c2185b 0%,#e0a96b 25%,#e91e8c 50%,#e0a96b 75%,#c2185b 100%)}' +
+    '.bv-name-d{background-image:linear-gradient(90deg,#f9a8d4 0%,#f6dca8 25%,#ff8fcf 50%,#f6dca8 75%,#f9a8d4 100%)}' +
+    '[data-theme=dark] .bv-name{background-image:linear-gradient(90deg,#f9a8d4 0%,#f6dca8 25%,#ff8fcf 50%,#f6dca8 75%,#f9a8d4 100%)}' +
     // filhos (reVENDE / .aí) ficam transparentes p/ o degradê do container fluir por cima de tudo
     '.bv-name *,.bv-name-d *{-webkit-text-fill-color:transparent!important;color:transparent!important;background:none!important}' +
     '.bv-name .ai,.bv-name-d .ai{animation:none}' +
-    '@keyframes bv-name-shimmer{to{background-position:200% center}}' +
+    '@keyframes bv-name-slide{from{background-position:0% 50%}to{background-position:200% 50%}}' +
     // elevação tingida na marca + halo ao passar o mouse nos cards de vitrine
     '.feat-card,.vit-card,.loja-card,.prod-card{position:relative;transition:box-shadow .38s ease,transform .35s cubic-bezier(.2,.7,.3,1),border-color .3s ease}' +
     // Lustre Líquido: verniz radial que segue o cursor dentro do card (compõe com o tilt)
