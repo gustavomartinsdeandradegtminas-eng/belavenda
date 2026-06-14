@@ -150,6 +150,22 @@
     '.btn-primary::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;z-index:-1;background:linear-gradient(100deg,transparent,rgba(255,255,255,.38),transparent);transform:skewX(-18deg);opacity:0}' +
     '.btn-primary:hover::after{opacity:1;animation:bv-sheen .85s cubic-bezier(.4,0,.2,1)}' +
     '@keyframes bv-sheen{from{left:-70%}to{left:140%}}' +
+    // ── Logo "reVENDE.aí": acento dourado vivo + lustre no monograma ──
+    // o ".aí" pulsa um brilho dourado (usa a própria cor de cada contexto)
+    '.ai{animation:bv-ai-glow 4.6s ease-in-out infinite}' +
+    '@keyframes bv-ai-glow{0%,100%{filter:brightness(1) drop-shadow(0 0 0 transparent)}50%{filter:brightness(1.24) drop-shadow(0 0 7px currentColor)}}' +
+    // logo clicável (nav): realce sutil no hover
+    '.nav-logo{transition:transform .25s cubic-bezier(.2,.7,.3,1)}' +
+    '.nav-logo:hover{transform:scale(1.04)}' +
+    '.nav-logo:hover .ai{filter:brightness(1.4) drop-shadow(0 0 10px currentColor)}' +
+    // monograma "r": lustre diagonal periódico (joia pegando luz)
+    '.auth-mark,.brand-mark,.sidebar-logo-mark,.tb-mark,.quiz-mark,.quiz-cta-mark{position:relative;overflow:hidden}' +
+    '.auth-mark::after,.brand-mark::after,.sidebar-logo-mark::after,.tb-mark::after,.quiz-mark::after,.quiz-cta-mark::after{content:"";position:absolute;top:0;left:-130%;width:55%;height:100%;transform:skewX(-20deg);pointer-events:none;animation:bv-mono-sheen 5.5s ease-in-out infinite}' +
+    // badges em gradiente: glint branco
+    '.sidebar-logo-mark::after,.tb-mark::after,.quiz-mark::after,.quiz-cta-mark::after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent)}' +
+    // badges brancos: glint dourado (champagne)
+    '.auth-mark::after,.brand-mark::after{background:linear-gradient(100deg,transparent,rgba(201,168,106,.5),transparent)}' +
+    '@keyframes bv-mono-sheen{0%,72%{left:-130%}100%{left:170%}}' +
     // elevação tingida na marca + halo ao passar o mouse nos cards de vitrine
     '.feat-card,.vit-card,.loja-card,.prod-card{position:relative;transition:box-shadow .38s ease,transform .35s cubic-bezier(.2,.7,.3,1),border-color .3s ease}' +
     // Lustre Líquido: verniz radial que segue o cursor dentro do card (compõe com o tilt)
