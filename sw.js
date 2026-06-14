@@ -1,12 +1,12 @@
 /**
- * BelaVenda — Service Worker (PWA)
+ * reVENDE.aí — Service Worker (PWA)
  * ─────────────────────────────────────────────────────────
  * Estratégia: NETWORK-FIRST. Sempre tenta a rede (para nunca servir
  * versão velha quando online) e, se falhar (offline), usa o cache.
  * Recursos de outros domínios (Google Fonts, fotos Pexels) NÃO são
  * interceptados — o navegador cuida deles normalmente.
  */
-const CACHE = 'belavenda-v4';
+const CACHE = 'revende-v5';
 const CORE = [
   './', './index.html', './loja.html', './cliente.html', './painel.html', './login.html',
   './bv-theme.js', './bv-toast.js', './bv-notify.js', './bv-icons.js', './bv-seed.js', './belavenda-api.js',

@@ -1,5 +1,5 @@
 /**
- * BelaVenda — Sistema de ícones compartilhado (bv-icons.js)
+ * reVENDE.aí — Sistema de ícones compartilhado (bv-icons.js)
  * ─────────────────────────────────────────────────────────
  * Injeta o sprite SVG (symbols), o CSS .ic, a fonte Playfair Display
  * e expõe um helper global icon(name, cls).

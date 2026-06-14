@@ -1,6 +1,6 @@
 {
-  "name": "BelaVenda — Beleza perto de você",
-  "short_name": "BelaVenda",
+  "name": "reVENDE.aí — Beleza perto de você",
+  "short_name": "reVENDE.aí",
   "description": "Marketplace que conecta revendedoras de cosméticos a clientes próximos. Descubra lojas perto de você e receba por motoboy.",
   "start_url": "./index.html",
   "scope": "./",

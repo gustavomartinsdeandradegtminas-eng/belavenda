@@ -1,5 +1,5 @@
 /**
- * BelaVenda — Dados de demonstração (bv-seed.js)
+ * reVENDE.aí — Dados de demonstração (bv-seed.js)
  * ─────────────────────────────────────────────────────────
  * Popula o localStorage com revendedoras, produtos e avaliações de exemplo,
  * para o grupo ver a plataforma "cheia". As imagens dos produtos usam as
@@ -12,7 +12,7 @@
 ;(function () {
   'use strict';
   try {
-    var SEED_VERSION = '4';
+    var SEED_VERSION = '5';
     if (localStorage.getItem('bv_demo_seeded') === SEED_VERSION) return;
 
     // IDs das revendedoras de demonstração (não mexemos em contas reais)
@@ -37,18 +37,18 @@
 
     var revs = [
       // ── São Paulo (capital) — várias revendedoras ──
-      R('r1',  'camila-beauty',     'Camila Beauty',            'camila@belavenda.app',   '5511987650001', '04101000', 'São Paulo', 'SP', -23.5893, -46.6345, true),
-      R('r2',  'espaco-renata',      'Espaço Renata Cosméticos', 'renata@belavenda.app',   '5511987650002', '05422000', 'São Paulo', 'SP', -23.5670, -46.7020, true),
-      R('r7',  'glamour-paula',      'Glamour by Paula',         'paula@belavenda.app',    '5511987650007', '04077000', 'São Paulo', 'SP', -23.6000, -46.6650, true),
-      R('r8',  'essencia-carla',     'Essência Carla',           'carla@belavenda.app',    '5511987650008', '03309000', 'São Paulo', 'SP', -23.5400, -46.5760, true),
-      R('r9',  'pele-viva-aline',    'Pele Viva by Aline',       'alinesp@belavenda.app',  '5511987650009', '02401000', 'São Paulo', 'SP', -23.5020, -46.6250, true),
-      R('r10', 'studio-make-bruna',  'Studio Make Bruna',        'bruna@belavenda.app',    '5511987650010', '04534000', 'São Paulo', 'SP', -23.5850, -46.6770, true),
-      R('r11', 'doce-beleza-leticia','Doce Beleza Letícia',      'leticia@belavenda.app',  '5511987650011', '05014000', 'São Paulo', 'SP', -23.5370, -46.6770, false),
+      R('r1',  'camila-beauty',     'Camila Beauty',            'camila@revende.app',   '5511987650001', '04101000', 'São Paulo', 'SP', -23.5893, -46.6345, true),
+      R('r2',  'espaco-renata',      'Espaço Renata Cosméticos', 'renata@revende.app',   '5511987650002', '05422000', 'São Paulo', 'SP', -23.5670, -46.7020, true),
+      R('r7',  'glamour-paula',      'Glamour by Paula',         'paula@revende.app',    '5511987650007', '04077000', 'São Paulo', 'SP', -23.6000, -46.6650, true),
+      R('r8',  'essencia-carla',     'Essência Carla',           'carla@revende.app',    '5511987650008', '03309000', 'São Paulo', 'SP', -23.5400, -46.5760, true),
+      R('r9',  'pele-viva-aline',    'Pele Viva by Aline',       'alinesp@revende.app',  '5511987650009', '02401000', 'São Paulo', 'SP', -23.5020, -46.6250, true),
+      R('r10', 'studio-make-bruna',  'Studio Make Bruna',        'bruna@revende.app',    '5511987650010', '04534000', 'São Paulo', 'SP', -23.5850, -46.6770, true),
+      R('r11', 'doce-beleza-leticia','Doce Beleza Letícia',      'leticia@revende.app',  '5511987650011', '05014000', 'São Paulo', 'SP', -23.5370, -46.6770, false),
       // ── Outras capitais ──
-      R('r3',  'julia-make-skin',    'Júlia Make & Skin',        'julia@belavenda.app',    '5521987650003', '22070000', 'Rio de Janeiro', 'RJ', -22.9710, -43.1820, true),
-      R('r4',  'boutique-aline',     'Boutique Aline',           'aline@belavenda.app',    '5541987650004', '80420000', 'Curitiba',       'PR', -25.4410, -49.2880, true),
-      R('r5',  'studio-bella-pele',  'Studio Bella Pele',        'bella@belavenda.app',    '5531987650005', '30112000', 'Belo Horizonte', 'MG', -19.9390, -43.9330, true),
-      R('r6',  'renascer-cosmeticos','Renascer Cosméticos',      'renascer@belavenda.app', '5551987650006', '90450000', 'Porto Alegre',   'RS', -30.0240, -51.2030, false)
+      R('r3',  'julia-make-skin',    'Júlia Make & Skin',        'julia@revende.app',    '5521987650003', '22070000', 'Rio de Janeiro', 'RJ', -22.9710, -43.1820, true),
+      R('r4',  'boutique-aline',     'Boutique Aline',           'aline@revende.app',    '5541987650004', '80420000', 'Curitiba',       'PR', -25.4410, -49.2880, true),
+      R('r5',  'studio-bella-pele',  'Studio Bella Pele',        'bella@revende.app',    '5531987650005', '30112000', 'Belo Horizonte', 'MG', -19.9390, -43.9330, true),
+      R('r6',  'renascer-cosmeticos','Renascer Cosméticos',      'renascer@revende.app', '5551987650006', '90450000', 'Porto Alegre',   'RS', -30.0240, -51.2030, false)
     ];
     // Fotos de perfil (retratos genéricos do Pexels, sem marcas)
     var FOTOS = [3769136, 1104758, 5905902, 8727399, 6634221, 3769021];

@@ -1,5 +1,5 @@
 /**
- * BelaVenda — Toasts + diálogos elegantes (bv-toast.js)
+ * reVENDE.aí — Toasts + diálogos elegantes (bv-toast.js)
  * ─────────────────────────────────────────────────────────
  * Substitui alert()/confirm()/prompt() nativos por componentes próprios,
  * coerentes com a identidade e o modo escuro (usa variáveis de tema).

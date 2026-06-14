@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BelaVenda – Catálogo</title>
-<meta name="description" content="Catálogo de produtos de beleza da sua revendedora BelaVenda. Faça seu pedido e receba por motoboy.">
+<title>reVENDE.aí – Catálogo</title>
+<meta name="description" content="Catálogo de produtos de beleza da sua revendedora reVENDE.aí. Faça seu pedido e receba por motoboy.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#c2185b">
 <meta name="mobile-web-app-capable" content="yes">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="BelaVenda">
-<meta property="og:title" content="Catálogo BelaVenda">
-<meta property="og:description" content="Veja os produtos de beleza desta revendedora e faça seu pedido pelo BelaVenda.">
+<meta property="og:site_name" content="reVENDE.aí">
+<meta property="og:title" content="Catálogo reVENDE.aí">
+<meta property="og:description" content="Veja os produtos de beleza desta revendedora e faça seu pedido pelo reVENDE.aí.">
 <meta property="og:image" content="https://gustavomartinsdeandradegtminas-eng.github.io/belavenda/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -288,7 +288,7 @@ input[id="card-num"]{letter-spacing:3px;font-family:'Courier New',monospace;font
 /* ═══ BOLETO ═══ */
 .boleto-box{background:#f8f9fa;border:1px solid var(--border);border-radius:12px;padding:22px}
 .boleto-logo{font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:4px}
-.boleto-logo span{color:var(--danger)}
+.boleto-logo span{color:#bf8a2a}
 .boleto-banco{font-size:.75rem;color:var(--muted);margin-bottom:16px}
 .boleto-barcode{height:72px;background:repeating-linear-gradient(90deg,#000 0px,#000 1px,transparent 1px,transparent 3px,#000 3px,#000 5px,transparent 5px,transparent 7px,#000 7px,#000 8px,transparent 8px,transparent 12px,#000 12px,#000 14px,transparent 14px,transparent 18px);border-radius:3px;margin:12px 0}
 .boleto-num{font-size:.72rem;font-family:monospace;text-align:center;color:var(--text);word-break:break-all;padding:4px}
@@ -504,7 +504,7 @@ function renderPage(){
   const marcas=[...new Set(produtos.map(p=>p.marca))].filter(Boolean)
   const ini=revendedora.nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()
   const cli=getClienteSession()
-  document.title=`${revendedora.nome} – BelaVenda`
+  document.title=`${revendedora.nome} – reVENDE.aí`
 
   document.getElementById('app').innerHTML=`
     ${!aberta?`<div class="loja-fechada-banner">
@@ -523,7 +523,7 @@ function renderPage(){
           </p>
           ${revendedora.bio?`<p class="store-bio">${revendedora.bio}</p>`:''}
           <div class="store-brands">
-            <span class="store-brand bv-logo">BelaVenda</span>
+            <span class="store-brand bv-logo">reVENDE.aí</span>
             ${marcas.map(m=>`<span class="store-brand">${m}</span>`).join('')}
           </div>
           ${avs.length?`
@@ -689,13 +689,16 @@ function flyToCart(srcBtn){
     if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return
     const card=srcBtn&&srcBtn.closest?srcBtn.closest('.prod-card'):null
     const img=card?card.querySelector('.prod-img img'):null
-    let alvo=document.getElementById('cart-dock')
-    if(!alvo||!alvo.offsetParent)alvo=document.querySelector('.cart-btn')
-    if(!img||!alvo)return
-    const a=img.getBoundingClientRect(), b=alvo.getBoundingClientRect()
-    if(!a.width||!b.width)return
+    if(!img)return
+    // alvo: dock (mobile, fixed — offsetParent é null em fixed, escolha por rect)
+    let alvo=document.getElementById('cart-dock'), b=alvo?alvo.getBoundingClientRect():null
+    if(!b||!b.width){alvo=document.querySelector('.cart-btn');b=alvo?alvo.getBoundingClientRect():null}
+    if(!alvo||!b||!b.width)return
+    const a=img.getBoundingClientRect()
+    if(!a.width)return
     const S=Math.min(84,a.width)
     const ghost=document.createElement('img')
+    ghost.setAttribute('aria-hidden','true')
     ghost.src=img.currentSrc||img.src
     ghost.style.cssText='position:fixed;left:'+(a.left+a.width/2-S/2)+'px;top:'+(a.top+a.height/2-S/2)+'px;width:'+S+'px;height:'+S+'px;object-fit:cover;border-radius:14px;z-index:9998;pointer-events:none;box-shadow:0 10px 30px rgba(136,14,79,.45)'
     document.body.appendChild(ghost)
@@ -1105,7 +1108,7 @@ function processarPagamento(){
 
 function showPixScreen(){
   const total=chTotal()
-  const pixKey=`belavenda+${revendedora.id.slice(0,8).toUpperCase()}@belavenda.app`
+  const pixKey=`revende+${revendedora.id.slice(0,8).toUpperCase()}@revende.app`
   pixSec=900
   document.getElementById('modal-hd-title').textContent='Pagamento PIX'
   document.getElementById('modal-body').innerHTML=`
@@ -1124,6 +1127,7 @@ function showPixScreen(){
   document.getElementById('modal-foot').innerHTML=`
     <button class="btn btn-secondary" onclick="chStep=2;renderStep()">← Mudar método</button>
     <button class="btn btn-success btn-full" onclick="confirmarPix()" style="flex:1">${icon('check-circle')} Já Paguei</button>`
+  if(window.bvAnimate)bvAnimate(document.getElementById('modal-body'))
   // timer
   clearInterval(pixTimerInt)
   pixTimerInt=setInterval(()=>{
@@ -1179,7 +1183,7 @@ function showBoletoScreen(){
   document.getElementById('modal-body').innerHTML=`
     ${stepBar(2)}
     <div class="boleto-box">
-      <div class="boleto-logo">Bela<span>Venda</span> Payments</div>
+      <div class="boleto-logo">reVENDE<span>.aí</span> Payments</div>
       <div class="boleto-banco">Banco Bradesco — Boleto de cobrança</div>
       <div style="display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted)">
         <span><strong>Beneficiário:</strong> ${revendedora.nome}</span>
@@ -1199,6 +1203,7 @@ function showBoletoScreen(){
   document.getElementById('modal-foot').innerHTML=`
     <button class="btn btn-secondary" onclick="chStep=2;renderStep()">← Mudar</button>
     <button class="btn btn-primary" style="flex:1;background:#bf360c" onclick="confirmarBoleto()">${icon('document')} Confirmar Pedido</button>`
+  if(window.bvAnimate)bvAnimate(document.getElementById('modal-body'))
 }
 
 function confirmarBoleto(){
@@ -1263,7 +1268,7 @@ function showSuccess(pedido,pagamento){
   }
   const corMsg=pagamento.status==='PAGO'?'#43a047':pagamento.status==='AGUARDANDO_PIX'?'#e65100':'#1976d2'
   const items=pedido.itens
-  const msg=`Oi ${revendedora.nome.split(' ')[0]}! Fiz meu pedido na BelaVenda:\n`+
+  const msg=`Oi ${revendedora.nome.split(' ')[0]}! Fiz meu pedido na reVENDE.aí:\n`+
     items.map(it=>`• ${it.quantidade}x ${it.nome}`).join('\n')+
     `\n\nSubtotal: ${fmtM(pedido.valorSubtotal)}`+
     (pedido.entrega?`\nFrete: ${pedido.entrega.name} — ${pedido.entrega.price===0?'Grátis':fmtM(pedido.entrega.price)}`:'') +

@@ -1,5 +1,5 @@
 /**
- * BelaVenda — Tema claro/escuro (bv-theme.js)
+ * reVENDE.aí — Tema claro/escuro (bv-theme.js)
  * ─────────────────────────────────────────────────────────
  * • Aplica o tema salvo imediatamente (sem flash) em <html data-theme>.
  * • Injeta os overrides de modo escuro — vencem por ESPECIFICIDADE
@@ -14,7 +14,15 @@
   var KEY = 'bv_theme';
   function saved() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function cur() { return d.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; }
-  function apply(t) { d.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light'); }
+  function apply(t) {
+    d.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+    // tinge o chrome do navegador junto com o tema (imersão no mobile)
+    try {
+      var m = d.querySelector('meta[name="theme-color"]');
+      if (!m) { m = d.createElement('meta'); m.name = 'theme-color'; (d.head || d.documentElement).appendChild(m); }
+      m.content = t === 'dark' ? '#140811' : '#c2185b';
+    } catch (e) {}
+  }
 
   // 1) Aplica ASAP (antes do body pintar) — evita flash
   apply(saved() || 'light');
@@ -196,6 +204,8 @@
     };
     var calm = false;
     try { calm = w.matchMedia('(prefers-reduced-motion:reduce)').matches; } catch (e) {}
+    // toggle no meio de uma transição: troca direta (sem empilhar transições)
+    if (d.documentElement.classList.contains('bv-theming')) { done(); return; }
     // Revelação circular: o novo tema "nasce" do botão e toma a tela (View Transition)
     if (!calm && d.startViewTransition) {
       var b = d.getElementById('bv-theme-btn');
@@ -212,7 +222,8 @@
             { duration: 520, easing: 'cubic-bezier(.2,.7,.3,1)', pseudoElement: '::view-transition-new(root)' }
           );
         }).catch(function () {});
-        vt.finished.finally(function () { d.documentElement.classList.remove('bv-theming'); });
+        var limpar = function () { d.documentElement.classList.remove('bv-theming'); };
+        vt.finished.then(limpar, limpar);
       } catch (e) {
         d.documentElement.classList.remove('bv-theming');
         done();

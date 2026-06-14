@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BelaVenda – Área do Cliente</title>
-<meta name="description" content="Descubra revendedoras de cosméticos perto de você, acompanhe seus pedidos e favorite suas lojas no BelaVenda.">
+<title>reVENDE.aí – Área do Cliente</title>
+<meta name="description" content="Descubra revendedoras de cosméticos perto de você, acompanhe seus pedidos e favorite suas lojas no reVENDE.aí.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#c2185b">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="BelaVenda">
+<meta name="apple-mobile-web-app-title" content="reVENDE.aí">
 <script src="bv-theme.js"></script>
 <script src="bv-toast.js"></script>
 <style>
@@ -21,7 +21,7 @@
 
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  /* ── Paleta única BelaVenda ─────────────────────────
+  /* ── Paleta única reVENDE.aí ─────────────────────────
      Mesmos tokens do index.html e login.html          */
   --rose:#c2185b;--rose-d:#880e4f;--rose-dd:#620839;
   --rose-l:#fce4ec;--rose-xl:#fff0f8;--rose-mid:#e91e8c;
@@ -111,7 +111,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-140px;width:500px;heig
   font-size:2rem;font-weight:900;letter-spacing:-1.5px;
   color:#fff;margin-bottom:5px;text-shadow:0 2px 10px rgba(0,0,0,.2);
 }
-.auth-logo span{opacity:.6;font-weight:400}
+.auth-logo span{color:#f4d9b0;opacity:1;font-weight:600}
 .auth-subtitle{font-size:.85rem;color:rgba(255,255,255,.88);font-weight:500;letter-spacing:.3px}
 
 /* Steps — sobre fundo branco agora */
@@ -200,7 +200,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-140px;width:500px;heig
 .topbar-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .tb-mark{width:36px;height:36px;border-radius:11px;background:#fff;color:var(--rose-d);display:grid;place-items:center;font-family:'Playfair Display',Georgia,serif;font-weight:800;font-size:1.35rem;line-height:1;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.22),inset 0 0 0 1px rgba(194,24,91,.1)}
 .tb-word{font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;font-weight:800;letter-spacing:-.3px;color:#fff;line-height:1}
-.tb-word i{font-style:italic;font-weight:600;opacity:.85}
+.tb-word i{font-style:italic;font-weight:600;opacity:1;color:#f4d9b0}
 .tb-sub{font-family:'Inter',sans-serif;font-size:.74rem;font-weight:500;opacity:.62;color:#fff;border-left:1px solid rgba(255,255,255,.4);padding-left:10px;margin-left:4px}
 @media(max-width:560px){.tb-sub{display:none}.tb-word{font-size:1.15rem}}
 .topbar-right{display:flex;align-items:center;gap:10px;font-size:.85rem}
@@ -230,7 +230,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-140px;width:500px;heig
 .pele-chips{display:flex;flex-wrap:wrap;gap:7px}
 .pele-chip{background:var(--bg);border:1.5px solid var(--border2);border-radius:20px;padding:7px 14px;font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s}
 .pele-chip.sel{border-color:transparent;background:var(--grad-primary);color:#fff}
-/* Programa Bela + Conquistas no perfil */
+/* Programa reVENDE.aí + Conquistas no perfil */
 .pf-fid{display:flex;align-items:center;gap:12px;background:var(--grad-card);border:1px solid var(--border);border-radius:13px;padding:12px 14px}
 .pf-fid-ic{width:40px;height:40px;border-radius:11px;background:var(--grad-primary);color:#fff;display:grid;place-items:center;font-size:1.05rem;flex-shrink:0}
 .pf-track{height:8px;background:var(--rose-l);border-radius:10px;overflow:hidden;margin-top:6px}
@@ -976,8 +976,8 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
   <div class="auth-card">
     <div class="auth-card-header">
       <a class="auth-home" href="index.html">← Página inicial</a>
-      <div class="auth-mark">B</div>
-      <div class="auth-logo">Bela<span>Venda</span></div>
+      <div class="auth-mark">r</div>
+      <div class="auth-logo">reVENDE<span>.aí</span></div>
       <div class="auth-subtitle">Área do Cliente</div>
     </div>
     <div class="steps" id="steps-indicator">
@@ -1031,8 +1031,8 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 <div class="painel" id="painel-screen">
   <div class="topbar">
     <div class="topbar-logo">
-      <span class="tb-mark">B</span>
-      <span class="tb-word">Bela<i>Venda</i></span>
+      <span class="tb-mark">r</span>
+      <span class="tb-word">reVENDE<i>.aí</i></span>
       <span class="tb-sub">Área do Cliente</span>
     </div>
     <div class="topbar-right">
@@ -1175,7 +1175,7 @@ input[type=range]{width:100%;accent-color:var(--rose);height:6px;cursor:pointer;
 <div class="modal-overlay" id="quiz-modal" onclick="fecharQuiz(event)">
   <div class="modal" id="quiz-modal-box" style="max-width:460px">
     <div class="quiz-head">
-      <div class="quiz-mark">B</div>
+      <div class="quiz-mark">r</div>
       <h3>Quiz de Beleza</h3>
       <p id="quiz-sub"> 5 perguntas rápidas para o Match te conhecer de verdade ✨</p>
       <div class="quiz-prog" id="quiz-prog"></div>
@@ -1258,11 +1258,11 @@ async function buscarCep(cep,resId,iconId,btnId,onSuccess,btnLabel){
 
 async function geocode(cep,cidade,uf){
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${cep}&country=BR&format=json&limit=1`,{headers:{'Accept-Language':'pt-BR','User-Agent':'BelaVenda/1.0'}})
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${cep}&country=BR&format=json&limit=1`,{headers:{'Accept-Language':'pt-BR','User-Agent':'reVENDE.aí/1.0'}})
     const d=await r.json()
     if(d.length)return{lat:parseFloat(d[0].lat),lng:parseFloat(d[0].lon)}
   }catch(e){}
-  const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cidade+', '+uf+', Brasil')}&format=json&limit=1`,{headers:{'Accept-Language':'pt-BR','User-Agent':'BelaVenda/1.0'}})
+  const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cidade+', '+uf+', Brasil')}&format=json&limit=1`,{headers:{'Accept-Language':'pt-BR','User-Agent':'reVENDE.aí/1.0'}})
   const d=await r.json()
   if(!d.length)throw new Error('Localização não encontrada.')
   return{lat:parseFloat(d[0].lat),lng:parseFloat(d[0].lon)}
@@ -1428,7 +1428,7 @@ function fidelidadeCardHTML(){
     <div class="fid-head">
       <span class="fid-ic">${icon(f.cur.ic)}</span>
       <div style="flex:1"><div class="fid-level">Nível ${f.cur.n}</div><div class="fid-pts">${f.pts} pontos acumulados</div></div>
-      <span class="fid-tag">${icon('sparkles')} Programa Bela</span>
+      <span class="fid-tag">${icon('sparkles')} Programa reVENDE.aí</span>
     </div>
     <div class="fid-track"><div class="fid-fill" style="width:${f.pct}%"></div><i class="fid-gem" style="left:${f.pct}%"></i></div>
     <div class="fid-foot">${f.nxt?`Faltam <b>${f.falta} pts</b> para o nível <b>${f.nxt.n}</b>`:`${icon('trophy')} Você alcançou o nível máximo. Parabéns!`}</div>
@@ -1474,7 +1474,7 @@ function renderPerfilBody(){
       <div class="perfil-stat"><div class="ps-v">${st.favoritas}</div><div class="ps-k">Favoritas</div></div>
     </div>
     <div class="perfil-sec">
-      <h4>${icon('sparkles')} Programa Bela</h4>
+      <h4>${icon('sparkles')} Programa reVENDE.aí</h4>
       <div class="pf-fid"><span class="pf-fid-ic">${icon(f.cur.ic)}</span><div style="flex:1;min-width:0"><div style="font-size:.85rem"><b>Nível ${f.cur.n}</b> · ${f.pts} pts</div><div class="pf-track"><div class="pf-fill" style="width:${f.pct}%"></div></div><div style="font-size:.72rem;color:var(--muted);margin-top:4px">${f.nxt?'Faltam '+f.falta+' pts para '+f.nxt.n:'Nível máximo atingido!'}</div></div></div>
     </div>
     <div class="perfil-sec">
@@ -2384,7 +2384,7 @@ function renderInicio(){
     </div>
     ${fidelidadeCardHTML()}
     ${!getPrefs().quizFeito?`<div class="quiz-cta" onclick="abrirQuiz()">
-      <div class="quiz-cta-mark">B</div>
+      <div class="quiz-cta-mark">r</div>
       <div style="flex:1;min-width:0">
         <div class="quiz-cta-t">Quiz de Beleza · 1 minuto</div>
         <div class="quiz-cta-s">Responda 5 perguntas e o Match passa a entender o seu estilo.</div>

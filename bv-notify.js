@@ -1,5 +1,5 @@
 /**
- * BelaVenda — Central de notificações (bv-notify.js)
+ * reVENDE.aí — Central de notificações (bv-notify.js)
  * ─────────────────────────────────────────────────────────
  * App estático: as notificações são DERIVADAS do estado (localStorage).
  * Cada evento tem um id estável; "não lida" = id ainda não visto.

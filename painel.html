@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BelaVenda – Painel</title>
-<meta name="description" content="Painel da revendedora BelaVenda: pedidos, clientes, produtos, entregas e relatórios.">
+<title>reVENDE.aí – Painel</title>
+<meta name="description" content="Painel da revendedora reVENDE.aí: pedidos, clientes, produtos, entregas e relatórios.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#c2185b">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="BelaVenda">
+<meta name="apple-mobile-web-app-title" content="reVENDE.aí">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="bv-theme.js"></script>
@@ -38,7 +38,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:12px}
 .sidebar-logo-mark{width:44px;height:44px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 18px rgba(194,24,91,.5),inset 0 1px 0 rgba(255,255,255,.25);font-family:'Playfair Display',Georgia,serif;font-weight:800;color:#fff;font-size:1.3rem;line-height:1}
 .sidebar-logo-text h1{color:#fff;font-size:1.35rem;font-weight:800;font-family:'Playfair Display',Georgia,serif;line-height:1.05;letter-spacing:.2px}
-.sidebar-logo-text h1 span{background:linear-gradient(120deg,#f48fb1,#e91e8c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sidebar-logo-text h1 span{color:#f4d9b0}
 .sidebar-logo-text p{color:rgba(255,255,255,.42);font-size:.7rem;margin-top:3px;letter-spacing:.3px}
 .sidebar-nav{flex:1;padding:12px;overflow-y:auto}
 .nav-section{padding:14px 12px 6px;font-size:.66rem;font-weight:700;color:rgba(255,255,255,.34);text-transform:uppercase;letter-spacing:1.3px}
@@ -281,9 +281,9 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="sidebar-logo-mark">B</div>
+    <div class="sidebar-logo-mark">r</div>
     <div class="sidebar-logo-text">
-      <h1>Bela<span>Venda</span></h1>
+      <h1>reVENDE<span>.aí</span></h1>
       <p>Painel da Revendedora</p>
     </div>
   </div>
@@ -1009,7 +1009,7 @@ function renderDetalhePedido(id){
         <div class="card">
           <div class="card-header"><span class="card-title">WhatsApp</span></div>
           <div class="card-body">
-            <a class="wa-btn" style="width:100%;justify-content:center" href="https://wa.me/${(p.clienteTelefone||'').replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+p.clienteNome+'! Atualização do seu pedido BelaVenda: '+p.status)}" target="_blank">Contatar Cliente</a>
+            <a class="wa-btn" style="width:100%;justify-content:center" href="https://wa.me/${(p.clienteTelefone||'').replace(/\D/g,'')}?text=${encodeURIComponent('Olá '+p.clienteNome+'! Atualização do seu pedido reVENDE.aí: '+p.status)}" target="_blank">Contatar Cliente</a>
           </div>
         </div>
         <div class="card">
@@ -1058,11 +1058,11 @@ async function gerarRecibo(id){
   // faixa de cabeçalho na marca
   ctx.save();if(ctx.roundRect){ctx.beginPath();ctx.roundRect(36,36,W-72,150,[22,22,0,0]);ctx.clip()}else{ctx.beginPath();ctx.rect(36,36,W-72,150);ctx.clip()}
   ctx.fillStyle=gradMarca(ctx,W,200);ctx.fillRect(36,36,W-72,150)
-  ctx.globalAlpha=.12;ctx.font='italic 900 210px "Playfair Display", Georgia, serif';ctx.fillStyle='#fff';ctx.fillText('B',W-220,230)
+  ctx.globalAlpha=.12;ctx.font='italic 900 210px "Playfair Display", Georgia, serif';ctx.fillStyle='#fff';ctx.fillText('r',W-220,230)
   ctx.restore()
   ctx.textAlign='center'
   ctx.fillStyle='#fff';ctx.font='900 44px "Playfair Display", Georgia, serif'
-  ctx.fillText(rev.nome||'BelaVenda',W/2,118)
+  ctx.fillText(rev.nome||'reVENDE.aí',W/2,118)
   ctx.fillStyle='rgba(255,255,255,.85)';ctx.font='600 20px Inter, sans-serif'
   ctx.fillText('Recibo de pedido',W/2,152)
   // meta do pedido
@@ -1110,7 +1110,7 @@ async function gerarRecibo(id){
   ctx.fillStyle='#c2185b';ctx.font='italic 700 24px "Playfair Display", Georgia, serif'
   ctx.fillText('Obrigada pela preferência! ♥',W/2,H-104)
   ctx.fillStyle='#b48ba0';ctx.font='600 16px Inter, sans-serif'
-  ctx.fillText('Emitido pela BelaVenda · belavenda',W/2,H-72)
+  ctx.fillText('Emitido pela reVENDE.aí',W/2,H-72)
   baixarCanvas(cv,'recibo-'+p.id.slice(0,8).toUpperCase()+'.png')
   bvToast('Recibo baixado!','success')
 }
@@ -1605,7 +1605,7 @@ async function divulgarProduto(id){
     ctx.fillStyle=rg;ctx.fillRect(0,0,S,S)
     // monograma B gigante em outline (marca-d'água)
     ctx.save();ctx.globalAlpha=.10;ctx.font='italic 900 760px "Playfair Display", Georgia, serif'
-    ctx.fillStyle='#fff';ctx.fillText('B',S-430,S-60);ctx.restore()
+    ctx.fillStyle='#fff';ctx.fillText('r',S-430,S-60);ctx.restore()
     // foto do produto em medalhão circular
     if(comFoto&&img){
       const R=235,cx=S/2,cy=330
@@ -1636,7 +1636,7 @@ async function divulgarProduto(id){
     ctx.fillText(fmtMoeda(p.precoVenda),S/2,baseY+(l2?312:215))
     // rodapé: loja + chamada
     ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='800 36px Inter, sans-serif'
-    ctx.fillText(rev.nome||'BelaVenda',S/2,S-88)
+    ctx.fillText(rev.nome||'reVENDE.aí',S/2,S-88)
     ctx.fillStyle='rgba(255,255,255,.65)';ctx.font='600 27px Inter, sans-serif'
     ctx.fillText('Peça pelo WhatsApp · entrega no mesmo dia',S/2,S-42)
   }
@@ -1819,7 +1819,7 @@ function renderCalculadora(){
               <input type="number" id="c-frete" step="0.01" placeholder="0,00" value="0" oninput="calcMargem()">
             </div>
             <div class="form-group">
-              <label>Taxa BelaVenda (%)</label>
+              <label>Taxa reVENDE.aí (%)</label>
               <input type="number" id="c-taxa" step="0.1" placeholder="0" value="5" oninput="calcMargem()">
             </div>
           </div>
@@ -1827,7 +1827,7 @@ function renderCalculadora(){
             <div class="calc-row"><span>Preço de Venda</span><span id="r-venda">—</span></div>
             <div class="calc-row"><span>(-) Custo do Produto</span><span id="r-custo">—</span></div>
             <div class="calc-row"><span>(-) Frete</span><span id="r-frete">—</span></div>
-            <div class="calc-row"><span>(-) Taxa BelaVenda</span><span id="r-taxa">—</span></div>
+            <div class="calc-row"><span>(-) Taxa reVENDE.aí</span><span id="r-taxa">—</span></div>
             <div class="calc-row total"><span>= Lucro Líquido</span><span id="r-lucro">—</span></div>
             <div class="calc-row total"><span>Margem de Lucro</span><span id="r-margem">—</span></div>
           </div>

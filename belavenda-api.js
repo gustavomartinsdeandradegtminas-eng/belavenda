@@ -510,7 +510,7 @@
         try {
           const r = await fetch(
             `https://nominatim.openstreetmap.org/search?postalcode=${cep}&country=BR&format=json&limit=1`,
-            { headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'BelaVenda/1.0' } }
+            { headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'reVENDE.aí/1.0' } }
           )
           const d = await r.json()
           if (d.length) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon), cidade, estado: uf, cep }
@@ -518,7 +518,7 @@
         // Fallback: busca por cidade/estado
         const r2 = await fetch(
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(`${cidade}, ${uf}, Brasil`)}&format=json&limit=1`,
-          { headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'BelaVenda/1.0' } }
+          { headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'reVENDE.aí/1.0' } }
         )
         const d2 = await r2.json()
         if (!d2.length) throw new Error('Localização não encontrada para este CEP.')
@@ -614,7 +614,7 @@
       // FAKE (desenvolvimento/demo) ─────────────────────────
       if (BV_CONFIG.paymentProvider === 'fake') {
         const txId = 'PIX' + _uid().replace(/-/g, '').slice(0, 12).toUpperCase()
-        const copyPaste = `00020126580014br.gov.bcb.pix0136${_uid()}5204000053039865406${(amount * 100).toFixed(0).padStart(10, '0')}5802BR5913BelaVenda6009CURITIBA6304${txId.slice(-4)}`
+        const copyPaste = `00020126580014br.gov.bcb.pix0136${_uid()}5204000053039865406${(amount * 100).toFixed(0).padStart(10, '0')}5802BR5913reVENDE.aí6009CURITIBA6304${txId.slice(-4)}`
         return {
           txId, copyPaste,
           qrCodeSVG: _fakeQRSVG(),
@@ -631,7 +631,7 @@
       //   //             const payment = new Payment(mp)
       //   //             const res = await payment.create({ body: {
       //   //               transaction_amount: amount,
-      //   //               description: `Pedido BelaVenda #${orderId}`,
+      //   //               description: `Pedido reVENDE.aí #${orderId}`,
       //   //               payment_method_id: 'pix',
       //   //               payer: { email: payerEmail, first_name: payerName }
       //   //             }})
@@ -731,7 +731,7 @@
       //   // Backend: POST /payments/boleto
       //   //   payment.create({ body: {
       //   //     transaction_amount: amount,
-      //   //     description: `Pedido BelaVenda #${orderId}`,
+      //   //     description: `Pedido reVENDE.aí #${orderId}`,
       //   //     payment_method_id: 'bolbradesco', // ou 'pec'
       //   //     payer: {
       //   //       email: payerEmail, first_name: payerName,
@@ -837,7 +837,7 @@
   // ══════════════════════════════════════════════════════════
   //  MÓDULO: ENTREGA LOCAL (delivery)
   //
-  //  Contexto: BelaVenda faz entregas CURTAS e URBANAS —
+  //  Contexto: reVENDE.aí faz entregas CURTAS e URBANAS —
   //  geralmente dentro da mesma cidade, por motoboy.
   //  O cálculo é baseado em DISTÂNCIA EM KM, não em região.
   //
@@ -901,7 +901,7 @@
         const q = encodeURIComponent(`${c}, ${dv.localidade}, ${dv.uf}, Brasil`)
         const rn = await fetch(
           `https://nominatim.openstreetmap.org/search?q=${q}&format=json&limit=1`,
-          { headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'BelaVenda/1.0' } }
+          { headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'reVENDE.aí/1.0' } }
         )
         const dn = await rn.json()
         if (!dn.length) return null

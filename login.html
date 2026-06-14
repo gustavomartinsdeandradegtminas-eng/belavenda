@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BelaVenda – Revendedora</title>
-<meta name="description" content="Entre no seu painel de revendedora BelaVenda ou crie sua conta gratuita.">
+<title>reVENDE.aí – Revendedora</title>
+<meta name="description" content="Entre no seu painel de revendedora reVENDE.aí ou crie sua conta gratuita.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#c2185b">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="BelaVenda">
+<meta name="apple-mobile-web-app-title" content="reVENDE.aí">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="bv-theme.js"></script>
@@ -41,7 +41,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 .brand-logo,.form-side h2{font-family:'Playfair Display',Georgia,serif}
 .brand-mark{width:66px;height:66px;border-radius:19px;background:#fff;color:var(--primary-d);display:grid;place-items:center;font-family:'Playfair Display',Georgia,serif;font-weight:800;font-size:2.5rem;line-height:1;margin-bottom:18px;box-shadow:0 10px 28px rgba(0,0,0,.24),inset 0 0 0 1px rgba(194,24,91,.08);position:relative;z-index:1}
 .brand-logo{font-size:2.6rem;font-weight:900;letter-spacing:-1.5px;margin-bottom:10px;position:relative;z-index:1}
-.brand-logo em{opacity:.55;font-style:normal;font-weight:400}
+.brand-logo em{opacity:.55;font-style:normal;font-weight:400}.brand-logo span{color:#f4d9b0}
 .brand-tagline{font-size:.95rem;opacity:.88;text-align:center;max-width:280px;line-height:1.7;position:relative;z-index:1;font-weight:400}
 .brand-feats{margin-top:40px;display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px;position:relative;z-index:1}
 .brand-feat{
@@ -134,8 +134,8 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 </head>
 <body>
 <div class="brand-side">
-  <div class="brand-mark">B</div>
-  <div class="brand-logo">Bela<span>Venda</span></div>
+  <div class="brand-mark">r</div>
+  <div class="brand-logo">reVENDE<span>.aí</span></div>
   <div class="brand-tagline">Gerencie seu negócio e seja encontrada por clientes próximos a você</div>
   <div class="brand-feats">
     <div class="brand-feat"><span class="brand-feat-icon"><svg class="ic"><use href="#ic-map-pin"/></svg></span><span class="brand-feat-text">Apareça no mapa da sua cidade</span></div>
@@ -147,7 +147,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg)
 
 <div class="form-side">
   <a class="back" href="index.html">← Página inicial</a>
-  <h2 id="form-title">Entrar na BelaVenda</h2>
+  <h2 id="form-title">Entrar na reVENDE.aí</h2>
   <p id="form-sub">Área exclusiva para revendedoras</p>
   <div class="tabs">
     <button class="tab active" onclick="switchTab('login')">Entrar</button>
@@ -254,7 +254,7 @@ function switchTab(t) {
   document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', i === (t === 'login' ? 0 : 1)))
   document.getElementById('login-form').style.display = t === 'login' ? '' : 'none'
   document.getElementById('register-form').style.display = t === 'register' ? '' : 'none'
-  document.getElementById('form-title').textContent = t === 'login' ? 'Entrar na BelaVenda' : 'Criar sua conta'
+  document.getElementById('form-title').textContent = t === 'login' ? 'Entrar na reVENDE.aí' : 'Criar sua conta'
   document.getElementById('form-sub').textContent = t === 'login' ? 'Área exclusiva para revendedoras' : 'Comece a gerenciar seu negócio'
 }
 

@@ -1,5 +1,5 @@
 /**
- * BelaVenda — Ilustrações de produto (bv-art.js)
+ * reVENDE.aí — Ilustrações de produto (bv-art.js)
  * ─────────────────────────────────────────────────────────
  * Ilustrações coloridas (SVG, sem dependência externa) que representam
  * cada tipo de produto, para um catálogo mais bonito.
